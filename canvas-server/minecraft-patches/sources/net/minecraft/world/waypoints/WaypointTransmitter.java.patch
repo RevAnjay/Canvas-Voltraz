@@ -1,5 +1,5 @@
 diff --git a/net/minecraft/world/waypoints/WaypointTransmitter.java b/net/minecraft/world/waypoints/WaypointTransmitter.java
-index 00c3ade..e1d3917 100644
+index 00c3ade..808e9da 100644
 --- a/net/minecraft/world/waypoints/WaypointTransmitter.java
 +++ b/net/minecraft/world/waypoints/WaypointTransmitter.java
 @@ -51,7 +51,7 @@ public interface WaypointTransmitter extends Waypoint {
@@ -7,7 +7,7 @@ index 00c3ade..e1d3917 100644
          if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(player)) return false; // Canvas - region threading - if isn't current tick thread, not visible
          final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData playerChunkLoader = ((ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer)player).moonrise$getChunkLoader();
 -        return playerChunkLoader != null && playerChunkLoader.getSentChunksRaw().contains(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(pos));
-+        return playerChunkLoader != null && playerChunkLoader.getSentChunksRaw().contains(ca.spottedleaf.moonrise.common.util.pos.longKey);
++        return playerChunkLoader != null && playerChunkLoader.getSentChunksRaw().contains(pos.longKey); // Leaf - Cache chunk key
          // Paper end - rewrite chunk system
      }
  
