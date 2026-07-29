@@ -99,26 +99,26 @@ public class WorldConfig extends Part {
                 }
             },
             Style.create()
-                .literal("CanvasMC 世界默认配置文件").endLine()
+                .literal("CanvasMC World Default Configuration").endLine()
                 .blank()
                 .wordWrap(
-                    "这是 CanvasMC 按世界配置文件的默认值。",
-                    "每个选项都可以在各维度文件夹中的 patch 变体中被覆盖。你可以",
-                    "自由修改、添加或删除注释。"
+                    "These are the default values for the CanvasMC per-world configuration file.",
+                    "Each option can be overridden in a patch variant in the respective dimension folder. You are",
+                    "free to modify, add, or remove comments."
                 ).endLine()
                 .blank()
                 .wordWrap(
-                    "你可以使用 \"/canvas reload\" 命令在运行时刷新此配置，但不建议在正式运行",
-                    "期间执行此操作，因为这可能导致意外崩溃或非预期行为。"
+                    "You can use the \"/canvas reload\" command to refresh this configuration at runtime, but it is not recommended during normal operation",
+                    "as it may cause unexpected crashes or unintended behavior."
                 ).endLine()
                 .blank()
                 .wordWrap(
-                    "此配置中所有选项的默认值都是为了上游兼容性而非性能优化而设定的。",
-                    "你需要进行一些手动配置才能获得 Canvas 提供的部分性能提升。"
+                    "The default values of all options in this configuration are set for upstream compatibility rather than performance optimization.",
+                    "You need to do some manual configuration to get some of the performance improvements provided by Canvas."
                 ).endLine()
                 .blank()
                 .wordWrap(
-                    "如果你对某些配置选项有疑问，请在我们的 Discord 中联系"
+                    "If you have questions about any configuration options, please contact us in our Discord"
                 ).endLine()
                 .literal("https://canvasmc.io/discord")
                 .compile(60)
@@ -159,16 +159,16 @@ public class WorldConfig extends Part {
                 WORLD_CONFIGS.put(dimension, instance);
             },
             Style.create()
-                .literal("世界 " + dimension.identifier() + " 的配置补丁文件").endLine()
+                .literal("Configuration patch file for world " + dimension.identifier()).endLine()
                 .blank()
                 .wordWrap(
-                    "此配置文件可用于覆盖 \"/config/canvas-worlds.yml\" 中",
-                    "定义的默认配置值"
+                    "This configuration file can be used to override the default configuration values",
+                    "defined in \"/config/canvas-worlds.yml\""
                 ).endLine()
                 .blank()
                 .wordWrap(
-                    "要覆盖其中的值，只需复制相同的选项路径并覆盖其值。将此文件中的值",
-                    "视为专属于当前世界的默认值替换即可"
+                    "To override a value, simply copy the same option path and override its value. Treat the values in this file",
+                    "as default value replacements exclusive to this world"
                 )
                 .compile(60)
         );
@@ -201,24 +201,24 @@ public class WorldConfig extends Part {
     }
 
     {
-        option("regionBars").docs("区域资源条配置。你可以使用 \"/regionbar\" 命令为玩家切换这些资源条");
+        option("regionBars").docs("Region resource bar configuration. You can use the \"/regionbar\" command to toggle these bars for players");
     }
 
     public RegionBars regionBars = new RegionBars();
     public static class RegionBars extends Part {
 
         {
-            option("enableTpsBar").docs("启用 Canvas 的区域化 TPS 条实现。");
+            option("enableTpsBar").docs("Enable Canvas's regionized TPS bar implementation.");
             option("tpsBarFormat")
                 .docs(
-                    "TPS 条的 MiniMessage 格式行。占位符为 <tps>、<mspt>、<util> 和 <players>。",
-                    "旧版标记（%tps%、%mspt%、%util%、%players%）也可使用，会自动转换。"
+                    "The MiniMessage format line for the TPS bar. Placeholders are <tps>, <mspt>, <util>, and <players>.",
+                    "Legacy markers (%tps%, %mspt%, %util%, %players%) are also supported and auto-converted."
                 ).greedyString();
-            option("enableRamBar").docs("启用 Canvas 的区域化 RAM 条实现。");
+            option("enableRamBar").docs("Enable Canvas's regionized RAM bar implementation.");
             option("ramBarFormat")
                 .docs(
-                    "RAM 条的 MiniMessage 格式行。占位符为 <used>、<xmx>、<percent>。",
-                    "旧版标记（%used%、%xmx%、%percent%）也可使用，会自动转换。"
+                    "The MiniMessage format line for the RAM bar. Placeholders are <used>, <xmx>, <percent>.",
+                    "Legacy markers (%used%, %xmx%, %percent%) are also supported and auto-converted."
                 ).greedyString();
         }
 
@@ -235,8 +235,8 @@ public class WorldConfig extends Part {
         {
             option("particles")
                 .docs(
-                    "除非另有明确说明，所有选项均为发送给客户端的不必要数据包，",
-                    "可以安全禁用而不会偏离原版行为"
+                    "Unless otherwise explicitly stated, all options are unnecessary packets sent to the client,",
+                    "and can be safely disabled without deviating from vanilla behavior"
                 );
         }
 
@@ -247,8 +247,8 @@ public class WorldConfig extends Part {
         public static class Particles extends Part {
 
             {
-                option("disableFallParticles").docs("注意：启用此选项会破坏原版视觉兼容性");
-                option("disableNewCombatParticles").docs("注意：启用此选项会破坏原版视觉兼容性");
+                option("disableFallParticles").docs("Note: Enabling this option breaks vanilla visual compatibility");
+                option("disableNewCombatParticles").docs("Note: Enabling this option breaks vanilla visual compatibility");
             }
 
             public boolean disableSprintParticles = false;
@@ -261,16 +261,16 @@ public class WorldConfig extends Part {
         }
 
         {
-            option("dontTrackPlayersInEntityTracking").docs("启用后，玩家将无法在此世界中看到其他玩家");
+            option("dontTrackPlayersInEntityTracking").docs("When enabled, players will not be able to see other players in this world");
         }
 
         public boolean dontTrackPlayersInEntityTracking = false;
     }
 
     {
-        option("chainEndCrystalExplosions").docs("启用后，末地水晶爆炸将被串联执行，而非在同一 tick 内全部执行");
-        option("disableSnowLightChecks").docs("禁用雪层光照检查，使雪层永不融化");
-        option("disableGrassLightChecks").docs("禁用草方块光照检查，使草方块即使在黑暗中也会蔓延");
+        option("chainEndCrystalExplosions").docs("When enabled, end crystal explosions will be chained rather than all executing in the same tick");
+        option("disableSnowLightChecks").docs("Disable snow light checks, making snow never melt");
+        option("disableGrassLightChecks").docs("Disable grass block light checks, making grass spread even in darkness");
     }
 
     public boolean chainEndCrystalExplosions = false;
@@ -281,8 +281,8 @@ public class WorldConfig extends Part {
     public static class Farming extends Part {
 
         {
-            option("disableFarmlandTrampling").docs("使掉落不会将耕地踩回泥土");
-            option("cropsIgnoreLightCheck").docs("使作物种植时忽略阳光需求");
+            option("disableFarmlandTrampling").docs("Prevent falls from trampling farmland back into dirt");
+            option("cropsIgnoreLightCheck").docs("Make crops ignore light requirements when planted");
         }
 
         public boolean farmlandAlwaysMoist = false;
@@ -299,23 +299,23 @@ public class WorldConfig extends Part {
         {
             option("fastOrbs")
                 .docs(
-                    "移除经验球拾取延迟并使用更快的合并系统。对密集经验农场非常有用。",
-                    "此选项改变了经验球的合并方式，允许单个经验球包含无限量的合并经验",
-                    "并立即被收集，比原版快得多。此选项还修复了 \"幽灵经验球\" 问题，",
-                    "因为系统改为增加经验球的价值而非增加数量"
+                    "Remove experience orb pickup delay and use a faster merge system. Very useful for dense xp farms.",
+                    "This option changes how experience orbs merge, allowing a single orb to contain unlimited merged experience",
+                    "and be collected immediately, much faster than vanilla. This option also fixes the \"ghost orb\" issue,",
+                    "because the system increases orb value instead of increasing orb count"
                 );
 
             option("entityCollisionMode")
                 .docs(
-                    Style.wrap("服务器的实体碰撞模式")
+                    Style.wrap("Entity collision mode for the server")
                         .defineEnum(EntityCollisionMode.class, (mode) -> {
                             return switch (mode) {
-                                case VANILLA -> "默认，所有实体都有碰撞";
+                                case VANILLA -> "Default, all entities collide";
                                 case ONLY_PUSHABLE_PLAYERS_SMALL ->
-                                    "仅玩家可被实体推动，搜索范围较小";
+                                    "Only players can be pushed by entities, with a smaller search range";
                                 case ONLY_PUSHABLE_PLAYERS_LARGE ->
-                                    "仅玩家可被实体推动，搜索范围为正常半径";
-                                case NO_COLLISIONS -> "完全禁用实体碰撞";
+                                    "Only players can be pushed by entities, with a normal search radius";
+                                case NO_COLLISIONS -> "Completely disable entity collisions";
                             };
                         })
                 );
@@ -329,14 +329,14 @@ public class WorldConfig extends Part {
             {
                 option("itemEntityVelocityOnDeathFactor")
                     .docs(
-                        "物品实体死亡掉落时速度的倍增系数。值越小，扩散范围越小；",
-                        "值越大，扩散范围越大"
+                        "Velocity multiplier for item entities dropped on death. Smaller values reduce spread range;",
+                        "larger values increase spread range"
                     ).greaterThanOrEqualTo(0.0F);
                 option("itemEntitiesWaitTwoSecondsForMergeCheckAlways")
                     .docs(
-                        "物品实体在 tick 期间的合并检查间隔通常为 2 秒（除非物品正在移动，",
-                        "此时间隔为 2 tick）。此选项强制将间隔始终设为 2 tick，",
-                        "减少物品实体检查合并的次数"
+                        "Item entity merge check interval during tick is usually 2 seconds (unless the item is moving,",
+                        "in which case it is 2 ticks). This option forces the interval to always be 2 ticks,",
+                        "reducing how often item entities check for merging"
                     );
             }
 
@@ -392,17 +392,17 @@ public class WorldConfig extends Part {
         public static class Projectiles extends Part {
 
             {
-                option("loadChunks").docs("指定哪些投射物在移动时应加载区块。仅在玩家投掷时有效");
+                option("loadChunks").docs("Specify which projectiles should load chunks while moving. Only effective when thrown by players");
                 option("crossRegionRedirectableProjectileDeflection")
                     .docs(
                         Style.wrap(
-                            "恢复原版中箭矢命中可重定向投射物（如风弹和火球）时的重定向行为，",
-                            "支持跨区域线程生效。"
+                            "Restores vanilla behavior where arrows hitting redirectable projectiles (such as wind charges and fireballs) redirect them,",
+                            "supporting cross-region threading."
                         )
                         .blank()
                         .wordWrap(
-                            "建议在 paper-world-defaults.yml 中设置 \"max-arrow-despawn-invulnerability: disabled\"",
-                            "以防止箭矢消失"
+                            "Recommended to set \"max-arrow-despawn-invulnerability: disabled\" in paper-world-defaults.yml",
+                            "to prevent arrows from despawning"
                         )
                     );
             }
@@ -420,12 +420,12 @@ public class WorldConfig extends Part {
         }
 
         {
-            option("skeletonAimAccuracy").docs("定义骷髅弓箭射击的不精准度。14 为原版值，值越高越不精准，值越低越精准");
+            option("skeletonAimAccuracy").docs("Defines skeleton archery inaccuracy. 14 is the vanilla value; higher values are less accurate, lower values are more accurate");
             option("villagers")
                 .docs(
-                    "村民相关选项。减少 POI 搜索范围的选项将搜索半径（以方块为单位）",
-                    "从 48 缩小到 16，可以在几乎不偏离原版行为的情况下改善 tick 耗时，",
-                    "但这会阻止村民获取 17-48 方块范围外的 POI"
+                    "Villager related options. Options that reduce POI search range shrink the search radius (in blocks)",
+                    "from 48 to 16, which can improve tick duration with almost no deviation from vanilla behavior,",
+                    "but prevents villagers from acquiring POIs 17-48 blocks away"
                 );
         }
 
@@ -436,15 +436,15 @@ public class WorldConfig extends Part {
 
             {
                 option("villagerAcquirePoiTasksLoadChunks")
-                    .docs("是否允许村民为定位 POI 而加载未加载的区块");
+                    .docs("Whether villagers are allowed to load unloaded chunks to locate POIs");
             }
 
             {
                 option("villagerSmartHibernation")
                     .docs(
-                        "启用后，被固体方块完全包围且未在交易的村民",
-                        "将跳过大脑 tick 和其他 AI 处理。",
-                        "可显著降低拥有大量封闭村民的村民农场的 tick 耗时。"
+                        "When enabled, villagers completely surrounded by solid blocks and not trading",
+                        "will skip brain ticking and other AI processing.",
+                        "Significantly reduces tick duration for villager farms with large numbers of enclosed villagers."
                     );
             }
 
@@ -456,15 +456,15 @@ public class WorldConfig extends Part {
         }
 
         public boolean experienceOrbsAreFireResistant = false; // Canvas - fire res orbs
-        public boolean allowUnsafeTeleportation = false; // Luminol - allow unsafe teleportation (沙子复制等)
+        public boolean allowUnsafeTeleportation = false; // Luminol - allow unsafe teleportation (sand duping, etc.)
     }
 
     public Combat combat = new Combat();
     public static class Combat extends Part {
 
         {
-            option("restoreOldAttackDelayMechanics").docs("恢复 1.8 攻击延迟机制");
-            option("imitateSwordBlocking").docs("恢复 1.8 剑格挡机制。可能不适用于 <1.21.4 的客户端");
+            option("restoreOldAttackDelayMechanics").docs("Restore 1.8 attack delay mechanics");
+            option("imitateSwordBlocking").docs("Restore 1.8 sword blocking mechanics. May not work on clients <1.21.4");
         }
 
         public boolean restoreOldAttackDelayMechanics = false;
@@ -474,8 +474,8 @@ public class WorldConfig extends Part {
         public static class Mace extends Part {
 
             {
-                option("ignoreFallDistance").docs("移除锤的坠落距离增幅");
-                option("fallDistanceLimit").docs("锤伤害加成中坠落距离缩放停止生效的阈值");
+                option("ignoreFallDistance").docs("Remove mace fall distance multiplier");
+                option("fallDistanceLimit").docs("Threshold where fall distance scaling stops applying for mace bonus damage");
             }
 
             public boolean ignoreFallDistance = false;
@@ -483,9 +483,9 @@ public class WorldConfig extends Part {
         }
 
         {
-            option("criticalHitMultiplier").docs("配置每次暴击的伤害倍率");
-            option("removeRedDeathAnimation").docs("移除实体被击杀时的红色死亡动画");
-            option("useLegacyBlastProtection").docs("恢复 1.21 之前的爆炸保护逻辑");
+            option("criticalHitMultiplier").docs("Configure damage multiplier for critical hits");
+            option("removeRedDeathAnimation").docs("Remove red death animation when entities are killed");
+            option("useLegacyBlastProtection").docs("Restore pre-1.21 blast protection logic");
         }
 
         public boolean disableSweepingEdge = false;
@@ -505,22 +505,22 @@ public class WorldConfig extends Part {
             option("spawner")
                 .docs(
                     Style.create().wordWrap(
-                        "此配置部分中的所有整数选项仅在创建相关刷怪笼实例时生效。",
-                        "这是因为插件也能通过 Paper API 在运行时修改这些值。",
-                        "已生成的刷怪笼不会应用此配置，仅对新生成的刷怪笼生效"
+                        "All integer options in this section take effect only when creating spawner instances.",
+                        "This is because plugins can also modify these values at runtime via the Paper API.",
+                        "Existing spawners will not apply this configuration; it takes effect only for newly generated spawners."
                     ).blank()
-                    .literal("相关选项包括：")
+                    .literal("Relevant options include:")
                     .wordWrap(
-                        "\"min-spawn-delay\"、\"max-spawn-delay\"、\"spawn-count\"、\"max-nearby-entities\"、",
-                        "\"required-player-range\"、\"spawn-range\""
+                        "\"min-spawn-delay\", \"max-spawn-delay\", \"spawn-count\", \"max-nearby-entities\",",
+                        "\"required-player-range\", \"spawn-range\""
                     )
                 );
 
             option("optimizeDropperTransfer")
                 .docs(
-                    "当发射器将物品推入容器时，预检查是否有可用槽位。",
-                    "如果没有可用槽位，则提前返回（断路器模式），并使用零拷贝物品移动",
-                    "来避免事件系统开销。可提升漏斗密集型建筑的性能。"
+                    "When droppers push items into containers, pre-check if slots are available.",
+                    "If no slot is available, return early (circuit breaker pattern) and use zero-copy item movement",
+                    "to avoid event system overhead. Improves performance for hopper-heavy structures."
                 );
         }
 
@@ -532,20 +532,20 @@ public class WorldConfig extends Part {
         public static class Spawner extends Part {
 
             {
-                option("minSpawnDelay").docs("刷怪笼两次生成之间的最小延迟")
+                option("minSpawnDelay").docs("Minimum delay between spawner spawns")
                     .greaterThanOrEqualTo(0.0F);
-                option("maxSpawnDelay").docs("刷怪笼两次生成之间的最大延迟")
+                option("maxSpawnDelay").docs("Maximum delay between spawner spawns")
                     .greaterThanOrEqualTo(0.0F);
-                option("spawnCount").docs("刷怪笼每轮生成的实体数量")
+                option("spawnCount").docs("Number of entities spawned per spawner cycle")
                     .greaterThanOrEqualTo(0.0F);
-                option("maxNearbyEntities").docs("刷怪笼停止 tick 前的最大附近实体数量")
+                option("maxNearbyEntities").docs("Maximum number of nearby entities before spawner stops ticking")
                     .greaterThanOrEqualTo(0.0F);
-                option("requiredPlayerRange").docs("刷怪笼激活所需的玩家范围")
+                option("requiredPlayerRange").docs("Player proximity range required for spawner activation")
                     .greaterThanOrEqualTo(0.0F);
-                option("spawnRange").docs("生成实体的最大位置范围")
+                option("spawnRange").docs("Maximum position range for spawning entities")
                     .greaterThanOrEqualTo(0.0F);
-                option("disableMaxNearbyEntitiesCheck").docs("禁用刷怪笼最大附近实体数量检查");
-                option("spawnedEntitiesHaveNoCollision").docs("禁用刷怪笼生成的实体的碰撞");
+                option("disableMaxNearbyEntitiesCheck").docs("Disable spawner maximum nearby entity check");
+                option("spawnedEntitiesHaveNoCollision").docs("Disable collisions for entities spawned by spawners");
             }
 
             public int minSpawnDelay = 200;
@@ -562,15 +562,15 @@ public class WorldConfig extends Part {
     {
         option("waypointUpdateScale")
             .docs(
-                "控制 Canvas 路点系统随玩家间距离的衰减速度。",
-                "你可以在此了解新系统的工作原理并尝试调整此配置：",
+                "Controls decay rate of the Canvas waypoint system based on distance between players.",
+                "You can read how the new system works and adjust this configuration here:",
                 "https://docs.canvasmc.io/canvas/info/waypoints/"
             );
-        option("disableCriterionTrigger").docs("禁用所有准则触发器。进度将无法正常工作！");
-        option("cactusCheckSurvivalBeforeGrowth").docs("仙人掌生长前检查是否能存活。可大幅优化仙人掌农场");
+        option("disableCriterionTrigger").docs("Disable all criterion triggers. Advancements will not function properly!");
+        option("cactusCheckSurvivalBeforeGrowth").docs("Check survival capability before cactus growth. Can significantly optimize cactus farms");
         option("enableSuffocationOptimization")
             .docs(
-                "通过选择性跳过窒息检查来优化窒息判定，同时仍保持原版外观行为"
+                "Optimizes suffocation checks by selectively skipping checks while preserving vanilla visual behavior"
             );
     }
 
@@ -585,20 +585,20 @@ public class WorldConfig extends Part {
         {
             option("sleepSkippingNight")
                 .docs(
-                    "跳过夜晚时显示的动作栏消息。",
-                    "使用 \"default\" 为原版消息，留空则禁用"
+                    "Action bar message displayed when skipping the night.",
+                    "Use \"default\" for vanilla message, or leave empty to disable"
                 );
             option("sleepingPlayersPercent")
                 .docs(
-                    "玩家入睡时显示的动作栏消息。",
-                    "使用 \"default\" 为原版消息，留空则禁用。你可以使用 \"<count>\"",
-                    "作为当前入睡玩家数量的占位符，使用 \"<total>\"",
-                    "作为需要入睡的玩家总数的占位符"
+                    "Action bar message displayed when players sleep.",
+                    "Use \"default\" for vanilla message, or leave empty to disable. You can use \"<count>\"",
+                    "as placeholder for current sleeping player count, and \"<total>\"",
+                    "as placeholder for total required sleeping players"
                 );
             option("sleepNotPossible")
                 .docs(
-                    "当玩家尝试睡觉但 \"players_sleeping_percentage\"",
-                    "游戏规则设置为大于 100 的值时显示的动作栏消息。使用 \"default\" 为原版消息，留空则禁用"
+                    "Action bar message displayed when players try to sleep but \"players_sleeping_percentage\"",
+                    "gamerule is set above 100. Use \"default\" for vanilla message, or leave empty to disable"
                 );
         }
 

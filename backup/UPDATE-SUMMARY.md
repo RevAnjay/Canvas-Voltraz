@@ -1,46 +1,46 @@
-# Canvas 1.21.11 上游更新备份说明
+# Canvas 1.21.11 Upstream Update Backup Instructions
 
-## 备份内容
+## Backup Contents
 
-### 新增文件（`backup/src/`）
-- `GlobalConfiguration.java` — 新全局配置系统（YAML，替代旧 Config.java）
-- `WorldConfig.java` — Per-world 配置系统
-- `configuration/` — YAML 配置框架（11个文件）
-- `TickGuard.java` — 区域线程安全检查（替代 AsyncCatcher）
-- `CanonicalReference.java` — 一次性引用工具
-- `UpdateSuppressionException.java` — 更新抑制异常捕获
-- `Util.java` — 更新版（添加了 gradient 功能）
-- `lithium/` — Lithium 移植（HashPalette, Equipment Tracking）
+### Added Files (`backup/src/`)
+- `GlobalConfiguration.java` — New global configuration system (YAML, replacing old Config.java)
+- `WorldConfig.java` — Per-world configuration system
+- `configuration/` — YAML configuration framework (11 files)
+- `TickGuard.java` — Region thread safety checks (replacing AsyncCatcher)
+- `CanonicalReference.java` — Disposable reference utility
+- `UpdateSuppressionException.java` — Update suppression exception capture
+- `Util.java` — Updated version (added gradient features)
+- `lithium/` — Lithium ports (HashPalette, Equipment Tracking)
 
-### 修改的构建文件（`backup/`）
-- `build.gradle.kts` — 添加 aliyun 镜像、canvasMavenPublicUrl
-- `settings.gradle.kts` — 添加 aliyun 镜像
-- `CLAUDE.md` — 项目文档
+### Modified Build Files (`backup/`)
+- `build.gradle.kts` — Added Aliyun mirror, canvasMavenPublicUrl
+- `settings.gradle.kts` — Added Aliyun mirror
+- `CLAUDE.md` — Project documentation
 
-## 重新 clone 后的操作步骤
+## Post Re-clone Steps
 
-1. 将 `backup/src/` 中的文件复制到 `canvas-server/src/main/java/io/canvasmc/canvas/`
-2. 将 `backup/build.gradle.kts` 和 `backup/settings.gradle.kts` 覆盖项目根目录的同名文件
-3. 将 `backup/CLAUDE.md` 放到项目根目录
-4. 运行 `./gradlew applyAllPatches`（需要代理访问 GitHub，端口 7897 SOCKS5）
-5. 运行 `./gradlew rebuildAllServerPatches` 重建补丁
-6. 运行 `./gradlew createMojmapPublisherJar` 构建
+1. Copy files in `backup/src/` to `canvas-server/src/main/java/io/canvasmc/canvas/`
+2. Overwrite `build.gradle.kts` and `settings.gradle.kts` in the project root with the files in `backup/`
+3. Place `backup/CLAUDE.md` into the project root
+4. Run `./gradlew applyAllPatches` (proxy required for GitHub access, port 7897 SOCKS5)
+5. Run `./gradlew rebuildAllServerPatches` to rebuild patches
+6. Run `./gradlew createMojmapPublisherJar` to build
 
-## 已完成的上游更新（需要重新应用）
+## Upstream Updates Completed (Needs Re-application)
 
-### 来自 Canvas 26.1.2
-- 配置系统重写（JSON5 → YAML）
-- 全局配置 + per-world 配置分离
-- TickGuard 替代 AsyncCatcher
+### From Canvas 26.1.2
+- Config system rewrite (JSON5 → YAML)
+- Global configuration + per-world configuration separation
+- TickGuard replacing AsyncCatcher
 - Purpur Alternative Keepalive
 - Region Tick Guards
 - Remove MinecraftServer tickables + Fix GUI
 
-### 来自 Spring-for-LeavesMC
-- 性能优化：节流目标选择器、减少实体分配、移除 lambda、缓存攀爬检测、优化太阳灼烧、跳过零移动实体、更快区块序列化、Lithium 装备追踪
-- Bug 修复：更新抑制崩溃捕获、漏车修复、下落方块重复修复、传送门事件修复、区块重载检测修复
+### From Spring-for-LeavesMC
+- Performance Optimizations: Throttle goal selectors, reduce entity allocations, remove lambdas, cache climbing checks, optimize sun burn, skip zero-move entities, faster chunk serialization, Lithium equipment tracking
+- Bug Fixes: Update suppression crash capture, dropper leak fix, falling block dupe fix, portal event fix, chunk reload detection fix
 
-## 重要：代理配置
+## Important: Proxy Configuration
 ```bash
 git config --global http.proxy socks5h://127.0.0.1:7897
 git config --global https.proxy socks5h://127.0.0.1:7897

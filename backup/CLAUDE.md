@@ -1,146 +1,146 @@
 # Canvas 1.21.11 (PixelHaven Fork)
 
-Canvas 是一个基于 Folia（Paper 的区域化多线程分支）的 Minecraft 服务端分支，提供性能优化、配置扩展和 API 增强。
+Canvas is a Minecraft server fork based on Folia (Paper's regionized multithreading fork), providing performance optimizations, configuration extensions, and API enhancements.
 
-本分支 (`ver/1.21.11`) 是 PixelHaven 维护的 1.21.11 版本 fork，上游 Canvas 主线已迁移到 `ver/26.1.2`。
+This branch (`ver/1.21.11`) is a 1.21.11 version fork maintained by PixelHaven. Upstream Canvas mainline has migrated to `ver/26.1.2`.
 
-## 项目架构
+## Project Architecture
 
-### 补丁系统
+### Patch System
 
-Canvas 使用 paperweight-weaver 补丁系统，分层修改上游代码：
+Canvas uses the paperweight-weaver patch system to modify upstream code in layers:
 
 ```
-Minecraft 原版 → Paper 补丁 → Folia 补丁 → Canvas 补丁
+Vanilla Minecraft → Paper Patches → Folia Patches → Canvas Patches
 ```
 
-**补丁目录结构：**
+**Patch Directory Structure:**
 
-| 目录 | 作用 | 数量 |
-|------|------|------|
-| `canvas-server/minecraft-patches/base/` | 修改 Minecraft 源码（NMS） | 22 个 |
-| `canvas-server/paper-patches/base/` | 修改 Paper/Folia 服务端代码 | 13 个 |
-| `canvas-api/paper-patches/base/` | 修改 API 层代码 | 4 个 |
+| Directory | Purpose | Count |
+|-----------|---------|-------|
+| `canvas-server/minecraft-patches/base/` | Modifies Minecraft sources (NMS) | 22 |
+| `canvas-server/paper-patches/base/` | Modifies Paper/Folia server code | 13 |
+| `canvas-api/paper-patches/base/` | Modifies API layer code | 4 |
 
-补丁按编号顺序应用。修改补丁后需运行 `rebuildAllServerPatches` 重新生成。
+Patches are applied in numerical order. After modifying patches, run `rebuildAllServerPatches` to regenerate them.
 
-### 源码目录
+### Source Directories
 
-**Canvas 自有代码（`canvas-server/src/main/java/io/canvasmc/canvas/`）：**
+**Canvas Custom Code (`canvas-server/src/main/java/io/canvasmc/canvas/`):**
 
-| 目录 | 说明 |
-|------|------|
-| `GlobalConfiguration.java` | 全局配置（YAML，`config/canvas-server.yml`） |
-| `WorldConfig.java` | Per-world 配置（YAML，`config/canvas-worlds.yml` + 每个维度的 `canvas-patch.yml`） |
-| `configuration/` | YAML 配置框架（ConfigurationProvider, Part, Style, Resolver, Validator, NodeDiff, Token） |
-| `command/sub/` | 命令实现（reload, tpsbar, world-distance, set-max-players） |
-| `tick/` | 调度器相关（AffinitySchedulerThreadPool, SchedulerUtil, ScheduledHandleTickState） |
-| `util/` | 工具类（TickGuard, CanonicalReference, Util, FasterRandomSource） |
-| `world/entity/` | EnderPearls 管理 |
-| `world/waypoints/` | 路点系统 |
+| Directory | Description |
+|-----------|-------------|
+| `GlobalConfiguration.java` | Global configuration (YAML, `config/canvas-server.yml`) |
+| `WorldConfig.java` | Per-world configuration (YAML, `config/canvas-worlds.yml` + per-dimension `canvas-patch.yml`) |
+| `configuration/` | YAML config framework (ConfigurationProvider, Part, Style, Resolver, Validator, NodeDiff, Token) |
+| `command/sub/` | Command implementations (reload, tpsbar, world-distance, set-max-players) |
+| `tick/` | Scheduler related (AffinitySchedulerThreadPool, SchedulerUtil, ScheduledHandleTickState) |
+| `util/` | Utility classes (TickGuard, CanonicalReference, Util, FasterRandomSource) |
+| `world/entity/` | EnderPearls management |
+| `world/waypoints/` | Waypoint system |
 | `world/chunk/` | BalancedChunkSystem |
-| `spark/` | Spark profiler 集成 |
+| `spark/` | Spark profiler integration |
 
-**Canvas API（`canvas-api/src/main/java/io/canvasmc/canvas/`）：**
+**Canvas API (`canvas-api/src/main/java/io/canvasmc/canvas/`):**
 
-| 目录 | 说明 |
-|------|------|
-| `event/` | 自定义事件（PlayerPostRespawnAsyncEvent 等） |
-| `region/` | 区域化 API |
-| `simd/` | SIMD 检测 |
+| Directory | Description |
+|-----------|-------------|
+| `event/` | Custom events (PlayerPostRespawnAsyncEvent, etc.) |
+| `region/` | Regionized API |
+| `simd/` | SIMD detection |
 
-### 生成的目录（不直接编辑）
+### Generated Directories (Do Not Edit Directly)
 
-| 目录 | 说明 |
-|------|------|
-| `paper-server/` | Paper 补丁应用后的服务端代码 |
-| `paper-api/` | Paper 补丁应用后的 API 代码 |
-| `folia-server/` | Folia 补丁应用后的服务端代码 |
-| `folia-api/` | Folia 补丁应用后的 API 代码 |
+| Directory | Description |
+|-----------|-------------|
+| `paper-server/` | Server code after Paper patches applied |
+| `paper-api/` | API code after Paper patches applied |
+| `folia-server/` | Server code after Folia patches applied |
+| `folia-api/` | API code after Folia patches applied |
 
-### 配置系统
+### Configuration System
 
-配置从 JSON5（旧 `Config.java`）迁移到 YAML（`GlobalConfiguration` + `WorldConfig`）。
+Configuration migrated from JSON5 (old `Config.java`) to YAML (`GlobalConfiguration` + `WorldConfig`).
 
-**GlobalConfiguration**（全局，不可 per-world 覆盖）：
-- `regionScheduler.*` — 调度器配置（affinity, tick rate, guard severity）
-- `chunkSystem.*` — 区块系统（线程优先级, fluid 处理, 结构优化）
-- `networking.*` — 网络（包过滤, keepalive, 协议切换）
-- `vanillaFixes.*` — MC bug 修复开关
-- `chat.*` — 聊天报告禁用
-- `purpurContainers.*` — 容器行数配置
-- `combat.*` — 战斗配置（已被部分迁移到 WorldConfig）
+**GlobalConfiguration** (Global, cannot be overridden per-world):
+- `regionScheduler.*` — Scheduler configuration (affinity, tick rate, guard severity)
+- `chunkSystem.*` — Chunk system (thread priority, fluid processing, structure optimization)
+- `networking.*` — Networking (packet filtering, keepalive, protocol switching)
+- `vanillaFixes.*` — MC bugfix toggles
+- `chat.*` — Chat reporting disable
+- `purpurContainers.*` — Container row configuration
+- `combat.*` — Combat configuration (partially migrated to WorldConfig)
 
-**WorldConfig**（per-world，可在每个维度的 `canvas-patch.yml` 中覆盖）：
+**WorldConfig** (Per-world, overridable in per-dimension `canvas-patch.yml`):
 - `regionBars.*` — TPS/RAM bar
-- `visuals.*` — 粒子、火焰显示
-- `entities.*` — 碰撞模式、投射物、经验球、骷髅精准度
-- `combat.*` — 攻击延迟、暴击、扫击、剑格挡
-- `blocks.spawner.*` — 刷怪箱配置
-- `farming.*` — 农业（耕地、作物、树叶）
-- `sleeping.*` — 睡觉配置
+- `visuals.*` — Particle and flame rendering
+- `entities.*` — Collision mode, projectiles, XP orbs, skeleton accuracy
+- `combat.*` — Attack delay, crits, sweeping edge, sword blocking
+- `blocks.spawner.*` — Mob spawner configuration
+- `farming.*` — Farming (farmland, crops, leaf decay)
+- `sleeping.*` — Sleep configuration
 
-## 构建方法
+## Build Instructions
 
-### 环境要求
+### Requirements
 
 - Java 21+
 - Git
 
-### 构建服务器 JAR
+### Build Server JAR
 
 ```bash
-# 构建完整的服务器 JAR（用于部署）
+# Build complete server JAR (for deployment)
 ./gradlew createMojmapPublisherJar
 ```
 
-产物位于 `canvas-server/build/libs/`。
+Artifacts are located in `canvas-server/build/libs/`.
 
-### 开发流程
+### Development Workflow
 
 ```bash
-# 1. 应用所有补丁（首次或补丁更新后）
+# 1. Apply all patches (first time or after patch update)
 ./gradlew applyAllPatches
 
-# 2. 修改源码...
-#    - Canvas 自有代码：直接编辑 canvas-server/src/ 或 canvas-api/src/
-#    - Minecraft 源码：编辑 canvas-server/src/minecraft/java/
-#    - Paper/Folia 代码：编辑 paper-server/src/ 或 folia-server/src/
+# 2. Edit source code...
+#    - Canvas custom code: edit canvas-server/src/ or canvas-api/src/ directly
+#    - Minecraft source: edit canvas-server/src/minecraft/java/
+#    - Paper/Folia code: edit paper-server/src/ or folia-server/src/
 
-# 3. 重建补丁（将源码变更转为 .patch 文件）
+# 3. Rebuild patches (convert source changes to .patch files)
 ./gradlew rebuildAllServerPatches
 
-# 4. 构建验证
+# 4. Verification build
 ./gradlew createMojmapPublisherJar
 
-# 5. 测试启动
+# 5. Test launch
 java -Xmx2G -jar canvas-server/build/libs/canvas-paperclip-*.jar --nogui
 ```
 
-### 常用 Gradle 任务
+### Common Gradle Tasks
 
-| 任务 | 说明 |
-|------|------|
-| `applyAllPatches` | 应用所有补丁到源码 |
-| `rebuildAllServerPatches` | 重建所有服务端补丁 |
-| `rebuildMinecraftBasePatches` | 仅重建 Minecraft base 补丁 |
-| `rebuildMinecraftSourcePatches` | 仅重建 Minecraft source 补丁 |
-| `rebuildServerBasePatches` | 重建 Paper/Folia base 补丁 |
-| `createMojmapPublisherJar` | 构建完整服务器 JAR |
-| `:canvas-server:compileJava` | 仅编译服务端（快速验证） |
+| Task | Description |
+|------|-------------|
+| `applyAllPatches` | Apply all patches to source |
+| `rebuildAllServerPatches` | Rebuild all server patches |
+| `rebuildMinecraftBasePatches` | Rebuild Minecraft base patches only |
+| `rebuildMinecraftSourcePatches` | Rebuild Minecraft source patches only |
+| `rebuildServerBasePatches` | Rebuild Paper/Folia base patches |
+| `createMojmapPublisherJar` | Build full server JAR |
+| `:canvas-server:compileJava` | Compile server only (fast verification) |
 
-### 修改补丁的正确方式
+### Proper Way to Modify Patches
 
-1. `./gradlew applyAllPatches` — 应用补丁到工作目录
-2. 在 `canvas-server/src/minecraft/java/` 或 `paper-server/src/` 中编辑文件
-3. `./gradlew rebuildAllServerPatches` — 从工作目录重新生成 `.patch` 文件
-4. 提交 `.patch` 文件的变更
+1. `./gradlew applyAllPatches` — Apply patches to working directory
+2. Edit files in `canvas-server/src/minecraft/java/` or `paper-server/src/`
+3. `./gradlew rebuildAllServerPatches` — Regenerate `.patch` files from working directory
+4. Commit changes to `.patch` files
 
-**不要**直接编辑 `.patch` 文件，应通过修改源码 + rebuild 的方式。
+**Do NOT** edit `.patch` files directly; modify source code and rebuild instead.
 
-## 关键配置引用映射
+## Key Config Reference Mapping
 
-从旧 `Config.INSTANCE` 迁移到新系统的参考：
+Reference for migrating from old `Config.INSTANCE` to the new system:
 
 ```
 Config.INSTANCE.scheduler.*           → GlobalConfiguration.getInstance().regionScheduler.affinityScheduler.*
@@ -151,7 +151,7 @@ Config.INSTANCE.enableNoChatReports   → GlobalConfiguration.getInstance().chat
 Config.INSTANCE.containers.*          → GlobalConfiguration.getInstance().purpurContainers.*
 Config.INSTANCE.fetchRespawnDimensionKey() → GlobalConfiguration.fetchRespawnDimensionKey()
 
-# 以下已迁移到 per-world 配置：
+# Migrated to per-world config:
 Config.INSTANCE.particles.*           → WorldConfig.getDefaults().visuals.particles.*
 Config.INSTANCE.combat.*              → WorldConfig.getDefaults().combat.*
 Config.INSTANCE.spawner.*             → WorldConfig.getDefaults().blocks.spawner.*
@@ -160,17 +160,17 @@ Config.INSTANCE.fastOrbs              → WorldConfig.getDefaults().entities.fas
 Config.INSTANCE.projectiles.*         → WorldConfig.getDefaults().entities.projectiles.*
 ```
 
-## Git 工作流
+## Git Workflow
 
-- **主分支**：`ver/1.21.11`
-- **上游**：`origin` → `https://github.com/Holywuya/Canvas-PixelHavenFork.git`
-- **上游 Canvas**：`upstream` → `https://github.com/CraftCanvasMC/Canvas.git`（`ver/26.1.2`）
-- **Folia 基础**：`foliaCommit = 3ef0ba66b20599d24f235ac795865047c29c5eb4`
+- **Main Branch**: `ver/1.21.11`
+- **Upstream Remote**: `origin` → `https://github.com/Holywuya/Canvas-PixelHavenFork.git`
+- **Upstream Canvas**: `upstream` → `https://github.com/CraftCanvasMC/Canvas.git` (`ver/26.1.2`)
+- **Folia Base**: `foliaCommit = 3ef0ba66b20599d24f235ac795865047c29c5eb4`
 
-## 注意事项
+## Important Notes
 
-- 中国大陆构建需要配置阿里云 Maven 镜像（已在 `build.gradle.kts` 和 `settings.gradle.kts` 中配置）
-- `canvas-server/src/minecraft/java/` 中的文件由补丁生成，修改后必须 rebuild patches
-- `paper-server/`、`folia-server/` 等目录是生成的，不要直接编辑
-- 配置系统使用 YAML（snakeyaml），字段名自动转换为 kebab-case
-- `WorldConfig` 使用延迟初始化，`getDefaults()` 在服务器启动前返回默认实例
+- Mainland China builds require Aliyun Maven mirror configuration (configured in `build.gradle.kts` and `settings.gradle.kts`)
+- Files in `canvas-server/src/minecraft/java/` are generated by patches; after editing, patches must be rebuilt
+- `paper-server/`, `folia-server/` etc. are generated directories; do not edit directly
+- Configuration system uses YAML (snakeyaml), field names auto-convert to kebab-case
+- `WorldConfig` uses lazy initialization; `getDefaults()` returns default instance prior to server start

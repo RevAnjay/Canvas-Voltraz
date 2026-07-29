@@ -1,41 +1,41 @@
-# Leaf 第一批低风险补丁移植设计
+# Leaf First Batch Low-Risk Patch Port Design
 
-## 背景
+## Background
 
-当前项目是 Canvas-PixelHavenFork `ver/1.21.11`，基于 Folia 的 region-threading 模型。Leaf `ver/1.21.11` 是 Paper fork，补丁数量多，且包含大量异步、并行、tracker、world tick 相关改动。
+The current project is Canvas-PixelHavenFork `ver/1.21.11`, based on Folia's region-threading model. Leaf `ver/1.21.11` is a Paper fork with a large number of patches, containing extensive changes related to async operations, parallelism, trackers, and world ticking.
 
-本设计只覆盖第一批低风险移植候选。目标不是完整迁移 Leaf，而是挑选无线程模型假设、改动局部、容易逐项验证的补丁，作为后续移植工作的基础。
+This design document covers only the first batch of low-risk porting candidates. The goal is not a complete migration of Leaf, but selecting patches that have no threading model assumptions, are localized, and easy to verify item-by-item, serving as the foundation for future porting work.
 
-## 目标
+## Goals
 
-移植第一批低风险 Leaf 补丁，优先获得以下收益：
+Port the first batch of low-risk Leaf patches, prioritizing the following benefits:
 
-- 在无监听器时跳过部分 Bukkit 事件构造和派发，减少热路径分配。
-- 引入局部微优化，减少重复查询、iterator 和字符串分配。
-- 引入明确的 vanilla bugfix，降低内存泄漏或崩溃风险。
+- Skip constructing and dispatching certain Bukkit events when there are no listeners, reducing hot-path allocations.
+- Introduce localized micro-optimizations to reduce redundant queries, iterators, and string allocations.
+- Introduce explicit vanilla bugfixes to lower memory leak or crash risks.
 
-每个补丁必须独立实现、独立验证、独立提交。
+Each patch must be independently implemented, verified, and committed.
 
-## 非目标
+## Non-Goals
 
-本批次明确不处理以下内容：
+This batch explicitly does NOT cover:
 
-- `Async Pathfinding`。
-- `Async Mob Spawning`。
-- `Async Chunk Sender`。
-- `Async Playerdata Saving`。
-- `Multithreaded Tracker`。
-- `Parallel World Ticking`。
-- Leaf、Gale 或 Purpur 配置系统整体移植。
-- 任何会改变 Folia region ownership 语义的补丁。
+- `Async Pathfinding`.
+- `Async Mob Spawning`.
+- `Async Chunk Sender`.
+- `Async Playerdata Saving`.
+- `Multithreaded Tracker`.
+- `Parallel World Ticking`.
+- Complete porting of Leaf, Gale, or Purpur configuration systems.
+- Any patch that alters Folia region ownership semantics.
 
-这些补丁需要单独设计，不能直接套用 Leaf 实现。
+These patches require separate dedicated designs and cannot directly adopt Leaf's implementations.
 
-## 方案
+## Proposed Strategy
 
-采用「小补丁队列」方案：每个 Leaf 补丁独立评估、移植和验证。实现时以生成源码为编辑目标，再通过项目 patch 系统重建补丁文件。
+Adopt a "small patch queue" approach: each Leaf patch is independently evaluated, ported, and verified. Implementation targets generated source files first, followed by rebuilding patch files through the project's patch system.
 
-本批次包含 8 个候选：
+This batch contains 8 candidates:
 
 1. `0256-Skip-BlockPhysicsEvent-if-no-listeners.patch`
 2. `0264-Skip-PreCreatureSpawnEvent-if-no-listeners.patch`
@@ -46,11 +46,11 @@
 7. `0313-Fix-MC-301114-Combat-Tracker-memory-leak.patch`
 8. `0322-fix-skeleton-horse-trap-NPE.patch`
 
-## 文件边界
+## File Boundaries
 
-### Minecraft/NMS 补丁
+### Minecraft/NMS Patches
 
-以下补丁修改 `canvas-server/src/minecraft/java/` 下的生成源码，最终重建到 `canvas-server/minecraft-patches/base/`：
+The following patches modify generated sources under `canvas-server/src/minecraft/java/` and are eventually rebuilt into `canvas-server/minecraft-patches/base/`:
 
 - `net/minecraft/world/level/redstone/NeighborUpdater.java`
 - `net/minecraft/world/level/NaturalSpawner.java`
@@ -64,76 +64,76 @@
 - `net/minecraft/world/entity/animal/equine/SkeletonHorse.java`
 - `net/minecraft/world/entity/animal/equine/SkeletonTrapGoal.java`
 
-### API 补丁
+### API Patches
 
-以下补丁修改 `canvas-api` 的 Paper API 生成源码或 API patch，最终重建到 `canvas-api/paper-patches/base/`：
+The following patches modify Paper API generated sources in `canvas-api` or API patches, eventually rebuilt into `canvas-api/paper-patches/base/`:
 
 - `org/bukkit/NamespacedKey.java`
 
-### Canvas 自有代码
+### Canvas Own Code
 
-如需要为 `CombatTracker` 内存泄漏修复引入 bounded list，应优先新增 Canvas 自有工具类，而不是引用 Leaf 包名：
+If fixing `CombatTracker` memory leak requires introducing a bounded list, Canvas utility classes should be created in preference to referencing Leaf package names:
 
 - `canvas-server/src/main/java/io/canvasmc/canvas/util/collection/EvictingRingList.java`
 
-如果实现可以用现有 JDK 集合完成，则不新增该类。
+If the implementation can be completed using existing JDK collections, this class will not be added.
 
-## 配置策略
+## Configuration Strategy
 
-第一批默认不新增配置项，理由如下：
+The first batch adds no new configuration options by default for the following reasons:
 
-- 事件跳过类补丁只有在无监听器时生效，不改变有监听器时的行为。
-- `MobEffectUtil`、`Inventory`、`NamespacedKey` 属于局部等价优化。
-- `SkeletonHorse` 修复是 bugfix。
+- Event skipping patches take effect only when there are no listeners, preserving behavior when listeners exist.
+- `MobEffectUtil`, `Inventory`, and `NamespacedKey` are localized equivalent optimizations.
+- `SkeletonHorse` fix is a bugfix.
 
-`CombatTracker` 内存泄漏修复需要限制历史条目数量。为避免引入 Leaf 配置系统，采用固定上限，并在实现计划中要求先核对 Paper PR 或 vanilla 上游是否已有合理上限。如果必须配置化，则放入 `GlobalConfiguration.vanillaFixes`，默认启用，默认上限使用 Leaf 的上限值或 Paper PR 中的上限值。
+The `CombatTracker` memory leak fix requires capping historical entries. To avoid introducing Leaf's configuration system, a fixed upper limit is used, requiring verification against Paper PRs or vanilla upstream for reasonable defaults. If configuration is mandatory, it will be placed in `GlobalConfiguration.vanillaFixes`, enabled by default, using Leaf's upper limit or Paper PR values.
 
-## 线程模型约束
+## Threading Model Constraints
 
-实现必须遵守以下规则：
+Implementations must strictly follow these rules:
 
-- 不新增异步 world/entity/chunk 访问。
-- 不放宽 `TickThread.ensureTickThread` 或 Folia ownership 检查。
-- 不引入 Leaf 的 world-level tick thread 假设。
-- 所有事件调用仍在原调用点执行，只在无监听器时跳过事件对象创建和 `callEvent`。
-- 不把 `getRegisteredListeners().length` 结果缓存到跨 tick、跨线程的全局状态。
+- No new async world/entity/chunk access.
+- Do not relax `TickThread.ensureTickThread` or Folia ownership checks.
+- Do not introduce Leaf's world-level tick thread assumptions.
+- All event invocations remain at their original execution points, skipping event object creation and `callEvent` only when no listeners are present.
+- Do not cache `getRegisteredListeners().length` results into cross-tick, cross-thread global state.
 
-## 测试与验证
+## Testing and Verification
 
-每个补丁至少需要：
+Each patch requires at minimum:
 
-1. `./gradlew applyAllPatches` 成功。
-2. 修改生成源码后，按 Canvas patch 流程提交 fixup 并重建对应 patch。
-3. `./gradlew :canvas-server:compileJava` 成功。
-4. 若修改 API，运行 `./gradlew :canvas-api:compileJava`。
-5. 批次结束后运行 `./gradlew createMojmapPublisherJar`。
+1. `./gradlew applyAllPatches` succeeds.
+2. After modifying generated sources, submit fixups and rebuild patches following the Canvas patch workflow.
+3. `./gradlew :canvas-server:compileJava` succeeds.
+4. If API is modified, run `./gradlew :canvas-api:compileJava`.
+5. Run `./gradlew createMojmapPublisherJar` at the end of the batch.
 
-能写单元测试的 API 或 utility 类应补测试。NMS 行为补丁以编译和最小运行验证为主，因为当前仓库没有稳定的 NMS 单元测试入口。
+API or utility classes that can have unit tests should include them. NMS behavior patches focus primarily on compilation and minimal runtime verification, as the workspace lacks a stable NMS unit testing harness.
 
-## 风险与缓解
+## Risks and Mitigation
 
-| 风险 | 缓解 |
+| Risk | Mitigation |
 |---|---|
-| Leaf patch 已被当前 Canvas 或上游包含 | 每个任务先 grep 目标源码和 patch，确认是否已有等价逻辑 |
-| 事件跳过改变插件语义 | 只在 `HandlerList` 无注册监听器时跳过，有监听器时保持原路径 |
-| `CombatTracker` 修复引入 Leaf 包名或配置系统 | 使用 Canvas 包名或 JDK 实现，不引用 Leaf 配置类 |
-| API patch 与 Paper/Canvas 现有改动冲突 | 单独处理 `NamespacedKey`，编译 API 后再继续 |
-| NMS patch 重建失败 | 按 CLAUDE.md 流程修改生成源码并 rebuild，不直接编辑 `.patch` |
+| Leaf patch already included in current Canvas or upstream | Grep target sources and patches before each task to verify existing logic |
+| Event skipping changes plugin semantics | Skip only when `HandlerList` has no registered listeners, preserving original flow otherwise |
+| `CombatTracker` fix introduces Leaf package name or config system | Use Canvas package name or JDK implementations without referencing Leaf config classes |
+| API patch conflicts with Paper/Canvas existing changes | Process `NamespacedKey` independently, compiling API before proceeding |
+| NMS patch rebuild fails | Follow CLAUDE.md workflow to modify generated sources and rebuild, never edit `.patch` files directly |
 
-## 验收标准
+## Acceptance Criteria
 
-本批次完成时应满足：
+Completion of this batch requires:
 
-- 8 个候选补丁中，已移植的每个补丁都有独立 commit。
-- 被跳过的候选必须在提交说明或后续记录中说明原因，例如「已存在」或「与 Folia 冲突」。
-- 不引入 Leaf、Gale、Purpur 配置框架。
-- 不引入新的异步 world/entity/chunk 访问。
-- `./gradlew :canvas-server:compileJava` 通过。
-- 涉及 API 时，`./gradlew :canvas-api:compileJava` 通过。
-- 批次结束时，`./gradlew createMojmapPublisherJar` 通过，或如失败，失败原因明确且不是本批次代码导致。
+- Each of the 8 candidate patches ported has an independent commit.
+- Skipped candidates must state the reason in commit notes or documentation (e.g. "already exists" or "conflicts with Folia").
+- No introduction of Leaf, Gale, or Purpur configuration frameworks.
+- No introduction of new async world/entity/chunk access.
+- `./gradlew :canvas-server:compileJava` passes.
+- When API is involved, `./gradlew :canvas-api:compileJava` passes.
+- At batch completion, `./gradlew createMojmapPublisherJar` passes, or if failing, the failure reason is explicit and unrelated to this batch.
 
-## 自检结果
+## Self-Check Results
 
-- 占位符检查：无 `TODO`、`待定`、`后续实现` 等占位内容。
-- 范围检查：范围限定为第一批 8 个低风险补丁，不包含高风险异步和线程模型补丁。
-- 一致性检查：配置策略、线程模型约束和验收标准一致，均要求不引入 Leaf 配置系统和异步 world 访问。
+- Placeholder check: No `TODO`, `TBD`, or `future implementation` placeholders.
+- Scope check: Limited strictly to the first batch of 8 low-risk patches; no high-risk async or threading model patches included.
+- Consistency check: Configuration strategy, threading model constraints, and acceptance criteria are fully consistent in forbidding Leaf config systems and async world access.

@@ -685,7 +685,7 @@ public class BufferedLinearRegionFile implements IRegionFile {
         this.increaseDirty(chunkIndex); // Canvas - Improved bucket dirty marking
     }
 
-    // MCC 的玩意,这东西也用不上给Linear了()
+    // MCC's stuff, not used by Linear either
     @Override
     public CompoundTag getOversizedData(int x, int z) {
         return null;
