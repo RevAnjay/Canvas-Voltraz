@@ -1,5 +1,3 @@
-diff --git a/net/minecraft/world/waypoints/WaypointTransmitter.java b/net/minecraft/world/waypoints/WaypointTransmitter.java
-index 00c3ade..808e9da 100644
 --- a/net/minecraft/world/waypoints/WaypointTransmitter.java
 +++ b/net/minecraft/world/waypoints/WaypointTransmitter.java
 @@ -51,7 +51,7 @@ public interface WaypointTransmitter extends Waypoint {

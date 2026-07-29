@@ -1,5 +1,3 @@
-diff --git a/net/minecraft/network/VarLong.java b/net/minecraft/network/VarLong.java
-index 9e48454..dc26d87 100644
 --- a/net/minecraft/network/VarLong.java
 +++ b/net/minecraft/network/VarLong.java
 @@ -8,15 +8,18 @@ public class VarLong {

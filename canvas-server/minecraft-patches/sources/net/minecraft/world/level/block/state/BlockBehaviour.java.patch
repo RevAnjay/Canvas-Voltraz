@@ -1,5 +1,3 @@
-diff --git a/net/minecraft/world/level/block/state/BlockBehaviour.java b/net/minecraft/world/level/block/state/BlockBehaviour.java
-index a26e2b6..15abf37 100644
 --- a/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/net/minecraft/world/level/block/state/BlockBehaviour.java
 @@ -100,6 +100,7 @@ public abstract class BlockBehaviour implements FeatureElement {

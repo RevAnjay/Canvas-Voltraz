@@ -1,5 +1,3 @@
-diff --git a/net/minecraft/server/level/DistanceManager.java b/net/minecraft/server/level/DistanceManager.java
-index 1fd1ecc..5699342 100644
 --- a/net/minecraft/server/level/DistanceManager.java
 +++ b/net/minecraft/server/level/DistanceManager.java
 @@ -177,7 +177,7 @@ public abstract class DistanceManager implements ca.spottedleaf.moonrise.patches

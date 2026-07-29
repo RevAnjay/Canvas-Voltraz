@@ -1,5 +1,3 @@
-diff --git a/net/minecraft/world/level/block/PoweredRailBlock.java b/net/minecraft/world/level/block/PoweredRailBlock.java
-index 48e7f97..8c16e9e 100644
 --- a/net/minecraft/world/level/block/PoweredRailBlock.java
 +++ b/net/minecraft/world/level/block/PoweredRailBlock.java
 @@ -122,6 +122,12 @@ public class PoweredRailBlock extends BaseRailBlock {

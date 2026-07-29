@@ -1,5 +1,3 @@
-diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index 3bce1f9..29ece5f 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -200,7 +200,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa

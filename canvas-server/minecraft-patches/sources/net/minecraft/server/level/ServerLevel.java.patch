@@ -1,5 +1,3 @@
-diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 689a2b5..7873165 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -717,6 +717,13 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
