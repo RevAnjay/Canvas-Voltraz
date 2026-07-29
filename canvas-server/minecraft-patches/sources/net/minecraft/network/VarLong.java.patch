@@ -1,0 +1,30 @@
+diff --git a/net/minecraft/network/VarLong.java b/net/minecraft/network/VarLong.java
+index 9e48454..dc26d87 100644
+--- a/net/minecraft/network/VarLong.java
++++ b/net/minecraft/network/VarLong.java
+@@ -8,15 +8,18 @@ public class VarLong {
+     private static final int CONTINUATION_BIT_MASK = 128;
+     private static final int DATA_BITS_PER_BYTE = 7;
+ 
+-    public static int getByteSize(long data) {
+-        for (int i = 1; i < MAX_VARLONG_SIZE; i++) {
+-            if ((data & -1L << i * 7) == 0L) {
+-                return i;
+-            }
++    // Canvas start - Pre-compute VarLong sizes (ported from Leaf/Gale 0075)
++    private static final int[] VARLONG_EXACT_BYTE_LENGTHS = new int[65];
++    static {
++        for (int i = 0; i <= 64; ++i) {
++            VARLONG_EXACT_BYTE_LENGTHS[i] = (int) Math.ceil((63d - (i - 1)) / 7d);
+         }
+-
+-        return MAX_VARLONG_SIZE;
++        VARLONG_EXACT_BYTE_LENGTHS[64] = 1; // Special case for the number 0.
++    }
++    public static int getByteSize(long data) {
++        return VARLONG_EXACT_BYTE_LENGTHS[Long.numberOfLeadingZeros(data)];
+     }
++    // Canvas end - Pre-compute VarLong sizes
+ 
+     public static boolean hasContinuationBit(byte data) {
+         return (data & 128) == 128;

@@ -1,0 +1,17 @@
+diff --git a/net/minecraft/world/level/block/PoweredRailBlock.java b/net/minecraft/world/level/block/PoweredRailBlock.java
+index 48e7f97..8c16e9e 100644
+--- a/net/minecraft/world/level/block/PoweredRailBlock.java
++++ b/net/minecraft/world/level/block/PoweredRailBlock.java
+@@ -122,6 +122,12 @@ public class PoweredRailBlock extends BaseRailBlock {
+ 
+     @Override
+     protected void updateState(BlockState state, Level level, BlockPos pos, Block block) {
++        // Canvas start - Rail Optimization (ported from Leaf 0224)
++        if (io.canvasmc.canvas.GlobalConfiguration.getInstance().optimizedPoweredRails.enabled) {
++            io.canvasmc.canvas.world.block.OptimizedPoweredRails.updateState(this, state, level, pos);
++            return;
++        }
++        // Canvas end - Rail Optimization
+         boolean poweredValue = state.getValue(POWERED);
+         boolean flag = level.hasNeighborSignal(pos)
+             || this.findPoweredRailSignal(level, pos, state, true, 0)
