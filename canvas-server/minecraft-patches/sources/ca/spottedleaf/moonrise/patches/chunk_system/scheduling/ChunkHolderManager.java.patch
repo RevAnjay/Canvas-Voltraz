@@ -1,0 +1,40 @@
+diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
+index 1e28a39..ca80daf 100644
+--- a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
++++ b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
+@@ -659,7 +659,7 @@ public final class ChunkHolderManager {
+ 
+     public <T> boolean addTicketAtLevel(final TicketType type, final ChunkPos chunkPos, final int level,
+                                         final T identifier) {
+-        return this.addTicketAtLevel(type, CoordinateUtils.getChunkKey(chunkPos), level, identifier);
++        return this.addTicketAtLevel(type, chunkPos.longKey, level, identifier);
+     }
+ 
+     public <T> boolean addTicketAtLevel(final TicketType type, final int chunkX, final int chunkZ, final int level,
+@@ -776,7 +776,7 @@ public final class ChunkHolderManager {
+     }
+ 
+     public <T> boolean removeTicketAtLevel(final TicketType type, final ChunkPos chunkPos, final int level, final T identifier) {
+-        return this.removeTicketAtLevel(type, CoordinateUtils.getChunkKey(chunkPos), level, identifier);
++        return this.removeTicketAtLevel(type, chunkPos.longKey, level, identifier);
+     }
+ 
+     public <T> boolean removeTicketAtLevel(final TicketType type, final int chunkX, final int chunkZ, final int level, final T identifier) {
+@@ -1469,7 +1469,7 @@ public final class ChunkHolderManager {
+         }
+ 
+         public static <T> TicketOperation<T, T> addOp(final ChunkPos chunk, final TicketType type, final int ticketLevel, final T identifier) {
+-            return addOp(CoordinateUtils.getChunkKey(chunk), type, ticketLevel, identifier);
++            return addOp(chunk.longKey, type, ticketLevel, identifier);
+         }
+ 
+         public static <T> TicketOperation<T, T> addOp(final int chunkX, final int chunkZ, final TicketType type, final int ticketLevel, final T identifier) {
+@@ -1481,7 +1481,7 @@ public final class ChunkHolderManager {
+         }
+ 
+         public static <T> TicketOperation<T, T> removeOp(final ChunkPos chunk, final TicketType type, final int ticketLevel, final T identifier) {
+-            return removeOp(CoordinateUtils.getChunkKey(chunk), type, ticketLevel, identifier);
++            return removeOp(chunk.longKey, type, ticketLevel, identifier);
+         }
+ 
+         public static <T> TicketOperation<T, T> removeOp(final int chunkX, final int chunkZ, final TicketType type, final int ticketLevel, final T identifier) {

@@ -1,10 +1,22 @@
+diff --git a/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/server/ServerEntityLookup.java b/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/server/ServerEntityLookup.java
+index 87bf0fe..ca0a8be 100644
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/server/ServerEntityLookup.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/server/ServerEntityLookup.java
-@@ -97,6 +_,7 @@
-         if (entity instanceof ThrownEnderpearl enderpearl) {
-             this.addEnderPearl(CoordinateUtils.getChunkKey(enderpearl.chunkPosition()), enderpearl.getId()); // Folia - region threading
+@@ -95,7 +95,7 @@ public final class ServerEntityLookup extends EntityLookup {
+             ((ChunkSystemServerLevel)this.serverWorld).moonrise$getNearbyPlayers().addPlayer(player);
          }
-+        if (entity instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon) dragon.syncDragonPartsAfterTeleportTransform(); // Canvas - Sync dragon part when teleportation or first created
+         if (entity instanceof ThrownEnderpearl enderpearl) {
+-            this.addEnderPearl(CoordinateUtils.getChunkKey(enderpearl.chunkPosition()), enderpearl.getId()); // Folia - region threading
++            this.addEnderPearl(enderpearl.chunkPosition().longKey, enderpearl.getId()); // Folia - region threading
+         }
+         if (entity instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon dragon) dragon.syncDragonPartsAfterTeleportTransform(); // Canvas - Sync dragon part when teleportation or first created
          entity.registerScheduler(); // Paper - optimise Folia entity scheduler
+@@ -107,7 +107,7 @@ public final class ServerEntityLookup extends EntityLookup {
+             ((ChunkSystemServerLevel)this.serverWorld).moonrise$getNearbyPlayers().removePlayer(player);
+         }
+         if (entity instanceof ThrownEnderpearl enderpearl) {
+-            this.removeEnderPearl(CoordinateUtils.getChunkKey(enderpearl.chunkPosition()), enderpearl.getId()); // Folia - region threading
++            this.removeEnderPearl(enderpearl.chunkPosition().longKey, enderpearl.getId()); // Folia - region threading
+         }
+         entity.getBukkitEntity().taskScheduler.registerTo(null); // Folia - region threading
      }
- 

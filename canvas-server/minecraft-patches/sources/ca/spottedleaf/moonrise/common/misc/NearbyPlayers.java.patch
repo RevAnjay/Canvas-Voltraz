@@ -1,18 +1,32 @@
+diff --git a/ca/spottedleaf/moonrise/common/misc/NearbyPlayers.java b/ca/spottedleaf/moonrise/common/misc/NearbyPlayers.java
+index 30ccd1e..20cb2de 100644
 --- a/ca/spottedleaf/moonrise/common/misc/NearbyPlayers.java
 +++ b/ca/spottedleaf/moonrise/common/misc/NearbyPlayers.java
-@@ -22,6 +_,7 @@
-         GENERAL,
-         GENERAL_SMALL,
-         GENERAL_REALLY_SMALL,
-+        GENERAL_REALLY_REALLY_SMALL, // Canvas - add really, really, small nearby map
-         TICK_VIEW_DISTANCE,
-         VIEW_DISTANCE,
-         // Moonrise start - chunk tick iteration
-@@ -121,6 +_,7 @@
-         players[NearbyMapType.GENERAL.ordinal()].update(chunk.x, chunk.z, GENERAL_AREA_VIEW_DISTANCE);
-         players[NearbyMapType.GENERAL_SMALL.ordinal()].update(chunk.x, chunk.z, GENERAL_SMALL_VIEW_DISTANCE);
-         players[NearbyMapType.GENERAL_REALLY_SMALL.ordinal()].update(chunk.x, chunk.z, GENERAL_REALLY_SMALL_VIEW_DISTANCE);
-+        players[NearbyMapType.GENERAL_REALLY_REALLY_SMALL.ordinal()].update(chunk.x, chunk.z, 2); // Canvas - add really, really, small nearby map
-         players[NearbyMapType.TICK_VIEW_DISTANCE.ordinal()].update(chunk.x, chunk.z, PlatformHooks.get().getTickViewDistance(player));
-         players[NearbyMapType.VIEW_DISTANCE.ordinal()].update(chunk.x, chunk.z, PlatformHooks.get().getViewDistance(player));
-         players[NearbyMapType.SPAWN_RANGE.ordinal()].update(chunk.x, chunk.z, ChunkTickConstants.PLAYER_SPAWN_TRACK_RANGE); // Moonrise - chunk tick iteration
+@@ -129,11 +129,11 @@ public final class NearbyPlayers {
+     }
+ 
+     public TrackedChunk getChunk(final ChunkPos pos) {
+-        return this.byChunk.get(CoordinateUtils.getChunkKey(pos));
++        return this.byChunk.get(pos.longKey);
+     }
+ 
+     public TrackedChunk getChunk(final BlockPos pos) {
+-        return this.byChunk.get(CoordinateUtils.getChunkKey(pos));
++        return this.byChunk.get(pos.longKey);
+     }
+ 
+     public TrackedChunk getChunk(final int chunkX, final int chunkZ) {
+@@ -141,11 +141,11 @@ public final class NearbyPlayers {
+     }
+ 
+     public ReferenceList<ServerPlayer> getPlayers(final BlockPos pos, final NearbyMapType type) {
+-        return this.directByChunk[type.ordinal()].get(CoordinateUtils.getChunkKey(pos));
++        return this.directByChunk[type.ordinal()].get(pos.longKey);
+     }
+ 
+     public ReferenceList<ServerPlayer> getPlayers(final ChunkPos pos, final NearbyMapType type) {
+-        return this.directByChunk[type.ordinal()].get(CoordinateUtils.getChunkKey(pos));
++        return this.directByChunk[type.ordinal()].get(pos.longKey);
+     }
+ 
+     public ReferenceList<ServerPlayer> getPlayersByChunk(final int chunkX, final int chunkZ, final NearbyMapType type) {

@@ -1,0 +1,13 @@
+diff --git a/net/minecraft/server/level/DistanceManager.java b/net/minecraft/server/level/DistanceManager.java
+index 1fd1ecc..765c8a9 100644
+--- a/net/minecraft/server/level/DistanceManager.java
++++ b/net/minecraft/server/level/DistanceManager.java
+@@ -177,7 +177,7 @@ public abstract class DistanceManager implements ca.spottedleaf.moonrise.patches
+         for (int i = 0; i < size; ++i) {
+             final LevelChunk chunk = raw[i];
+ 
+-            action.accept(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getChunkKey(chunk.getPos()));
++            action.accept(ca.spottedleaf.moonrise.common.util.chunk.getPos().longKey);
+         }
+         // Paper end - rewrite chunk system
+     }
