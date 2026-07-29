@@ -1166,7 +1166,7 @@ index bc6a5cacd67d46e0beb97adf30d98c1034be1a44..d5f6f9632017c4d4353936e8e257b907
                  if (blockState == null) { return false; } // Paper - Prevent sync chunk loads when villagers try to find beds
                  return globalPos.pos().closerToCenterThan(owner.position(), 2.0) && blockState.is(BlockTags.BEDS) && !blockState.getValue(BedBlock.OCCUPIED);
 diff --git a/net/minecraft/world/entity/animal/allay/AllayAi.java b/net/minecraft/world/entity/animal/allay/AllayAi.java
-index 36a9887f8be04c5c3fda6d926d819a9e5b2a79f2..792f747819922e8945e538e94b0fe2dcae476438 100644
+index a37edaec0f9bbd4269d61f4f051ede8005182077..d17d9a182809fe6424b65fd8c0aba855666e65fa 100644
 --- a/net/minecraft/world/entity/animal/allay/AllayAi.java
 +++ b/net/minecraft/world/entity/animal/allay/AllayAi.java
 @@ -114,6 +114,14 @@ public class AllayAi {

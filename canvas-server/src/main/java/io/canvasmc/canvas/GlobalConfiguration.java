@@ -51,7 +51,8 @@ public class GlobalConfiguration extends Part {
     public static final int WARN = 1;
     public static final int ERROR = 2;
 
-    private static GlobalConfiguration INSTANCE;
+    public static GlobalConfiguration INSTANCE;
+    public static GlobalConfiguration get() { return INSTANCE; }
     private static ApiClient.BuildStatus BUILD_STATUS = ApiClient.BuildStatus.UNKNOWN;
     private static boolean ENABLE_FASTER_RANDOM = true;
 
@@ -138,6 +139,7 @@ public class GlobalConfiguration extends Part {
 
         // validate the configuration so users don't end up doing a stupid
         Validator.validateObject(configuration);
+        io.canvasmc.canvas.util.DABConfig.initDabEntities();
 
         if (TickRegions.started) {
 
@@ -738,6 +740,33 @@ public class GlobalConfiguration extends Part {
         public boolean expiredMessageWarning = true;
         public boolean notSecureMarker = true;
         public boolean nullIdDisconnections = true;
+    }
+
+    public DAB dab = new DAB();
+    public static class DAB extends Part {
+        public boolean enabled = true;
+        public int startDistance = 12;
+        public int maxTickFreq = 20;
+        public int activationDistMod = 8;
+        public boolean dontEnableIfInWater = false;
+        public java.util.List<String> blacklistedEntities = new java.util.ArrayList<>(java.util.Arrays.asList(
+            "villager",
+            "axolotl",
+            "hoglin",
+            "zombified_piglin",
+            "goat"
+        ));
+    }
+
+    public OptimizedPoweredRails optimizedPoweredRails = new OptimizedPoweredRails();
+    public static class OptimizedPoweredRails extends Part {
+        public boolean enabled = true;
+        public int railActivationRange = 8; // Vanilla signal distance (PoweredRailBlock recursionCount >= 8)
+    }
+
+    public AsyncPlayerDataSave asyncPlayerDataSave = new AsyncPlayerDataSave();
+    public static class AsyncPlayerDataSave extends Part {
+        public boolean enabled = true;
     }
 
 }

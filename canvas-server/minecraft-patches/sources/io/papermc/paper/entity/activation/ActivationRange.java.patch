@@ -43,7 +43,7 @@
  
      //static AABB maxBB = new AABB(0, 0, 0, 0, 0, 0); // Folia - threaded regions - replaced by local variable
  
-@@ -231,7 +_,7 @@
+@@ -246,7 +_,7 @@
          }
          // special cases.
          if (entity instanceof final LivingEntity living) {
@@ -52,7 +52,7 @@
                  return 1;
              }
              if (entity instanceof final Mob mob && mob.getTarget() != null) {
-@@ -299,7 +_,7 @@
+@@ -314,7 +_,7 @@
       */
      public static boolean checkIfActive(final Entity entity) {
          // Never safe to skip fireworks or item gravity

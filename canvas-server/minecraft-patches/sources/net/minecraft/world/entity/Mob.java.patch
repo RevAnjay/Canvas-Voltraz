@@ -11,12 +11,12 @@
      @Override
      public void inactiveTick() {
          super.inactiveTick();
--        if (this.goalSelector.inactiveTick()) {
+-        if (this.goalSelector.inactiveTick(this.activatedPriority, true)) {
 +        boolean isThrottled = io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.throttleInactiveGoalSelectorTick && (inactiveTickDisableCounter++ % 20 != 0); // Canvas - throttle inactive goal selector ticking
-+        if (this.goalSelector.inactiveTick() && !isThrottled) { // Canvas - throttle inactive goal selector ticking
++        if (this.goalSelector.inactiveTick(this.activatedPriority, true) && !isThrottled) { // Canvas - throttle inactive goal selector ticking
              this.goalSelector.tick();
          }
-         if (this.targetSelector.inactiveTick()) {
+         if (this.targetSelector.inactiveTick(this.activatedPriority, true)) {
 @@ -341,6 +_,7 @@
              this.resetAmbientSoundTime();
              this.playAmbientSound();

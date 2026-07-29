@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/EntityType.java
 +++ b/net/minecraft/world/entity/EntityType.java
-@@ -1227,9 +_,30 @@
+@@ -1229,9 +_,30 @@
      private final float spawnDimensionsScale;
      private final FeatureFlagSet requiredFeatures;
      private final boolean allowedInPeaceful;

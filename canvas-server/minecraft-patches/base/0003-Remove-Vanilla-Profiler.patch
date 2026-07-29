@@ -84,7 +84,7 @@ index f109be01de8346f6729d30e27784e4cd45cdd48b..c98c4bc7dddb70d25ed3b08ab71ae91f
  
      public int forkLimit() {
 diff --git a/net/minecraft/commands/execution/tasks/BuildContexts.java b/net/minecraft/commands/execution/tasks/BuildContexts.java
-index 569abbea01f585990d2017c68580257275bbb06d..46cf0f3ab7146ba2f37eb1a3ef97eca864219eae 100644
+index c358df41d94ae3b0172883d25036c3bd8a1fe802..5a124bc9facb9e72907e74ec4b3a58b80337d5e4 100644
 --- a/net/minecraft/commands/execution/tasks/BuildContexts.java
 +++ b/net/minecraft/commands/execution/tasks/BuildContexts.java
 @@ -42,9 +42,6 @@ public class BuildContexts<T extends ExecutionCommandSource<T>> {

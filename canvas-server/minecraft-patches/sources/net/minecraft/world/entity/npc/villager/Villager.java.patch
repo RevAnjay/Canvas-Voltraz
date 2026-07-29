@@ -11,7 +11,7 @@
      public static final Map<MemoryModuleType<GlobalPos>, BiPredicate<Villager, Holder<PoiType>>> POI_MEMORIES = ImmutableMap.of(
          MemoryModuleType.HOME,
          (villager, poiType) -> poiType.is(PoiTypes.HOME),
-@@ -293,6 +_,15 @@
+@@ -296,6 +_,15 @@
      }
      protected void customServerAiStep(ServerLevel level, final boolean inactive) {
          // Paper end - EAR 2
@@ -24,10 +24,10 @@
 +            this.canvas$isHibernating = false;
 +        }
 +        // Canvas end - VillagerSmartHibernation
-         if (!inactive) this.getBrain().tick(level, this); // Paper - EAR 2
+         if (!inactive && this.behaviorTick++ % this.activatedPriority == 0) this.getBrain().tick(level, this); // Paper - EAR 2 / Pufferfish - DAB
          if (this.assignProfessionWhenSpawned) {
              this.assignProfessionWhenSpawned = false;
-@@ -331,6 +_,24 @@
+@@ -334,6 +_,24 @@
          super.customServerAiStep(level);
      }
  
@@ -52,7 +52,7 @@
      @Override
      public void tick() {
          super.tick();
-@@ -851,7 +_,15 @@
+@@ -854,7 +_,15 @@
  
      private int countFoodPointsInInventory() {
          SimpleContainer inventory = this.getInventory();

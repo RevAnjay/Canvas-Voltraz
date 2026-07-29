@@ -32,7 +32,7 @@
      public int invulnerableTime;
      protected boolean firstTick = true;
      protected final SynchedEntityData entityData;
-@@ -890,7 +_,7 @@
+@@ -893,7 +_,7 @@
          }
  
          //if (this instanceof ServerPlayer) this.handlePortal(); // CraftBukkit - Moved up to postTick // Folia - region threading - ONLY allow in postTick()
@@ -41,7 +41,7 @@
              this.spawnSprintParticle();
          }
  
-@@ -925,7 +_,16 @@
+@@ -928,7 +_,16 @@
  
          this.checkBelowWorld();
          if (!this.level().isClientSide()) {
@@ -58,7 +58,7 @@
          }
  
          this.firstTick = false;
-@@ -1125,9 +_,27 @@
+@@ -1128,9 +_,27 @@
      }
  
      public void move(MoverType type, Vec3 movement) {
@@ -86,7 +86,7 @@
              this.setPos(this.getX() + movement.x, this.getY() + movement.y, this.getZ() + movement.z);
              this.horizontalCollision = false;
              this.verticalCollision = false;
-@@ -1176,6 +_,18 @@
+@@ -1179,6 +_,18 @@
  
                  Vec3 vec32 = this.position();
                  Vec3 vec33 = vec32.add(vec3);
@@ -105,7 +105,7 @@
                  this.addMovementThisTick(new Entity.Movement(vec32, vec33, movement));
                  this.setPos(vec33);
              }
-@@ -1243,8 +_,17 @@
+@@ -1246,8 +_,17 @@
                      }
                  }
  
@@ -125,7 +125,7 @@
                  if (this.vehicle == null && type != MoverType.PLAYER) this.repositionAllPassengers(false); // Paper
              }
          }
-@@ -1371,9 +_,19 @@
+@@ -1374,9 +_,19 @@
                      this.walkingStepSound(pos, state);
                  }
  
@@ -146,7 +146,7 @@
  
                  return true;
              } else {
-@@ -1703,6 +_,11 @@
+@@ -1706,6 +_,11 @@
          boolean flag1 = this.level instanceof ServerLevel serverLevel
              && serverLevel.getServer().debugSubscribers().hasAnySubscriberFor(DebugSubscriptions.ENTITY_BLOCK_INTERSECTIONS);
          AtomicInteger atomicInteger = new AtomicInteger();
@@ -158,7 +158,7 @@
          BlockGetter.forEachBlockIntersectedBetween(
              from,
              to,
-@@ -1713,13 +_,25 @@
+@@ -1716,13 +_,25 @@
                  } else if (index >= maxSteps) {
                      return false;
                  } else {
@@ -190,7 +190,7 @@
                      if (blockState.isAir()) {
                          if (flag1) {
                              this.debugBlockIntersection((ServerLevel)this.level(), pos.immutable(), false, false);
-@@ -1730,7 +_,7 @@
+@@ -1733,7 +_,7 @@
                          VoxelShape entityInsideCollisionShape = blockState.getEntityInsideCollisionShape(this.level(), pos, this);
                          boolean flag2 = entityInsideCollisionShape == Shapes.block()
                              || this.collidedWithShapeMovingFrom(from, to, entityInsideCollisionShape.move(new Vec3(pos)).toAabbs());
@@ -199,7 +199,7 @@
                          if ((flag2 || flag3) && visited.add(pos.asLong())) {
                              if (flag2) {
                                  try {
-@@ -1782,6 +_,7 @@
+@@ -1785,6 +_,7 @@
      }
  
      public boolean collidedWithFluid(FluidState fluid, BlockPos pos, Vec3 from, Vec3 to) {
@@ -207,7 +207,7 @@
          AABB aabb = fluid.getAABB(this.level(), pos);
          return aabb != null && this.collidedWithShapeMovingFrom(from, to, List.of(aabb));
      }
-@@ -2027,7 +_,7 @@
+@@ -2030,7 +_,7 @@
      }
  
      protected boolean updateInWaterStateAndDoFluidPushing() {
@@ -216,7 +216,7 @@
          this.updateInWaterStateAndDoWaterCurrentPushing();
          double d = this.level.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA) ? 0.007 : 0.0023333333333333335;
          boolean flag = this.updateFluidHeightAndDoFluidPushing(FluidTags.LAVA, d);
-@@ -2050,8 +_,8 @@
+@@ -2053,8 +_,8 @@
      }
  
      private void updateFluidOnEyes() {
@@ -227,7 +227,7 @@
          double eyeY = this.getEyeY();
          if (!(
              this.getVehicle() instanceof AbstractBoat abstractBoat
-@@ -2063,10 +_,29 @@
+@@ -2066,10 +_,29 @@
              FluidState fluidState = this.level().getFluidState(blockPos);
              double d = blockPos.getY() + fluidState.getHeight(this.level(), blockPos);
              if (d > eyeY) {
@@ -258,7 +258,7 @@
  
      protected void doWaterSplashEffect() {
          Entity entity = Objects.requireNonNullElse(this.getControllingPassenger(), this);
-@@ -2083,6 +_,7 @@
+@@ -2086,6 +_,7 @@
  
          float f1 = Mth.floor(this.getY());
  
@@ -266,7 +266,7 @@
          for (int i = 0; i < 1.0F + this.dimensions.width() * 20.0F; i++) {
              double d = (this.random.nextDouble() * 2.0 - 1.0) * this.dimensions.width();
              double d1 = (this.random.nextDouble() * 2.0 - 1.0) * this.dimensions.width();
-@@ -2103,6 +_,7 @@
+@@ -2106,6 +_,7 @@
              double d1 = (this.random.nextDouble() * 2.0 - 1.0) * this.dimensions.width();
              this.level().addParticle(ParticleTypes.SPLASH, this.getX() + d, f1 + 1.0F, this.getZ() + d1, deltaMovement.x, deltaMovement.y, deltaMovement.z);
          }
@@ -274,7 +274,7 @@
  
          this.gameEvent(GameEvent.SPLASH);
      }
-@@ -2144,11 +_,38 @@
+@@ -2147,11 +_,38 @@
      }
  
      public boolean isEyeInFluid(TagKey<Fluid> fluidTag) {
@@ -316,7 +316,7 @@
      }
  
      public void moveRelative(float amount, Vec3 relative) {
-@@ -2170,10 +_,24 @@
+@@ -2173,10 +_,24 @@
  
      @Deprecated
      public float getLightLevelDependentMagicValue() {
@@ -345,7 +345,7 @@
  
      public void absSnapTo(double x, double y, double z, float yRot, float xRot) {
          this.absSnapTo(x, y, z);
-@@ -2285,8 +_,8 @@
+@@ -2288,8 +_,8 @@
      }
  
      public void push(Entity entity) {
@@ -355,7 +355,7 @@
                  if (this.level.paperConfig().collisions.onlyPlayersCollide && !(entity instanceof ServerPlayer || this instanceof ServerPlayer)) return; // Paper - Collision option for requiring a player participant
                  double d = entity.getX() - this.getX();
                  double d1 = entity.getZ() - this.getZ();
-@@ -3450,6 +_,15 @@
+@@ -3453,6 +_,15 @@
          return this.calculateViewVector(this.getXRot(), this.getYRot());
      }
  
@@ -371,7 +371,7 @@
      public Vec3 getHeadLookAngle() {
          return this.calculateViewVector(this.getXRot(), this.getYHeadRot());
      }
-@@ -3792,6 +_,7 @@
+@@ -3795,6 +_,7 @@
      }
  
      protected static void sendBubbleColumnParticles(Level level, BlockPos pos) {
@@ -379,7 +379,7 @@
          if (level instanceof ServerLevel serverLevel) {
              for (int i = 0; i < 2; i++) {
                  serverLevel.sendParticles(
-@@ -4346,6 +_,7 @@
+@@ -4349,6 +_,7 @@
          Entity copy = this.getType().create(destination, EntitySpawnReason.DIMENSION_TRAVEL);
          copy.restoreFrom(this);
          copy.transform(pos, yaw, pitch, velocity);
@@ -387,7 +387,7 @@
          // vanilla code used to call remove _after_ copying, and some stuff is required to be after copy - so add hook here
          // for example, clearing of inventory after switching dimensions
          this.postRemoveAfterChangingDimensions();
-@@ -4362,11 +_,18 @@
+@@ -4365,11 +_,18 @@
              teleportTarget.cause(), teleportFlags, teleportComplete
          );
      }
@@ -406,7 +406,7 @@
          if (!ServerLevel.isInSpawnableBounds(new BlockPos(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockX(pos), ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockY(pos), ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockZ(pos)))) {
              throw new TeleportValidationException("Destination pos not in spawnable bounds");
          }
-@@ -4568,7 +_,7 @@
+@@ -4571,7 +_,7 @@
      public boolean endPortalLogicAsync(BlockPos portalPos) {
          ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this, "Cannot portal entity async");
  
@@ -415,7 +415,7 @@
          if (destination == null) {
              // wat
              return false;
-@@ -4580,7 +_,7 @@
+@@ -4583,7 +_,7 @@
      public boolean netherPortalLogicAsync(BlockPos portalPos) {
          ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this, "Cannot portal entity async");
  
@@ -424,7 +424,7 @@
          if (destination == null) {
              // wat
              return false;
-@@ -4876,6 +_,14 @@
+@@ -4879,6 +_,14 @@
              node.root = node.root.transformForAsyncTeleport(destination, null, null, null, null);
              // set portal cooldown
              node.root.setPortalCooldown();
@@ -439,7 +439,7 @@
          }
  
          // ensure the region is always ticking in case of a shutdown
-@@ -4989,19 +_,21 @@
+@@ -4992,19 +_,21 @@
                  );
                  event.callEvent();
  
@@ -469,7 +469,7 @@
              }
              if (this.isRemoved()) {
                  return null;
-@@ -5181,7 +_,7 @@
+@@ -5184,7 +_,7 @@
  
      public boolean canTeleport(Level fromLevel, Level toLevel) {
          if (!this.isAlive() || !this.valid) return false; // Paper - Fix item duplication and teleport issues
@@ -478,7 +478,7 @@
              for (Entity entity : this.getPassengers()) {
                  if (entity instanceof ServerPlayer serverPlayer && !serverPlayer.seenCredits) {
                      return false;
-@@ -5408,6 +_,7 @@
+@@ -5411,6 +_,7 @@
      }
  
      public final void setBoundingBox(AABB bb) {
@@ -486,7 +486,7 @@
          // CraftBukkit start - block invalid bounding boxes
          double minX = bb.minX,
                  minY = bb.minY,
-@@ -5709,9 +_,7 @@
+@@ -5712,9 +_,7 @@
  
      // Paper start - optimise collisions
      public boolean updateFluidHeightAndDoFluidPushing(final TagKey<Fluid> fluid, final double flowScale) {
@@ -497,7 +497,7 @@
  
          final AABB boundingBox = this.getBoundingBox().deflate(1.0E-3);
  
-@@ -5743,6 +_,7 @@
+@@ -5746,6 +_,7 @@
  
          final net.minecraft.world.level.chunk.ChunkSource chunkSource = world.getChunkSource();
  
@@ -505,7 +505,7 @@
          final int chunkLenX = maxChunkX - minChunkX + 1;
          // chunk index = (x - minX) + (maxX-minX+1)*(z - minZ)
          //             = x + (maxX-minX+1)*z - (minX + (maxX-minX+1)*minZ)
-@@ -5753,14 +_,28 @@
+@@ -5756,14 +_,28 @@
          // init chunks
          for (int currChunkZ = minChunkZ; currChunkZ <= maxChunkZ; ++currChunkZ) {
              for (int currChunkX = minChunkX; currChunkX <= maxChunkX; ++currChunkX) {
@@ -536,7 +536,7 @@
                          .states.get((currX & 15) | ((currZ & 15) << 4) | ((currY & 15) << 8)).getFluidState();
  
                      if (fluidState.isEmpty() || !fluidState.is(fluid)) {
-@@ -5802,7 +_,7 @@
+@@ -5805,7 +_,7 @@
              }
          }
  
@@ -545,7 +545,7 @@
  
          if (pushVector == Vec3.ZERO) {
              return inFluid;
-@@ -5838,7 +_,7 @@
+@@ -5841,7 +_,7 @@
      }
  
      public double getFluidHeight(TagKey<Fluid> fluidTag) {
@@ -554,7 +554,7 @@
      }
  
      public double getFluidJumpThreshold() {
-@@ -6104,6 +_,7 @@
+@@ -6107,6 +_,7 @@
              Util.logAndPauseIfInIde("Invalid entity rotation: " + yRot + ", discarding.");
          } else {
              this.yRot = yRot;
@@ -562,7 +562,7 @@
          }
      }
  
-@@ -6116,6 +_,7 @@
+@@ -6119,6 +_,7 @@
              Util.logAndPauseIfInIde("Invalid entity rotation: " + xRot + ", discarding.");
          } else {
              this.xRot = Math.clamp(xRot % 360.0F, -90.0F, 90.0F);
