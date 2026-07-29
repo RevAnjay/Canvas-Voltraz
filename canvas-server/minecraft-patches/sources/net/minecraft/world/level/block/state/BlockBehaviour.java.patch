@@ -1,8 +1,16 @@
 diff --git a/net/minecraft/world/level/block/state/BlockBehaviour.java b/net/minecraft/world/level/block/state/BlockBehaviour.java
-index a26e2b6..902739a 100644
+index a26e2b6..15abf37 100644
 --- a/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/net/minecraft/world/level/block/state/BlockBehaviour.java
-@@ -167,7 +167,7 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -100,6 +100,7 @@ public abstract class BlockBehaviour implements FeatureElement {
+     protected final BlockBehaviour.Properties properties;
+     protected final Optional<ResourceKey<LootTable>> drops;
+     protected final String descriptionId;
++    public @Nullable BlockEntityType blockEntityType = null; // Leaf - Optimize BlockEntityType#isValid
+ 
+     public BlockBehaviour(BlockBehaviour.Properties properties) {
+         this.hasCollision = properties.hasCollision;
+@@ -167,7 +168,7 @@ public abstract class BlockBehaviour implements FeatureElement {
      }
  
      protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
@@ -11,7 +19,7 @@ index a26e2b6..902739a 100644
      }
  
      protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-@@ -427,6 +427,9 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -427,6 +428,9 @@ public abstract class BlockBehaviour implements FeatureElement {
          private final boolean ignitedByLava;
          @Deprecated
          private final boolean liquid;
@@ -21,7 +29,7 @@ index a26e2b6..902739a 100644
          @Deprecated
          private boolean legacySolid;
          private final PushReaction pushReaction;
-@@ -470,6 +473,24 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -470,6 +474,24 @@ public abstract class BlockBehaviour implements FeatureElement {
          private boolean emptyCollisionShape;
          private boolean emptyConstantCollisionShape;
          private VoxelShape constantCollisionShape;
@@ -46,7 +54,7 @@ index a26e2b6..902739a 100644
  
          private static void initCaches(final VoxelShape shape, final boolean neighbours) {
              ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape).moonrise$isFullBlock();
-@@ -576,6 +597,9 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -576,6 +598,9 @@ public abstract class BlockBehaviour implements FeatureElement {
          protected boolean shapeExceedsCube = true; // Paper - moved from actual method to here
          public void initCache() {
              this.fluidState = this.owner.getFluidState(this.asState());
@@ -56,7 +64,7 @@ index a26e2b6..902739a 100644
              this.isRandomlyTicking = this.owner.isRandomlyTicking(this.asState());
              if (!this.getBlock().hasDynamicShape()) {
                  this.cache = new BlockBehaviour.BlockStateBase.Cache(this.asState());
-@@ -1064,8 +1088,14 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -1064,8 +1089,14 @@ public abstract class BlockBehaviour implements FeatureElement {
                          )
                      );
                  } else {
