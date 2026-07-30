@@ -4,11 +4,11 @@
          SensorType.SECONDARY_POIS,
          SensorType.GOLEM_DETECTED
      );
-+    // Canvas start - Lobotomize stuck villagers (ported from Purpur/Luminol)
++    // Luminol start - Lobotomize stuck villagers (ported from Purpur/Luminol)
 +    private boolean isLobotomized = false;
 +    public boolean isLobotomized() { return this.isLobotomized; }
 +    private int notLobotomizedCount = 0;
-+    // Canvas end - Lobotomize stuck villagers
++    // Luminol end - Lobotomize stuck villagers
 +
      public static final Map<MemoryModuleType<GlobalPos>, BiPredicate<Villager, Holder<PoiType>>> POI_MEMORIES = ImmutableMap.of(
          MemoryModuleType.HOME,
@@ -20,7 +20,7 @@
 -    protected void customServerAiStep(ServerLevel level, final boolean inactive) {
 +    protected void customServerAiStep(ServerLevel level, boolean inactive) {
          // Paper end - EAR 2
-+        // Canvas start - Lobotomize stuck villagers (ported from Purpur/Luminol)
++        // Luminol start - Lobotomize stuck villagers (ported from Purpur/Luminol)
 +        io.canvasmc.canvas.WorldConfig.Entities.Villagers villagerConfig = io.canvasmc.canvas.WorldConfig.forWorld(level).entities.villagers;
 +        if (villagerConfig.lobotomizeEnabled) {
 +            // treat as inactive if lobotomized
@@ -28,9 +28,9 @@
 +        } else {
 +            this.isLobotomized = false;
 +        }
-+        // Canvas end - Lobotomize stuck villagers
++        // Luminol end - Lobotomize stuck villagers
          if (!inactive && this.behaviorTick++ % this.activatedPriority == 0) this.getBrain().tick(level, this); // Paper - EAR 2 / Pufferfish - DAB
-+        else if (this.isLobotomized && shouldRestock(level)) restock(); // Canvas - Lobotomize stuck villagers
++        else if (this.isLobotomized && shouldRestock(level)) restock(); // Luminol - Lobotomize stuck villagers
          if (this.assignProfessionWhenSpawned) {
              this.assignProfessionWhenSpawned = false;
          }
@@ -38,7 +38,7 @@
          super.customServerAiStep(level);
      }
  
-+    // Canvas start - Lobotomize stuck villagers (ported from Purpur/Luminol)
++    // Luminol start - Lobotomize stuck villagers (ported from Purpur/Luminol)
 +    private boolean checkLobotomized(ServerLevel level, io.canvasmc.canvas.WorldConfig.Entities.Villagers config) {
 +        int interval = config.lobotomizeCheckInterval;
 +        boolean shouldCheckForTradeLocked = config.lobotomizeWaitUntilTradeLocked;
@@ -80,7 +80,7 @@
 +        // only if both blocks have no collision
 +        return !bottom.hasCollision && !top.hasCollision;
 +    }
-+    // Canvas end - Lobotomize stuck villagers
++    // Luminol end - Lobotomize stuck villagers
 +
      @Override
      public void tick() {

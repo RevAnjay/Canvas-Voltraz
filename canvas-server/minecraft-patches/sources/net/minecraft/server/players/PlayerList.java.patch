@@ -217,7 +217,7 @@
          if (Files.exists(path)) {
              return path;
          } else {
-+            // Canvas start - Remove useless creating stats json bases on player name logic
++            // Luminol start - Remove useless creating stats json bases on player name logic
 +            // Modern servers always use UUID-based stats files. The legacy player-name fallback
 +            // is dead code that adds unnecessary IO + string operations on every player join.
 +            /*
@@ -229,7 +229,7 @@
                  }
              }
 +            */
-+            // Canvas end - Remove useless creating stats json bases on player name logic
++            // Luminol end - Remove useless creating stats json bases on player name logic
  
              return path;
          }

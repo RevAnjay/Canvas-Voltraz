@@ -18,7 +18,7 @@
      private static final class BasicEntityList<E extends Entity> {
  
 -        private static final Entity[] EMPTY = new Entity[0];
-+        private static final Entity[] EMPTY = io.canvasmc.canvas.util.ArrayConstants.emptyEntityArray; // Canvas - reduce array allocations
++        private static final Entity[] EMPTY = io.canvasmc.canvas.util.ArrayConstants.emptyEntityArray; // Luminol - reduce array allocations
          private static final int DEFAULT_CAPACITY = 4;
  
          private E[] storage;
@@ -27,7 +27,7 @@
  
          public BasicEntityList(final int cap) {
 -            this.storage = (E[])(cap <= 0 ? EMPTY : new Entity[cap]);
-+            this.storage = (E[])(cap <= 0 ? io.canvasmc.canvas.util.ArrayConstants.emptyEntityArray : new Entity[cap]); // Canvas - reduce array allocations
++            this.storage = (E[])(cap <= 0 ? io.canvasmc.canvas.util.ArrayConstants.emptyEntityArray : new Entity[cap]); // Luminol - reduce array allocations
          }
  
          public boolean isEmpty() {
@@ -36,7 +36,7 @@
  
          private void resize() {
 -            if (this.storage == EMPTY) {
-+            if (this.storage == io.canvasmc.canvas.util.ArrayConstants.emptyEntityArray) { // Canvas - reduce array allocations
++            if (this.storage == io.canvasmc.canvas.util.ArrayConstants.emptyEntityArray) { // Luminol - reduce array allocations
                  this.storage = (E[])new Entity[DEFAULT_CAPACITY];
              } else {
                  this.storage = Arrays.copyOf(this.storage, this.storage.length * 2);

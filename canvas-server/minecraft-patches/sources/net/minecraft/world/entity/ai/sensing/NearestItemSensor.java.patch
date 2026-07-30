@@ -13,7 +13,7 @@
      private static final long XZ_RANGE = 32L;
      private static final long Y_RANGE = 16L;
      public static final int MAX_DISTANCE_TO_WANTED_ITEM = 32;
-+    private static final double MAX_DIST_SQ = (double) MAX_DISTANCE_TO_WANTED_ITEM * MAX_DISTANCE_TO_WANTED_ITEM; // Canvas - fast bit radix sort
++    private static final double MAX_DIST_SQ = (double) MAX_DISTANCE_TO_WANTED_ITEM * MAX_DISTANCE_TO_WANTED_ITEM; // Luminol - fast bit radix sort
  
      @Override
      public Set<MemoryModuleType<?>> requires() {
@@ -23,14 +23,14 @@
          Brain<?> brain = entity.getBrain();
 -        List<ItemEntity> entitiesOfClass = level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(32.0, 16.0, 32.0), itemEntity -> itemEntity.closerThan(entity, MAX_DISTANCE_TO_WANTED_ITEM) && entity.wantsToPickUp(level, itemEntity.getItem())); // Paper - Perf: Move predicate into getEntities
 -        entitiesOfClass.sort(Comparator.comparingDouble(entity::distanceToSqr));
-+        // Canvas start - fast bit radix sort
++        // Luminol start - fast bit radix sort
 +        net.minecraft.core.Position pos = entity.position();
 +        double x = pos.x();
 +        double y = pos.y();
 +        double z = pos.z();
 +        it.unimi.dsi.fastutil.objects.ObjectArrayList<ItemEntity> entitiesOfClass = (it.unimi.dsi.fastutil.objects.ObjectArrayList<ItemEntity>) level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(32.0, 16.0, 32.0), itemEntity -> itemEntity.distanceToSqr(x, y, z) < MAX_DIST_SQ && entity.wantsToPickUp(level, itemEntity.getItem())); // Paper - Perf: Move predicate into getEntities
 +        level.getCurrentWorldData().radixBitSorter.sort(entitiesOfClass.elements(), entitiesOfClass.size(), pos);
-+        // Canvas end - fast bit radix sort
++        // Luminol end - fast bit radix sort
          // Paper start - Perf: remove streams from hot code
          ItemEntity nearest = null;
          for (final ItemEntity itemEntity : entitiesOfClass) {

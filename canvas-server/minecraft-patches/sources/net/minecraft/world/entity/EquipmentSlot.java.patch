@@ -4,7 +4,7 @@
      SADDLE(EquipmentSlot.Type.SADDLE, 0, 1, 7, "saddle");
  
      public static final int NO_COUNT_LIMIT = 0;
-+    public static final EquipmentSlot[] VALUES_ARRAY = values(); // Canvas - reduce array allocations
++    public static final EquipmentSlot[] VALUES_ARRAY = values(); // Luminol - reduce array allocations
      public static final List<EquipmentSlot> VALUES = List.of(values());
      public static final IntFunction<EquipmentSlot> BY_ID = ByIdMap.continuous(equipmentSlot -> equipmentSlot.id, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
      public static final StringRepresentable.EnumCodec<EquipmentSlot> CODEC = StringRepresentable.fromEnum(EquipmentSlot::values);

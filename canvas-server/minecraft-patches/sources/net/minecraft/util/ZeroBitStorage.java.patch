@@ -5,7 +5,7 @@
  
  public class ZeroBitStorage implements BitStorage {
 -    public static final long[] RAW = new long[0];
-+    public static final long[] RAW = io.canvasmc.canvas.util.ArrayConstants.emptyLongArray; // Canvas - reduce array allocations
++    public static final long[] RAW = io.canvasmc.canvas.util.ArrayConstants.emptyLongArray; // Luminol - reduce array allocations
      private final int size;
  
      public ZeroBitStorage(int size) {

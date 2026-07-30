@@ -235,11 +235,11 @@
          }
          // Paper end - Add BlockBreakProgressUpdateEvent
 -        for (ServerPlayer serverPlayer : this.server.getPlayerList().getPlayers()) {
-+        // Canvas start - reduce block destruction packet allocations
++        // Gale start - SportPaper - reduce block destruction packet allocations
 +        var players = this.server.getPlayerList().getPlayers();
 +        if (players.isEmpty()) return;
 +        ClientboundBlockDestructionPacket packet = new ClientboundBlockDestructionPacket(breakerId, pos, progress);
-+        // Canvas end - reduce block destruction packet allocations
++        // Gale end - SportPaper - reduce block destruction packet allocations
 +        for (ServerPlayer serverPlayer : players) {
              if (serverPlayer.level() == this && serverPlayer.getId() != breakerId) {
                  double d = pos.getX() - serverPlayer.getX();
@@ -249,7 +249,7 @@
                  // CraftBukkit end
                  if (d * d + d1 * d1 + d2 * d2 < 1024.0) {
 -                    serverPlayer.connection.send(new ClientboundBlockDestructionPacket(breakerId, pos, progress));
-+                    serverPlayer.connection.send(packet); // Canvas - reduce block destruction packet allocations
++                    serverPlayer.connection.send(packet); // Gale - SportPaper - reduce block destruction packet allocations
                  }
              }
          }

@@ -5,7 +5,7 @@
  
              if (conversionParams.keepEquipment()) {
 -                for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+                for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++                for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
                      ItemStack itemBySlot = oldMob.getItemBySlot(equipmentSlot);
                      if (!itemBySlot.isEmpty()) {
                          newMob.setItemSlot(equipmentSlot, itemBySlot.copyAndClear());

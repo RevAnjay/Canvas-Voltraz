@@ -40,7 +40,7 @@
  
      private boolean isEquipped(Item item) {
 -        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
              ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
              Equippable equippable = itemBySlot.get(DataComponents.EQUIPPABLE);
              if (itemBySlot.is(item) && equippable != null && equippable.slot() == equipmentSlot) {

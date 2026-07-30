@@ -93,7 +93,7 @@
                                          if (target instanceof net.minecraft.world.entity.animal.allay.Allay || target instanceof net.minecraft.world.entity.animal.equine.AbstractHorse) { // Paper - Fix horse armor desync
                                              ServerGamePacketListenerImpl.this.send(new net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket(
 -                                                target.getId(), java.util.Arrays.stream(net.minecraft.world.entity.EquipmentSlot.values())
-+                                                target.getId(), java.util.Arrays.stream(net.minecraft.world.entity.EquipmentSlot.VALUES_ARRAY) // Canvas - reduce array allocations
++                                                target.getId(), java.util.Arrays.stream(net.minecraft.world.entity.EquipmentSlot.VALUES_ARRAY) // Luminol - reduce array allocations
                                                  .map((slot) -> com.mojang.datafixers.util.Pair.of(slot, ((LivingEntity) target).getItemBySlot(slot).copy()))
                                                  .collect(Collectors.toList()), true)); // Paper - sanitize
                                              player.containerMenu.sendAllDataToRemote();

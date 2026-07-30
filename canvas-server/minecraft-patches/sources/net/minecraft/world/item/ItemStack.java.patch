@@ -19,7 +19,7 @@
      private void addAttributeTooltips(Consumer<Component> tooltipAdder, TooltipDisplay tooltipDisplay, @Nullable Player player) {
          if (tooltipDisplay.shows(DataComponents.ATTRIBUTE_MODIFIERS)) {
 -            for (EquipmentSlotGroup equipmentSlotGroup : EquipmentSlotGroup.values()) {
-+            for (EquipmentSlotGroup equipmentSlotGroup : EquipmentSlotGroup.VALUES_ARRAY) { // Canvas - reduce array allocations
++            for (EquipmentSlotGroup equipmentSlotGroup : EquipmentSlotGroup.VALUES_ARRAY) { // Luminol - reduce array allocations
                  MutableBoolean mutableBoolean = new MutableBoolean(true);
                  this.forEachModifier(
                      equipmentSlotGroup,

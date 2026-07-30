@@ -5,7 +5,7 @@
  
  public class TranslatableContents implements ComponentContents {
 -    public static final Object[] NO_ARGS = new Object[0];
-+    public static final Object[] NO_ARGS = io.canvasmc.canvas.util.ArrayConstants.emptyObjectArray; // Canvas - reduce array allocations
++    public static final Object[] NO_ARGS = io.canvasmc.canvas.util.ArrayConstants.emptyObjectArray; // Luminol - reduce array allocations
      private static final Codec<Object> PRIMITIVE_ARG_CODEC = ExtraCodecs.JAVA.validate(TranslatableContents::filterAllowedArguments);
      private static final Codec<Object> ARG_CODEC = Codec.either(PRIMITIVE_ARG_CODEC, ComponentSerialization.CODEC)
          .xmap(

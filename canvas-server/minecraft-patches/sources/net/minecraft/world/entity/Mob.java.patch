@@ -30,7 +30,7 @@
              int i = this.xpReward;
  
 -            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
                  if (equipmentSlot.canIncreaseExperience()) {
                      ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
                      if (!itemBySlot.isEmpty() && this.dropChances.byEquipment(equipmentSlot) <= 1.0F) {
@@ -105,7 +105,7 @@
          super.dropCustomDeathLoot(level, damageSource, recentlyHit);
  
 -        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
              if (this.shouldSkipLoot(equipmentSlot)) continue; // Paper
              ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
              float f = this.dropChances.byEquipment(equipmentSlot);
@@ -114,7 +114,7 @@
          Set<EquipmentSlot> set = new HashSet<>();
  
 -        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
              ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
              if (!itemBySlot.isEmpty()) {
                  if (!filter.test(itemBySlot)) {
@@ -123,7 +123,7 @@
          this.enchantSpawnedWeapon(level, random, difficulty);
  
 -        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
              if (equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
                  this.enchantSpawnedArmor(level, random, equipmentSlot, difficulty);
              }
@@ -132,7 +132,7 @@
      protected void postRemoveAfterChangingDimensions() {
          super.postRemoveAfterChangingDimensions();
 -        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
              ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
              if (!itemBySlot.isEmpty()) {
                  itemBySlot.setCount(0);
@@ -141,7 +141,7 @@
          super.removeAfterChangingDimensions();
          // Folia start - region threading - move inventory clearing until after the dimension change - move into postRemoveAfterChangingDimensions
 -//        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+//        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++//        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
  //            ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
  //            if (!itemBySlot.isEmpty()) {
  //                itemBySlot.setCount(0);

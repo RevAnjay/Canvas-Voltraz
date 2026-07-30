@@ -5,7 +5,7 @@
  
      public String[] getUserList() {
 -        return this.map.keySet().toArray(new String[0]);
-+        return this.map.keySet().toArray(io.canvasmc.canvas.util.ArrayConstants.emptyStringArray); // Canvas - reduce array allocations
++        return this.map.keySet().toArray(io.canvasmc.canvas.util.ArrayConstants.emptyStringArray); // Luminol - reduce array allocations
      }
  
      public boolean isEmpty() {

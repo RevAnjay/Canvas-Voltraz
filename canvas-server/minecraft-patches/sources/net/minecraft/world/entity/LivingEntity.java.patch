@@ -267,7 +267,7 @@
          // Paper end - EntityEquipmentChangedEvent
  
 -        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
              ItemStack itemStack = this.lastEquipmentItems.get(equipmentSlot);
              ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
              if (this.equipmentHasChanged(itemStack, itemBySlot)) {
@@ -305,7 +305,7 @@
      public boolean canGlide() {
          if (!this.onGround() && !this.isPassenger() && !this.hasEffect(MobEffects.LEVITATION)) {
 -            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
                  if (canGlideUsing(this.getItemBySlot(equipmentSlot), equipmentSlot)) {
                      return true;
                  }

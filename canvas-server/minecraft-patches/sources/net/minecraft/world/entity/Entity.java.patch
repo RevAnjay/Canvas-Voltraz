@@ -360,7 +360,7 @@
  
      private boolean attemptToShearEquipment(Player player, InteractionHand hand, ItemStack stack, Mob mob) {
 -        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
              ItemStack itemBySlot = mob.getItemBySlot(equipmentSlot);
              Equippable equippable = itemBySlot.get(DataComponents.EQUIPPABLE);
              if (equippable != null
@@ -386,11 +386,11 @@
      public boolean isOnFire() {
 -        boolean flag = this.level() != null && this.level().isClientSide();
 -        return !this.fireImmune() && (this.remainingFireTicks > 0 || flag && this.getSharedFlag(FLAG_ONFIRE));
-+        // Canvas start - Short-circuit isOnFire checks
++        // Leaf start - Short-circuit isOnFire checks
 +        // Server-side only (Folia), so clientSide flag check is dead code.
 +        // Reorder: check remainingFireTicks first to skip fireImmune() virtual call when not on fire.
 +        return this.remainingFireTicks > 0 && !this.fireImmune();
-+        // Canvas end - Short-circuit isOnFire checks
++        // Leaf end - Short-circuit isOnFire checks
      }
  
      public boolean isPassenger() {

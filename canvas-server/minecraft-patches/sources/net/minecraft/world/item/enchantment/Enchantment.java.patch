@@ -5,7 +5,7 @@
          Map<EquipmentSlot, ItemStack> map = Maps.newEnumMap(EquipmentSlot.class);
  
 -        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
              if (this.matchingSlot(equipmentSlot)) {
                  ItemStack itemBySlot = entity.getItemBySlot(equipmentSlot);
                  if (!itemBySlot.isEmpty()) {

@@ -5,7 +5,7 @@
      @Override
      public DataResult<ByteBuffer> getByteBuffer(Unit input) {
 -        return DataResult.success(ByteBuffer.wrap(new byte[0]));
-+        return DataResult.success(ByteBuffer.wrap(io.canvasmc.canvas.util.ArrayConstants.emptyByteArray)); // Canvas - reduce array allocations
++        return DataResult.success(ByteBuffer.wrap(io.canvasmc.canvas.util.ArrayConstants.emptyByteArray)); // Luminol - reduce array allocations
      }
  
      @Override

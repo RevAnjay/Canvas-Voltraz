@@ -177,7 +177,7 @@
              List<Pair<EquipmentSlot, ItemStack>> list = Lists.newArrayList();
  
 -            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
-+            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
++            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Luminol - reduce array allocations
                  ItemStack itemBySlot = livingEntityx.getItemBySlot(equipmentSlot);
                  if (!itemBySlot.isEmpty()) {
                      list.add(Pair.of(equipmentSlot, itemBySlot.copy()));
