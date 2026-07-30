@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -717,6 +717,13 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -717,6 +_,13 @@
          // Paper end - rewrite chunk system
          this.getCraftServer().addWorld(this.getWorld()); // CraftBukkit
          this.updateTickData(); // Folia - region threading - make sure it is initialised before ticked
@@ -14,7 +14,7 @@
      }
  
      // Folia start - region threading
-@@ -932,7 +939,43 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -932,7 +_,43 @@
                                          entity.stopRiding();
                                      }
  
@@ -59,7 +59,7 @@
                                  }
                              }
                          }
-@@ -1035,71 +1078,73 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1035,71 +_,73 @@
      // Paper start - optimise random ticking
      private final io.papermc.paper.threadedregions.util.SimpleThreadLocalRandomSource simpleRandom = io.papermc.paper.threadedregions.util.SimpleThreadLocalRandomSource.INSTANCE; // Folia - region threading
  
@@ -89,19 +89,21 @@
              }
  
 -            final ca.spottedleaf.moonrise.common.list.ShortList tickList = ((ca.spottedleaf.moonrise.patches.block_counting.BlockCountingChunkSection)section).moonrise$getTickingBlockList();
+-
+-            for (int i = 0; i < tickSpeed; ++i) {
+-                final int tickingBlocks = tickList.size();
+-                final int index = simpleRandom.nextInt() & ((16 * 16 * 16) - 1);
+-
+-                if (index >= tickingBlocks) {
+-                    // most of the time we fall here
+-                    continue;
 +            final var states = section.states;
 +            final var tickList = ((ca.spottedleaf.moonrise.patches.block_counting.BlockCountingChunkSection)section).moonrise$getTickingBlockList();
 +            final int tickingBlocks = tickList.size();
 +            if (tickingBlocks == 0) continue;
- 
--            for (int i = 0; i < tickSpeed; ++i) {
--                final int tickingBlocks = tickList.size();
--                final int index = simpleRandom.nextInt() & ((16 * 16 * 16) - 1);
++
 +            final int offsetY = (sectionIndex + minSection) << 4;
- 
--                if (index >= tickingBlocks) {
--                    // most of the time we fall here
--                    continue;
++
 +            // cached rng for block selection
 +            long rndCache = random.nextLong();
 +            int bitsLeft = 64;
@@ -166,7 +168,7 @@
          }
      }
  
-@@ -1108,7 +1153,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1108,7 +_,7 @@
          boolean isRaining = this.isRaining();
          int minBlockX = pos.getMinBlockX();
          int minBlockZ = pos.getMinBlockZ();
@@ -175,7 +177,7 @@
              BlockPos blockPos = this.findLightningTargetAround(this.getBlockRandomPos(minBlockX, 0, minBlockZ, 15));
              if (this.isRainingAt(blockPos)) {
                  DifficultyInstance currentDifficultyAt = this.getCurrentDifficultyAt(blockPos);
-@@ -1139,6 +1184,16 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1139,6 +_,16 @@
      public void tickPrecipitation(BlockPos pos) {
          BlockPos heightmapPos = this.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos);
          BlockPos blockPos = heightmapPos.below();
@@ -192,7 +194,7 @@
          Biome biome = this.getBiome(heightmapPos).value();
          if (biome.shouldFreeze(this, blockPos)) {
              org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockFormEvent(this, blockPos, Blocks.ICE.defaultBlockState(), Block.UPDATE_ALL, null); // CraftBukkit
-@@ -1162,8 +1217,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1162,8 +_,7 @@
  
              Biome.Precipitation precipitationAt = biome.getPrecipitationAt(blockPos, this.getSeaLevel());
              if (precipitationAt != Biome.Precipitation.NONE) {
@@ -202,7 +204,7 @@
              }
          }
      }
-@@ -1729,7 +1783,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1729,7 +_,7 @@
  
      // CraftBukkit start
      private boolean addEntity(Entity entity, org.bukkit.event.entity.CreatureSpawnEvent.@Nullable SpawnReason spawnReason) {
@@ -211,7 +213,7 @@
          entity.generation = false; // Paper - Don't fire sync event during generation; Reset flag if it was added during a ServerLevel generation process
          // Paper start - extra debug info
          if (entity.valid) {
-@@ -1776,7 +1830,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -1776,7 +_,7 @@
  
      public void unload(LevelChunk chunk) {
          // Spigot start
@@ -220,7 +222,7 @@
              if (blockEntity instanceof net.minecraft.world.Container) {
                  // Paper start - this area looks like it can load chunks, change the behavior
                  // chests for example can apply physics to the world
-@@ -2595,6 +2649,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2595,6 +_,7 @@
  
          for (TickingBlockEntity tickingBlockEntity : (Iterable<? extends net.minecraft.world.level.block.entity.TickingBlockEntity>)null) { // Folia - region threading
              BlockPos pos = tickingBlockEntity.getPos();
@@ -228,7 +230,7 @@
              csvOutput.writeRow(pos.getX(), pos.getY(), pos.getZ(), tickingBlockEntity.getType());
          }
      }
-@@ -2754,14 +2809,14 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2754,14 +_,14 @@
  
      public boolean isPositionEntityTicking(BlockPos pos) {
          // Paper start - rewrite chunk system
@@ -245,7 +247,7 @@
          return chunkHolder != null && chunkHolder.isEntityTickingReady();
          // Paper end - rewrite chunk system
      }
-@@ -2781,7 +2836,7 @@ public class ServerLevel extends Level implements ServerEntityGetter, WorldGenLe
+@@ -2781,7 +_,7 @@
  
      public boolean canSpawnEntitiesInChunk(ChunkPos chunkPos) {
          // Paper start - rewrite chunk system

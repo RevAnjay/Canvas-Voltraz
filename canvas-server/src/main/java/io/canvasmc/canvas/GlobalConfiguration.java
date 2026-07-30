@@ -650,6 +650,13 @@ public class GlobalConfiguration extends Part {
                     "to exit early before executing expensive operations.",
                     "Ported from Gale, adapted by Spring."
                 );
+            option("onlyTickItemsInHand")
+                .docs(
+                    "When enabled, only ticks/updates items in the main hand and offhand instead of the entire inventory.",
+                    "Reduces per-tick inventory iteration overhead. May affect items that rely on inventory ticking",
+                    "(e.g. compass pointing, clock updates) when not held in hand.",
+                    "Ported from Leaf."
+                );
         }
 
         public boolean skipEntityMoveIfMovementIsZero = false;
@@ -661,6 +668,7 @@ public class GlobalConfiguration extends Part {
         public boolean removeTickGuardLambda = false;
         public boolean cacheClimbingCheckForActivation = false;
         public boolean optimizeSunBurnTick = false;
+        public boolean onlyTickItemsInHand = false;
     }
 
     {

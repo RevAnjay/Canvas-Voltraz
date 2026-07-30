@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -200,7 +200,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -200,7 +_,7 @@
      public static final NameAndId ANONYMOUS_PLAYER_PROFILE = new NameAndId(Util.NIL_UUID, "Anonymous Player");
      public LevelStorageSource.LevelStorageAccess storageSource;
      public final PlayerDataStorage playerDataStorage;
@@ -9,7 +9,7 @@
      private ServerConnectionListener connection;
      // Paper - per world load listener - moved LevelLoadListener to ServerLevel
      private @Nullable ServerStatus status;
-@@ -271,7 +271,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -271,7 +_,7 @@
      public org.bukkit.craftbukkit.CraftServer server;
      public joptsimple.OptionSet options;
      public org.bukkit.command.ConsoleCommandSender console;
@@ -18,7 +18,7 @@
      public java.util.Queue<Runnable> processQueue = new java.util.concurrent.ConcurrentLinkedQueue<Runnable>();
      public int autosavePeriod;
      // Paper - don't store the vanilla dispatcher
-@@ -651,6 +651,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -651,6 +_,7 @@
          io.papermc.paper.plugin.lifecycle.event.LifecycleEventRunner.INSTANCE.callReloadableRegistrarEvent(io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents.COMMANDS, io.papermc.paper.command.brigadier.PaperCommands.INSTANCE, org.bukkit.plugin.Plugin.class, io.papermc.paper.plugin.lifecycle.event.registrar.ReloadableRegistrarEvent.Cause.INITIAL); // Paper - call commands event for regular plugins
          this.server.getCommandMap().registerServerAliases(); // Paper - relocate initial CommandMap#registerServerAliases() call
          ((org.bukkit.craftbukkit.help.SimpleHelpMap) this.server.getHelpMap()).initializeCommands();
@@ -26,7 +26,7 @@
          this.server.getPluginManager().callEvent(new org.bukkit.event.server.ServerLoadEvent(org.bukkit.event.server.ServerLoadEvent.LoadType.STARTUP));
          this.connection.acceptConnections();
      }
-@@ -736,6 +737,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -736,6 +_,7 @@
              );
          }
          this.addLevel(serverLevel);
@@ -34,7 +34,7 @@
          this.initWorld(serverLevel, serverLevelData, worldOptions);
      }
      public void initWorld(ServerLevel serverLevel, net.minecraft.world.level.storage.PrimaryLevelData serverLevelData, WorldOptions worldOptions) {
-@@ -976,10 +978,10 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -976,10 +_,10 @@
          // CraftBukkit end
          if (flush) {
              for (ServerLevel serverLevel : this.getAllLevels()) {
@@ -47,7 +47,7 @@
          }
  
          return flag;
-@@ -1319,11 +1321,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1319,11 +_,7 @@
                  LOGGER.info("*************************************************************************************");
              }
              // Paper end - Add onboarding message for initial server start
@@ -60,7 +60,7 @@
  
              while (this.running) {
                  final long tickStart = System.nanoTime(); // Paper - improve tick loop
-@@ -1356,7 +1354,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1356,7 +_,7 @@
                  this.lastOverloadWarningNanos = this.nextTickTimeNanos;
  
                  this.currentTickStart = tickStart;
@@ -69,7 +69,7 @@
                  // Paper end - improve tick loop
  
                  boolean flag = l == 0L;
-@@ -1873,12 +1871,28 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1873,12 +_,28 @@
          //io.papermc.paper.adventure.providers.ClickCallbackProviderImpl.DIALOG_CLICK_MANAGER.handleQueue(this.tickCount); // Paper // Folia - region threading - moved to global tick
          //this.getFunctions().tick(); // Folia - region threading - TODO Purge functions
          this.updateEffectiveRespawnData();
@@ -98,7 +98,7 @@
  
          // Send time updates to everyone, it will get the right time from the world the player is in.
          // Paper start - Perf: Optimize time updates
-@@ -1912,10 +1926,28 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1912,10 +_,28 @@
  
              try {
                  serverLevel.tick(hasTimeLeft, region); // Folia - region threading
@@ -127,7 +127,7 @@
              }
  
              regionizedWorldData.explosionDensityCache.clear(); // Paper - Optimize explosions // Folia - region threading
-@@ -1929,9 +1961,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1929,9 +_,7 @@
              GameTestTicker.SINGLETON.tick();
          }
  
@@ -138,7 +138,7 @@
  
          if (false) for (ServerPlayer serverPlayer : this.playerList.getPlayers()) { // Folia - region threading
              serverPlayer.connection.chunkSender.sendNextChunks(serverPlayer);
-@@ -1968,7 +1998,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1968,7 +_,7 @@
      }
  
      public void addTickable(Runnable tickable) {
@@ -147,7 +147,7 @@
      }
  
      protected void setId(String serverId) {
-@@ -2031,7 +2061,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -2031,7 +_,7 @@
  
      @DontObfuscate
      public String getServerModName() {
@@ -156,7 +156,7 @@
      }
  
      public SystemReport fillSystemReport(SystemReport systemReport) {
-@@ -2331,6 +2361,13 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -2331,6 +_,13 @@
          return 256;
      }
  

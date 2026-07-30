@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/PoweredRailBlock.java
 +++ b/net/minecraft/world/level/block/PoweredRailBlock.java
-@@ -122,6 +122,12 @@ public class PoweredRailBlock extends BaseRailBlock {
+@@ -122,6 +_,12 @@
  
      @Override
      protected void updateState(BlockState state, Level level, BlockPos pos, Block block) {

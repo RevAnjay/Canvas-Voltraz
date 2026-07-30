@@ -1,6 +1,6 @@
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/scheduling/ChunkHolderManager.java
-@@ -659,7 +659,7 @@ public final class ChunkHolderManager {
+@@ -659,7 +_,7 @@
  
      public <T> boolean addTicketAtLevel(final TicketType type, final ChunkPos chunkPos, final int level,
                                          final T identifier) {
@@ -9,7 +9,7 @@
      }
  
      public <T> boolean addTicketAtLevel(final TicketType type, final int chunkX, final int chunkZ, final int level,
-@@ -776,7 +776,7 @@ public final class ChunkHolderManager {
+@@ -776,7 +_,7 @@
      }
  
      public <T> boolean removeTicketAtLevel(final TicketType type, final ChunkPos chunkPos, final int level, final T identifier) {
@@ -18,7 +18,7 @@
      }
  
      public <T> boolean removeTicketAtLevel(final TicketType type, final int chunkX, final int chunkZ, final int level, final T identifier) {
-@@ -1469,7 +1469,7 @@ public final class ChunkHolderManager {
+@@ -1469,7 +_,7 @@
          }
  
          public static <T> TicketOperation<T, T> addOp(final ChunkPos chunk, final TicketType type, final int ticketLevel, final T identifier) {
@@ -27,7 +27,7 @@
          }
  
          public static <T> TicketOperation<T, T> addOp(final int chunkX, final int chunkZ, final TicketType type, final int ticketLevel, final T identifier) {
-@@ -1481,7 +1481,7 @@ public final class ChunkHolderManager {
+@@ -1481,7 +_,7 @@
          }
  
          public static <T> TicketOperation<T, T> removeOp(final ChunkPos chunk, final TicketType type, final int ticketLevel, final T identifier) {

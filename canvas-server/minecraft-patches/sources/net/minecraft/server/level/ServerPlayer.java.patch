@@ -75,6 +75,26 @@
          menu.addSlotListener(this.containerListener);
          menu.setSynchronizer(this.containerSynchronizer);
      }
+@@ -1017,12 +_,19 @@
+                 }
+             }
+ 
++            // Canvas start - only tick items in hand
++            if (io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.onlyTickItemsInHand) {
++                this.synchronizeSpecialItemUpdates(this.getMainHandItem());
++                this.synchronizeSpecialItemUpdates(this.getOffhandItem());
++            } else {
++            // Canvas end - only tick items in hand
+             for (int i = 0; i < this.getInventory().getContainerSize(); i++) {
+                 ItemStack item = this.getInventory().getItem(i);
+                 if (!item.isEmpty()) {
+                     this.synchronizeSpecialItemUpdates(item);
+                 }
+             }
++            } // Canvas - only tick items in hand
+ 
+             if (this.getHealth() != this.lastSentHealth
+                 || this.lastSentFood != this.foodData.getFoodLevel()
 @@ -1090,6 +_,16 @@
  
              // Folia - region threading - move to main tick loop where we can detect duplicates

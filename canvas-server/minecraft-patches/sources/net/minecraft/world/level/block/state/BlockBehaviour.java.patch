@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/net/minecraft/world/level/block/state/BlockBehaviour.java
-@@ -100,6 +100,7 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -100,6 +_,7 @@
      protected final BlockBehaviour.Properties properties;
      protected final Optional<ResourceKey<LootTable>> drops;
      protected final String descriptionId;
@@ -8,7 +8,7 @@
  
      public BlockBehaviour(BlockBehaviour.Properties properties) {
          this.hasCollision = properties.hasCollision;
-@@ -167,7 +168,7 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -167,7 +_,7 @@
      }
  
      protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
@@ -17,7 +17,7 @@
      }
  
      protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-@@ -427,6 +428,9 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -427,6 +_,9 @@
          private final boolean ignitedByLava;
          @Deprecated
          private final boolean liquid;
@@ -27,7 +27,7 @@
          @Deprecated
          private boolean legacySolid;
          private final PushReaction pushReaction;
-@@ -470,6 +474,24 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -470,6 +_,24 @@
          private boolean emptyCollisionShape;
          private boolean emptyConstantCollisionShape;
          private VoxelShape constantCollisionShape;
@@ -52,7 +52,7 @@
  
          private static void initCaches(final VoxelShape shape, final boolean neighbours) {
              ((ca.spottedleaf.moonrise.patches.collisions.shape.CollisionVoxelShape)shape).moonrise$isFullBlock();
-@@ -576,6 +598,9 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -576,6 +_,9 @@
          protected boolean shapeExceedsCube = true; // Paper - moved from actual method to here
          public void initCache() {
              this.fluidState = this.owner.getFluidState(this.asState());
@@ -62,7 +62,7 @@
              this.isRandomlyTicking = this.owner.isRandomlyTicking(this.asState());
              if (!this.getBlock().hasDynamicShape()) {
                  this.cache = new BlockBehaviour.BlockStateBase.Cache(this.asState());
-@@ -1064,8 +1089,14 @@ public abstract class BlockBehaviour implements FeatureElement {
+@@ -1064,8 +_,14 @@
                          )
                      );
                  } else {

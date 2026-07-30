@@ -1,6 +1,6 @@
 --- a/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/server/ServerEntityLookup.java
 +++ b/ca/spottedleaf/moonrise/patches/chunk_system/level/entity/server/ServerEntityLookup.java
-@@ -95,8 +95,9 @@ public final class ServerEntityLookup extends EntityLookup {
+@@ -95,8 +_,9 @@
              ((ChunkSystemServerLevel)this.serverWorld).moonrise$getNearbyPlayers().addPlayer(player);
          }
          if (entity instanceof ThrownEnderpearl enderpearl) {
@@ -11,7 +11,7 @@
          entity.registerScheduler(); // Paper - optimise Folia entity scheduler
      }
  
-@@ -106,7 +107,7 @@ public final class ServerEntityLookup extends EntityLookup {
+@@ -106,7 +_,7 @@
              ((ChunkSystemServerLevel)this.serverWorld).moonrise$getNearbyPlayers().removePlayer(player);
          }
          if (entity instanceof ThrownEnderpearl enderpearl) {

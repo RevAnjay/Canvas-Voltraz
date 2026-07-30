@@ -35,6 +35,21 @@
          return this.wasUnderwater;
      }
  
+@@ -490,7 +_,14 @@
+         }
+ 
+         this.tickRegeneration();
++        // Canvas start - only tick items in hand
++        if (io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.onlyTickItemsInHand) {
++            this.getMainHandItem().inventoryTick(this.level(), this, EquipmentSlot.MAINHAND);
++            this.getOffhandItem().inventoryTick(this.level(), this, EquipmentSlot.OFFHAND);
++        } else {
+         this.inventory.tick();
++        }
++        // Canvas end - only tick items in hand
+         if (this.abilities.flying && !this.isPassenger()) {
+             this.resetFallDistance();
+         }
 @@ -649,7 +_,7 @@
          }
  

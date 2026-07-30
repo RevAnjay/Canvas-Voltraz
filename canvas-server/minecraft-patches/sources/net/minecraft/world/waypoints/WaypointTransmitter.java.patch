@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/waypoints/WaypointTransmitter.java
 +++ b/net/minecraft/world/waypoints/WaypointTransmitter.java
-@@ -51,7 +51,7 @@ public interface WaypointTransmitter extends Waypoint {
+@@ -51,7 +_,7 @@
          // Paper start - rewrite chunk system
          if (!ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(player)) return false; // Canvas - region threading - if isn't current tick thread, not visible
          final ca.spottedleaf.moonrise.patches.chunk_system.player.RegionizedPlayerChunkLoader.PlayerChunkLoaderData playerChunkLoader = ((ca.spottedleaf.moonrise.patches.chunk_system.player.ChunkSystemServerPlayer)player).moonrise$getChunkLoader();

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerState.java
 +++ b/net/minecraft/world/level/block/entity/trialspawner/TrialSpawnerState.java
-@@ -173,17 +173,19 @@ public enum TrialSpawnerState implements StringRepresentable {
+@@ -173,17 +_,19 @@
      }
  
      private static Optional<Vec3> calculatePositionToSpawnSpawner(ServerLevel level, BlockPos pos, TrialSpawner spawner, TrialSpawnerStateData data) {
@@ -31,7 +31,7 @@
          if (list.isEmpty()) {
              return Optional.empty();
          } else {
-@@ -204,16 +206,29 @@ public enum TrialSpawnerState implements StringRepresentable {
+@@ -204,16 +_,29 @@
      private static @Nullable Entity selectEntityToSpawnItemAbove(
          List<Player> player, Set<UUID> currentMobs, TrialSpawner spawner, BlockPos pos, ServerLevel level
      ) {

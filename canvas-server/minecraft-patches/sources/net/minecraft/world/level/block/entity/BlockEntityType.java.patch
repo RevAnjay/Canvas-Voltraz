@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/entity/BlockEntityType.java
 +++ b/net/minecraft/world/level/block/entity/BlockEntityType.java
-@@ -295,6 +295,14 @@ public class BlockEntityType<T extends BlockEntity> {
+@@ -295,6 +_,14 @@
      private BlockEntityType(BlockEntityType.BlockEntitySupplier<? extends T> factory, Set<Block> validBlocks) {
          this.factory = factory;
          this.validBlocks = validBlocks;
@@ -15,7 +15,7 @@
      }
  
      public T create(BlockPos pos, BlockState state) {
-@@ -302,7 +310,7 @@ public class BlockEntityType<T extends BlockEntity> {
+@@ -302,7 +_,7 @@
      }
  
      public boolean isValid(BlockState state) {
