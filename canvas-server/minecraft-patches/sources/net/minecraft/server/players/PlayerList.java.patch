@@ -213,6 +213,26 @@
          return message.hasSignature() && !message.hasExpiredServer(Instant.now());
      }
  
+@@ -1289,6 +_,10 @@
+         if (Files.exists(path)) {
+             return path;
+         } else {
++            // Canvas start - Remove useless creating stats json bases on player name logic
++            // Modern servers always use UUID-based stats files. The legacy player-name fallback
++            // is dead code that adds unnecessary IO + string operations on every player join.
++            /*
+             String string = profile.name() + ".json";
+             if (FileUtil.isValidPathSegment(string)) {
+                 Path path1 = worldPath.resolve(string);
+@@ -1301,6 +_,8 @@
+                     }
+                 }
+             }
++            */
++            // Canvas end - Remove useless creating stats json bases on player name logic
+ 
+             return path;
+         }
 @@ -1324,7 +_,12 @@
          //this.broadcastAll(new ClientboundSetChunkCacheRadiusPacket(viewDistance)); // Paper - rewrite chunk system
  
