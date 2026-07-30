@@ -74,13 +74,14 @@
      public List<ItemEntity> captureDrops;
      // Paper start
      public int wakeupInactiveRemainingAnimals;
-@@ -419,11 +_,16 @@
+@@ -419,11 +_,17 @@
      public boolean shouldSignal = true;
      public final Map<ServerExplosion.CacheKey, Float> explosionDensityCache = new HashMap<>(64, 0.25f);
      public final PathTypeCache pathTypesByPosCache = new PathTypeCache();
 -    public final List<LevelChunk> temporaryChunkTickList = new java.util.ArrayList<>();
 +    public final List<LevelChunk> temporaryChunkTickList = new it.unimi.dsi.fastutil.objects.ObjectArrayList<>(); // Canvas - optimized collection
      public final Set<ChunkHolder> chunkHoldersToBroadcast = new ReferenceLinkedOpenHashSet<>();
++    public final io.canvasmc.canvas.util.FastBitRadixSort radixBitSorter = new io.canvasmc.canvas.util.FastBitRadixSort(); // Canvas - fast bit radix sort
  
      // not transient
      public java.util.ArrayDeque<net.minecraft.world.level.block.RedstoneTorchBlock.Toggle> redstoneUpdateInfos;

@@ -1,13 +1,36 @@
 --- a/net/minecraft/world/entity/ai/sensing/NearestItemSensor.java
 +++ b/net/minecraft/world/entity/ai/sensing/NearestItemSensor.java
-@@ -24,8 +_,8 @@
+@@ -1,8 +_,6 @@
+ package net.minecraft.world.entity.ai.sensing;
+ 
+ import com.google.common.collect.ImmutableSet;
+-import java.util.Comparator;
+-import java.util.List;
+ import java.util.Optional;
+ import java.util.Set;
+ import net.minecraft.server.level.ServerLevel;
+@@ -15,6 +_,7 @@
+     private static final long XZ_RANGE = 32L;
+     private static final long Y_RANGE = 16L;
+     public static final int MAX_DISTANCE_TO_WANTED_ITEM = 32;
++    private static final double MAX_DIST_SQ = (double) MAX_DISTANCE_TO_WANTED_ITEM * MAX_DISTANCE_TO_WANTED_ITEM; // Canvas - fast bit radix sort
+ 
+     @Override
+     public Set<MemoryModuleType<?>> requires() {
+@@ -24,8 +_,14 @@
      @Override
      protected void doTick(ServerLevel level, Mob entity) {
          Brain<?> brain = entity.getBrain();
 -        List<ItemEntity> entitiesOfClass = level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(32.0, 16.0, 32.0), itemEntity -> itemEntity.closerThan(entity, MAX_DISTANCE_TO_WANTED_ITEM) && entity.wantsToPickUp(level, itemEntity.getItem())); // Paper - Perf: Move predicate into getEntities
 -        entitiesOfClass.sort(Comparator.comparingDouble(entity::distanceToSqr));
-+        it.unimi.dsi.fastutil.objects.ObjectArrayList<ItemEntity> entitiesOfClass = (it.unimi.dsi.fastutil.objects.ObjectArrayList<ItemEntity>) level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(32.0, 16.0, 32.0), itemEntity -> itemEntity.closerThan(entity, MAX_DISTANCE_TO_WANTED_ITEM) && entity.wantsToPickUp(level, itemEntity.getItem())); // Paper - Perf: Move predicate into getEntities // Canvas - faster sorting
-+        entitiesOfClass.unstableSort(Comparator.comparingDouble(entity::distanceToSqr)); // Canvas - faster sorting
++        // Canvas start - fast bit radix sort
++        net.minecraft.core.Position pos = entity.position();
++        double x = pos.x();
++        double y = pos.y();
++        double z = pos.z();
++        it.unimi.dsi.fastutil.objects.ObjectArrayList<ItemEntity> entitiesOfClass = (it.unimi.dsi.fastutil.objects.ObjectArrayList<ItemEntity>) level.getEntitiesOfClass(ItemEntity.class, entity.getBoundingBox().inflate(32.0, 16.0, 32.0), itemEntity -> itemEntity.distanceToSqr(x, y, z) < MAX_DIST_SQ && entity.wantsToPickUp(level, itemEntity.getItem())); // Paper - Perf: Move predicate into getEntities
++        level.getCurrentWorldData().radixBitSorter.sort(entitiesOfClass.elements(), entitiesOfClass.size(), pos);
++        // Canvas end - fast bit radix sort
          // Paper start - Perf: remove streams from hot code
          ItemEntity nearest = null;
          for (final ItemEntity itemEntity : entitiesOfClass) {
