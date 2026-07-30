@@ -679,6 +679,81 @@ public class GlobalConfiguration extends Part {
         public boolean reduceSensorWork = false;
     }
 
+    // Canvas start - DAB (Dynamic Activation of Brains)
+    {
+        option("dab")
+            .docs(
+                Style.wrap(
+                    "Dynamic Activation of Brains (DAB) reduces AI processing for distant entities.",
+                    "Entities beyond the start distance have their AI tick rate reduced based on distance,",
+                    "significantly improving performance with large entity counts.",
+                    "Ported from Pufferfish/Folia."
+                )
+            );
+        option("dab.enabled").docs("Whether DAB is enabled");
+        option("dab.startDistance").docs("Distance in blocks from player at which DAB begins to reduce entity AI tick rate").greaterThan(0.0F);
+        option("dab.maxTickFreq").docs("Maximum AI tick interval (in ticks) for the most distant entities").greaterThan(0.0F);
+        option("dab.activationDistMod").docs("Distance modifier controlling how aggressively AI tick rate scales with distance").greaterThan(0.0F);
+        option("dab.dontEnableIfInWater").docs("Whether to keep entities in water fully active regardless of distance");
+        option("dab.blacklistedEntities").docs("List of entity type names that should never be deactivated by DAB");
+    }
+
+    public DAB dab = new DAB();
+    public static class DAB extends Part {
+        public boolean enabled = true;
+        public int startDistance = 12;
+        public int maxTickFreq = 20;
+        public int activationDistMod = 8;
+        public boolean dontEnableIfInWater = false;
+        public java.util.List<String> blacklistedEntities = new java.util.ArrayList<>(java.util.Arrays.asList(
+            "villager",
+            "axolotl",
+            "hoglin",
+            "zombified_piglin",
+            "goat"
+        ));
+    }
+
+    // Canvas start - Optimized Powered Rails
+    {
+        option("optimizedPoweredRails")
+            .docs(
+                Style.wrap(
+                    "Optimizes powered rail computation by caching and limiting rail activation range.",
+                    "Reduces redundant block updates and recalculation for powered rails,",
+                    "especially beneficial for servers with extensive rail networks."
+                )
+            );
+        option("optimizedPoweredRails.enabled").docs("Whether optimized powered rails is enabled");
+        option("optimizedPoweredRails.railActivationRange").docs("Maximum distance (in blocks) that a powered rail can activate other rails").greaterThan(0.0F);
+    }
+
+    public OptimizedPoweredRails optimizedPoweredRails = new OptimizedPoweredRails();
+    public static class OptimizedPoweredRails extends Part {
+        public boolean enabled = true;
+        public int railActivationRange = 8; // Vanilla signal distance (PoweredRailBlock recursionCount >= 8)
+    }
+
+    // Canvas start - Async Player Data Save
+    {
+        option("asyncPlayerDataSave")
+            .docs(
+                Style.wrap(
+                    "Saves player data asynchronously to reduce global region tick pressure.",
+                    "When enabled, player data serialization and disk I/O are offloaded,",
+                    "preerving server responsiveness during player saves and disconnects."
+                )
+            );
+        option("asyncPlayerDataSave.enabled").docs("Whether async player data saving is enabled");
+    }
+
+    public AsyncPlayerDataSave asyncPlayerDataSave = new AsyncPlayerDataSave();
+    public static class AsyncPlayerDataSave extends Part {
+        public boolean enabled = true;
+    }
+
+    // Canvas end - Performance-related config sections
+
     {
         option("regionFormat")
             .docs(
@@ -756,33 +831,6 @@ public class GlobalConfiguration extends Part {
         public boolean expiredMessageWarning = true;
         public boolean notSecureMarker = true;
         public boolean nullIdDisconnections = true;
-    }
-
-    public DAB dab = new DAB();
-    public static class DAB extends Part {
-        public boolean enabled = true;
-        public int startDistance = 12;
-        public int maxTickFreq = 20;
-        public int activationDistMod = 8;
-        public boolean dontEnableIfInWater = false;
-        public java.util.List<String> blacklistedEntities = new java.util.ArrayList<>(java.util.Arrays.asList(
-            "villager",
-            "axolotl",
-            "hoglin",
-            "zombified_piglin",
-            "goat"
-        ));
-    }
-
-    public OptimizedPoweredRails optimizedPoweredRails = new OptimizedPoweredRails();
-    public static class OptimizedPoweredRails extends Part {
-        public boolean enabled = true;
-        public int railActivationRange = 8; // Vanilla signal distance (PoweredRailBlock recursionCount >= 8)
-    }
-
-    public AsyncPlayerDataSave asyncPlayerDataSave = new AsyncPlayerDataSave();
-    public static class AsyncPlayerDataSave extends Part {
-        public boolean enabled = true;
     }
 
 }
