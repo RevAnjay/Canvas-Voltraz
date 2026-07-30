@@ -440,19 +440,31 @@ public class WorldConfig extends Part {
             }
 
             {
-                option("villagerSmartHibernation")
+                option("lobotomizeEnabled")
                     .docs(
-                        "When enabled, villagers completely surrounded by solid blocks and not trading",
-                        "will skip brain ticking and other AI processing.",
-                        "Significantly reduces tick duration for villager farms with large numbers of enclosed villagers."
+                        "When enabled, villagers that cannot path to adjacent blocks (stuck in fences, walls,",
+                        "or enclosed spaces) will skip brain ticking but still restock trades.",
+                        "Detection is throttled and adaptive, much lighter than hibernation."
                     );
+            }
+
+            {
+                option("lobotomizeCheckInterval")
+                    .docs("Interval in ticks to check if a villager is lobotomized");
+            }
+
+            {
+                option("lobotomizeWaitUntilTradeLocked")
+                    .docs("Wait until a villager has been traded with before lobotomizing");
             }
 
             public boolean villagerAcquirePoiTasksLoadChunks = true;
             public boolean reduceJobSitePoiSearchRange = false;
             public boolean reduceHomePoiSearchRange = false;
             public boolean reduceMeetingPointPoiSearchRange = false;
-            public boolean villagerSmartHibernation = false;
+            public boolean lobotomizeEnabled = false;
+            public int lobotomizeCheckInterval = 100;
+            public boolean lobotomizeWaitUntilTradeLocked = false;
         }
 
         public boolean experienceOrbsAreFireResistant = false; // Canvas - fire res orbs

@@ -1,53 +1,86 @@
 --- a/net/minecraft/world/entity/npc/villager/Villager.java
 +++ b/net/minecraft/world/entity/npc/villager/Villager.java
-@@ -167,6 +_,10 @@
+@@ -167,6 +_,12 @@
          SensorType.SECONDARY_POIS,
          SensorType.GOLEM_DETECTED
      );
-+    // Canvas start - VillagerSmartHibernation (ported from Kitin)
-+    public boolean canvas$isHibernating = false;
-+    // Canvas end - VillagerSmartHibernation
++    // Canvas start - Lobotomize stuck villagers (ported from Purpur/Luminol)
++    private boolean isLobotomized = false;
++    public boolean isLobotomized() { return this.isLobotomized; }
++    private int notLobotomizedCount = 0;
++    // Canvas end - Lobotomize stuck villagers
 +
      public static final Map<MemoryModuleType<GlobalPos>, BiPredicate<Villager, Holder<PoiType>>> POI_MEMORIES = ImmutableMap.of(
          MemoryModuleType.HOME,
          (villager, poiType) -> poiType.is(PoiTypes.HOME),
-@@ -296,6 +_,15 @@
+@@ -294,9 +_,19 @@
+         // Paper start - EAR 2
+         this.customServerAiStep(level, false);
      }
-     protected void customServerAiStep(ServerLevel level, final boolean inactive) {
+-    protected void customServerAiStep(ServerLevel level, final boolean inactive) {
++    protected void customServerAiStep(ServerLevel level, boolean inactive) {
          // Paper end - EAR 2
-+        // Canvas start - VillagerSmartHibernation (ported from Kitin)
-+        if (io.canvasmc.canvas.WorldConfig.forWorld(level).entities.villagers.villagerSmartHibernation) {
-+            if (canvas$checkHibernation(level)) {
-+                this.canvas$isHibernating = true;
-+                return; // Skip all AI processing for enclosed, non-trading villagers
-+            }
-+            this.canvas$isHibernating = false;
++        // Canvas start - Lobotomize stuck villagers (ported from Purpur/Luminol)
++        io.canvasmc.canvas.WorldConfig.Entities.Villagers villagerConfig = io.canvasmc.canvas.WorldConfig.forWorld(level).entities.villagers;
++        if (villagerConfig.lobotomizeEnabled) {
++            // treat as inactive if lobotomized
++            inactive = inactive || checkLobotomized(level, villagerConfig);
++        } else {
++            this.isLobotomized = false;
 +        }
-+        // Canvas end - VillagerSmartHibernation
++        // Canvas end - Lobotomize stuck villagers
          if (!inactive && this.behaviorTick++ % this.activatedPriority == 0) this.getBrain().tick(level, this); // Paper - EAR 2 / Pufferfish - DAB
++        else if (this.isLobotomized && shouldRestock(level)) restock(); // Canvas - Lobotomize stuck villagers
          if (this.assignProfessionWhenSpawned) {
              this.assignProfessionWhenSpawned = false;
-@@ -334,6 +_,24 @@
+         }
+@@ -334,6 +_,50 @@
          super.customServerAiStep(level);
      }
  
-+    // Canvas start - VillagerSmartHibernation (ported from Kitin)
-+    /**
-+     * Checks if this villager should hibernate: enclosed by solid blocks on all 6 sides and not trading.
-+     * Hibernating villagers skip brain tick and other AI processing to save performance.
-+     */
-+    private boolean canvas$checkHibernation(ServerLevel level) {
-+        if (this.isTrading()) return false;
-+        BlockPos pos = this.blockPosition();
-+        // Check all 6 axis-aligned neighbors for solid blocks
-+        return level.getBlockState(pos.above()).isSolid()
-+            && level.getBlockState(pos.below()).isSolid()
-+            && level.getBlockState(pos.north()).isSolid()
-+            && level.getBlockState(pos.south()).isSolid()
-+            && level.getBlockState(pos.east()).isSolid()
-+            && level.getBlockState(pos.west()).isSolid();
++    // Canvas start - Lobotomize stuck villagers (ported from Purpur/Luminol)
++    private boolean checkLobotomized(ServerLevel level, io.canvasmc.canvas.WorldConfig.Entities.Villagers config) {
++        int interval = config.lobotomizeCheckInterval;
++        boolean shouldCheckForTradeLocked = config.lobotomizeWaitUntilTradeLocked;
++        if (this.notLobotomizedCount > 3) {
++            // check half as often if not lobotomized for the last 3+ consecutive checks
++            interval *= 2;
++        }
++        if (this.level().getGameTime() % interval == 0) {
++            // offset Y for short blocks like dirt_path/farmland
++            this.isLobotomized = !(shouldCheckForTradeLocked && this.getVillagerXp() == 0) && !canTravelFrom(net.minecraft.core.BlockPos.containing(this.position().x, this.getBoundingBox().minY + 0.0625D, this.position().z));
++
++            if (this.isLobotomized) {
++                this.notLobotomizedCount = 0;
++            } else {
++                this.notLobotomizedCount++;
++            }
++        }
++        return this.isLobotomized;
 +    }
-+    // Canvas end - VillagerSmartHibernation
++
++    private boolean canTravelFrom(net.minecraft.core.BlockPos pos) {
++        return canTravelTo(pos.east()) || canTravelTo(pos.west()) || canTravelTo(pos.north()) || canTravelTo(pos.south());
++    }
++
++    private boolean canTravelTo(net.minecraft.core.BlockPos pos) {
++        net.minecraft.world.level.block.state.BlockState state = this.level().getBlockStateIfLoaded(pos);
++        if (state == null) {
++            // chunk not loaded
++            return false;
++        }
++        net.minecraft.world.level.block.Block bottom = state.getBlock();
++        if (bottom instanceof net.minecraft.world.level.block.FenceBlock ||
++                bottom instanceof net.minecraft.world.level.block.FenceGateBlock ||
++                bottom instanceof net.minecraft.world.level.block.WallBlock) {
++            // bottom block is too tall to get over
++            return false;
++        }
++        net.minecraft.world.level.block.Block top = level().getBlockState(pos.above()).getBlock();
++        // only if both blocks have no collision
++        return !bottom.hasCollision && !top.hasCollision;
++    }
++    // Canvas end - Lobotomize stuck villagers
 +
      @Override
      public void tick() {
