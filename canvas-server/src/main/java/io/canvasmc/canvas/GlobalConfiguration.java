@@ -657,6 +657,13 @@ public class GlobalConfiguration extends Part {
                     "(e.g. compass pointing, clock updates) when not held in hand.",
                     "Ported from Leaf."
                 );
+            option("reduceSensorWork")
+                .docs(
+                    "When enabled, skips mob sensing ticks on certain ticks based on entity ID to reduce sensor work.",
+                    "Sensing determines what entities/mobs are nearby and is expensive for large mob counts.",
+                    "This spreads the load by using entity ID-based throttling.",
+                    "Ported from Petal/Bloom."
+                );
         }
 
         public boolean skipEntityMoveIfMovementIsZero = false;
@@ -669,6 +676,7 @@ public class GlobalConfiguration extends Part {
         public boolean cacheClimbingCheckForActivation = false;
         public boolean optimizeSunBurnTick = false;
         public boolean onlyTickItemsInHand = false;
+        public boolean reduceSensorWork = false;
     }
 
     {
