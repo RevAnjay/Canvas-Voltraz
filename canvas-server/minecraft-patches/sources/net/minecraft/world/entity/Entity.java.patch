@@ -380,6 +380,20 @@
      public Vec3 getHeadLookAngle() {
          return this.calculateViewVector(this.getXRot(), this.getYHeadRot());
      }
+@@ -3532,8 +_,11 @@
+     }
+ 
+     public boolean isOnFire() {
+-        boolean flag = this.level() != null && this.level().isClientSide();
+-        return !this.fireImmune() && (this.remainingFireTicks > 0 || flag && this.getSharedFlag(FLAG_ONFIRE));
++        // Canvas start - Short-circuit isOnFire checks
++        // Server-side only (Folia), so clientSide flag check is dead code.
++        // Reorder: check remainingFireTicks first to skip fireImmune() virtual call when not on fire.
++        return this.remainingFireTicks > 0 && !this.fireImmune();
++        // Canvas end - Short-circuit isOnFire checks
+     }
+ 
+     public boolean isPassenger() {
 @@ -3795,6 +_,7 @@
      }
  
