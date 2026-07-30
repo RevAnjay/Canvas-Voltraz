@@ -7,7 +7,7 @@
  import java.util.EnumMap;
  import java.util.EnumSet;
  import java.util.Map;
-@@ -20,17 +_,28 @@
+@@ -20,17 +_,29 @@
          }
      };
      private final Map<Goal.Flag, WrappedGoal> lockedFlags = new EnumMap<>(Goal.Flag.class);
@@ -35,6 +35,7 @@
 +                wrappedGoal.stop();
 +            }
 +        }
++        this.availableGoals.removeIf(wrappedGoal -> filter.test(wrappedGoal.getGoal())); // Leaf - optimize goal selector - keep removal
      }
  
      // Paper start - EAR 2
