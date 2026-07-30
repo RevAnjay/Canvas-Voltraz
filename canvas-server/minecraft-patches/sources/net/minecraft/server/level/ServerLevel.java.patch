@@ -14,6 +14,14 @@
      }
  
      // Folia start - region threading
+@@ -918,6 +_,7 @@
+             regionizedWorldData // Folia - regionised ticking
+                 .forEachTickingEntity( // Folia - regionised ticking
+                     entity -> {
++                        entity.activatedPriorityReset = false; // Pufferfish - DAB
+                         if (!entity.isRemoved()) {
+                             if (!handleTickState.isEntityFrozen(entity)) { // Canvas - region threading
+                                 entity.checkDespawn();
 @@ -932,7 +_,43 @@
                                          entity.stopRiding();
                                      }

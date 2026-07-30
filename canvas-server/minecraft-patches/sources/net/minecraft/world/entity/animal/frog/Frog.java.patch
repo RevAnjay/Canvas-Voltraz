@@ -1,0 +1,15 @@
+--- a/net/minecraft/world/entity/animal/frog/Frog.java
++++ b/net/minecraft/world/entity/animal/frog/Frog.java
+@@ -198,9 +_,11 @@
+         VariantUtils.readVariant(input, Registries.FROG_VARIANT).ifPresent(this::setVariant);
+     }
+ 
++    private int behaviorTick = 0; // Pufferfish - DAB
++
+     @Override
+     protected void customServerAiStep(ServerLevel level) {
+-        this.getBrain().tick(level, this);
++        if (this.behaviorTick++ % this.activatedPriority == 0) this.getBrain().tick(level, this); // Pufferfish - DAB
+         FrogAi.updateActivity(this);
+         super.customServerAiStep(level);
+     }

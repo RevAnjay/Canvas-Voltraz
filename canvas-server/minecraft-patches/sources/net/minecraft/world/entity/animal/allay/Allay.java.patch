@@ -1,0 +1,15 @@
+--- a/net/minecraft/world/entity/animal/allay/Allay.java
++++ b/net/minecraft/world/entity/animal/allay/Allay.java
+@@ -221,9 +_,11 @@
+         return 0.4F;
+     }
+ 
++    private int behaviorTick = 0; // Pufferfish - DAB
++
+     @Override
+     protected void customServerAiStep(ServerLevel level) {
+-        this.getBrain().tick(level, this);
++        if (this.behaviorTick++ % this.activatedPriority == 0) this.getBrain().tick(level, this); // Pufferfish - DAB
+         AllayAi.updateActivity(this);
+         super.customServerAiStep(level);
+     }
