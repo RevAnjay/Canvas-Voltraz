@@ -355,6 +355,15 @@
                  if (this.level.paperConfig().collisions.onlyPlayersCollide && !(entity instanceof ServerPlayer || this instanceof ServerPlayer)) return; // Paper - Collision option for requiring a player participant
                  double d = entity.getX() - this.getX();
                  double d1 = entity.getZ() - this.getZ();
+@@ -3150,7 +_,7 @@
+     }
+ 
+     private boolean attemptToShearEquipment(Player player, InteractionHand hand, ItemStack stack, Mob mob) {
+-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+             ItemStack itemBySlot = mob.getItemBySlot(equipmentSlot);
+             Equippable equippable = itemBySlot.get(DataComponents.EQUIPPABLE);
+             if (equippable != null
 @@ -3453,6 +_,15 @@
          return this.calculateViewVector(this.getXRot(), this.getYRot());
      }

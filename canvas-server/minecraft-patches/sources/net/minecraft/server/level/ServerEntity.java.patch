@@ -172,6 +172,15 @@
  
      private void handleMinecartPosRot(NewMinecartBehavior behavior, byte yRot, byte xRot, boolean dirty) {
          this.sendDirtyEntityData();
+@@ -342,7 +_,7 @@
+         if (this.entity instanceof LivingEntity livingEntityx) {
+             List<Pair<EquipmentSlot, ItemStack>> list = Lists.newArrayList();
+ 
+-            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+                 ItemStack itemBySlot = livingEntityx.getItemBySlot(equipmentSlot);
+                 if (!itemBySlot.isEmpty()) {
+                     list.add(Pair.of(equipmentSlot, itemBySlot.copy()));
 @@ -352,7 +_,7 @@
              if (!list.isEmpty()) {
                  consumer.accept(new ClientboundSetEquipmentPacket(this.entity.getId(), list, true)); // Paper - data sanitization

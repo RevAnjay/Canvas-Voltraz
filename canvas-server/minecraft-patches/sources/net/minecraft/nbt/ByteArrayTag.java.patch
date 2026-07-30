@@ -1,0 +1,11 @@
+--- a/net/minecraft/nbt/ByteArrayTag.java
++++ b/net/minecraft/nbt/ByteArrayTag.java
+@@ -144,7 +_,7 @@
+ 
+     @Override
+     public void clear() {
+-        this.data = new byte[0];
++        this.data = io.canvasmc.canvas.util.ArrayConstants.emptyByteArray;
+     }
+ 
+     @Override

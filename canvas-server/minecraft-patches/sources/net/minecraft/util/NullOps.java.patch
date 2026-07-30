@@ -1,0 +1,11 @@
+--- a/net/minecraft/util/NullOps.java
++++ b/net/minecraft/util/NullOps.java
+@@ -171,7 +_,7 @@
+ 
+     @Override
+     public DataResult<ByteBuffer> getByteBuffer(Unit input) {
+-        return DataResult.success(ByteBuffer.wrap(new byte[0]));
++        return DataResult.success(ByteBuffer.wrap(io.canvasmc.canvas.util.ArrayConstants.emptyByteArray)); // Canvas - reduce array allocations
+     }
+ 
+     @Override

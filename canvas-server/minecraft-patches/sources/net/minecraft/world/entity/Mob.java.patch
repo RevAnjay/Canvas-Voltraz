@@ -25,6 +25,15 @@
      }
  
      @Override
+@@ -358,7 +_,7 @@
+         if (this.xpReward > 0) {
+             int i = this.xpReward;
+ 
+-            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+                 if (equipmentSlot.canIncreaseExperience()) {
+                     ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
+                     if (!itemBySlot.isEmpty() && this.dropChances.byEquipment(equipmentSlot) <= 1.0F) {
 @@ -577,17 +_,39 @@
          }
      }
@@ -91,3 +100,48 @@
              if (this.targetSelector.inactiveTick(this.activatedPriority, false))
              this.targetSelector.tickRunningGoals(false);
              if (this.goalSelector.inactiveTick(this.activatedPriority, false))
+@@ -1023,7 +_,7 @@
+     protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
+         super.dropCustomDeathLoot(level, damageSource, recentlyHit);
+ 
+-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+             if (this.shouldSkipLoot(equipmentSlot)) continue; // Paper
+             ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
+             float f = this.dropChances.byEquipment(equipmentSlot);
+@@ -1067,7 +_,7 @@
+     public Set<EquipmentSlot> dropPreservedEquipment(ServerLevel level, Predicate<ItemStack> filter) {
+         Set<EquipmentSlot> set = new HashSet<>();
+ 
+-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+             ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
+             if (!itemBySlot.isEmpty()) {
+                 if (!filter.test(itemBySlot)) {
+@@ -1197,7 +_,7 @@
+     protected void populateDefaultEquipmentEnchantments(ServerLevelAccessor level, RandomSource random, DifficultyInstance difficulty) {
+         this.enchantSpawnedWeapon(level, random, difficulty);
+ 
+-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+             if (equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
+                 this.enchantSpawnedArmor(level, random, equipmentSlot, difficulty);
+             }
+@@ -1608,7 +_,7 @@
+     @Override
+     protected void postRemoveAfterChangingDimensions() {
+         super.postRemoveAfterChangingDimensions();
+-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+             ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
+             if (!itemBySlot.isEmpty()) {
+                 itemBySlot.setCount(0);
+@@ -1621,7 +_,7 @@
+     protected void removeAfterChangingDimensions() {
+         super.removeAfterChangingDimensions();
+         // Folia start - region threading - move inventory clearing until after the dimension change - move into postRemoveAfterChangingDimensions
+-//        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++//        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+ //            ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
+ //            if (!itemBySlot.isEmpty()) {
+ //                itemBySlot.setCount(0);

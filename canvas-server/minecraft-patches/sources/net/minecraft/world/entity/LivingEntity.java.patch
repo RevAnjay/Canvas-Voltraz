@@ -262,6 +262,15 @@
              this.setDeltaMovement(this.getDeltaMovement().multiply(0.5, 0.8F, 0.5));
              Vec3 fluidFallingAdjustedMovement = this.getFluidFallingAdjustedMovement(gravity, isFalling, this.getDeltaMovement());
              this.setDeltaMovement(fluidFallingAdjustedMovement);
+@@ -3528,7 +_,7 @@
+         Map<org.bukkit.inventory.EquipmentSlot, io.papermc.paper.event.entity.EntityEquipmentChangedEvent.EquipmentChange> equipmentChanges = null;
+         // Paper end - EntityEquipmentChangedEvent
+ 
+-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+             ItemStack itemStack = this.lastEquipmentItems.get(equipmentSlot);
+             ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
+             if (this.equipmentHasChanged(itemStack, itemBySlot)) {
 @@ -3673,9 +_,9 @@
          if (this.jumping && this.isAffectedByFluids()) {
              double fluidHeight;
@@ -291,6 +300,15 @@
              if (!this.canGlide()) {
                  if (this.getSharedFlag(Entity.FLAG_FALL_FLYING) && !CraftEventFactory.callToggleGlideEvent(this, false).isCancelled()) // CraftBukkit
                  this.setSharedFlag(Entity.FLAG_FALL_FLYING, false);
+@@ -3800,7 +_,7 @@
+ 
+     public boolean canGlide() {
+         if (!this.onGround() && !this.isPassenger() && !this.hasEffect(MobEffects.LEVITATION)) {
+-            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++            for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+                 if (canGlideUsing(this.getItemBySlot(equipmentSlot), equipmentSlot)) {
+                     return true;
+                 }
 @@ -3816,6 +_,12 @@
      }
  

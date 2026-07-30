@@ -35,6 +35,15 @@
          return this.wasUnderwater;
      }
  
+@@ -351,7 +_,7 @@
+     }
+ 
+     private boolean isEquipped(Item item) {
+-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+             ItemStack itemBySlot = this.getItemBySlot(equipmentSlot);
+             Equippable equippable = itemBySlot.get(DataComponents.EQUIPPABLE);
+             if (itemBySlot.is(item) && equippable != null && equippable.slot() == equipmentSlot) {
 @@ -490,7 +_,14 @@
          }
  

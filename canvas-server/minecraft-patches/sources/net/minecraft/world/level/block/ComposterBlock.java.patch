@@ -1,0 +1,29 @@
+--- a/net/minecraft/world/level/block/ComposterBlock.java
++++ b/net/minecraft/world/level/block/ComposterBlock.java
+@@ -419,7 +_,7 @@
+ 
+         @Override
+         public int[] getSlotsForFace(Direction side) {
+-            return new int[0];
++            return io.canvasmc.canvas.util.ArrayConstants.emptyIntArray;
+         }
+ 
+         @Override
+@@ -454,7 +_,7 @@
+ 
+         @Override
+         public int[] getSlotsForFace(Direction side) {
+-            return side == Direction.UP ? new int[]{0} : new int[0];
++            return side == Direction.UP ? io.canvasmc.canvas.util.ArrayConstants.zeroSingletonIntArray : io.canvasmc.canvas.util.ArrayConstants.emptyIntArray;
+         }
+ 
+         @Override
+@@ -505,7 +_,7 @@
+ 
+         @Override
+         public int[] getSlotsForFace(Direction side) {
+-            return side == Direction.DOWN ? new int[]{0} : new int[0];
++            return side == Direction.DOWN ? io.canvasmc.canvas.util.ArrayConstants.zeroSingletonIntArray : io.canvasmc.canvas.util.ArrayConstants.emptyIntArray;
+         }
+ 
+         @Override

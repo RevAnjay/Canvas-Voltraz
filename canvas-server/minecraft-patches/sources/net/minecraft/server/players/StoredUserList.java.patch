@@ -1,0 +1,11 @@
+--- a/net/minecraft/server/players/StoredUserList.java
++++ b/net/minecraft/server/players/StoredUserList.java
+@@ -96,7 +_,7 @@
+     }
+ 
+     public String[] getUserList() {
+-        return this.map.keySet().toArray(new String[0]);
++        return this.map.keySet().toArray(io.canvasmc.canvas.util.ArrayConstants.emptyStringArray); // Canvas - reduce array allocations
+     }
+ 
+     public boolean isEmpty() {

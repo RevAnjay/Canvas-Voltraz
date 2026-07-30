@@ -1,5 +1,14 @@
 --- a/net/minecraft/world/item/enchantment/Enchantment.java
 +++ b/net/minecraft/world/item/enchantment/Enchantment.java
+@@ -109,7 +_,7 @@
+     public Map<EquipmentSlot, ItemStack> getSlotItems(LivingEntity entity) {
+         Map<EquipmentSlot, ItemStack> map = Maps.newEnumMap(EquipmentSlot.class);
+ 
+-        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES) {
++        for (EquipmentSlot equipmentSlot : EquipmentSlot.VALUES_ARRAY) { // Canvas - reduce array allocations
+             if (this.matchingSlot(equipmentSlot)) {
+                 ItemStack itemBySlot = entity.getItemBySlot(equipmentSlot);
+                 if (!itemBySlot.isEmpty()) {
 @@ -126,7 +_,15 @@
      }
  
