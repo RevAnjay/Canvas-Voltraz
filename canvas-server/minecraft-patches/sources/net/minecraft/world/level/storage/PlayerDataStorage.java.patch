@@ -1,0 +1,103 @@
+--- a/net/minecraft/world/level/storage/PlayerDataStorage.java
++++ b/net/minecraft/world/level/storage/PlayerDataStorage.java
+@@ -23,6 +_,7 @@
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private final File playerDir;
+     protected final DataFixer fixerUpper;
++    private final java.util.Map<java.util.UUID, java.util.concurrent.Future<?>> savingLocks = new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(); // Canvas - Async playerdata saving
+ 
+     public PlayerDataStorage(LevelStorageSource.LevelStorageAccess levelStorageAccess, DataFixer fixerUpper) {
+         this.fixerUpper = fixerUpper;
+@@ -32,20 +_,73 @@
+ 
+     public void save(Player player) {
+         if (org.spigotmc.SpigotConfig.disablePlayerDataSaving) return; // Spigot
++        // Canvas start - Async playerdata saving
++        CompoundTag dataToStore;
+         try (ProblemReporter.ScopedCollector scopedCollector = new ProblemReporter.ScopedCollector(player.problemPath(), LOGGER)) {
+             TagValueOutput tagValueOutput = TagValueOutput.createWithContext(scopedCollector, player.registryAccess());
+             player.saveWithoutId(tagValueOutput);
+-            Path path = this.playerDir.toPath();
+-            Path path1 = Files.createTempFile(path, player.getStringUUID() + "-", ".dat");
+-            CompoundTag compoundTag = tagValueOutput.buildResult();
+-            NbtIo.writeCompressed(compoundTag, path1);
+-            Path path2 = path.resolve(player.getStringUUID() + ".dat");
+-            Path path3 = path.resolve(player.getStringUUID() + ".dat_old");
+-            Util.safeReplaceFile(path2, path1, path3);
+-        } catch (Exception var11) {
+-            LOGGER.warn("Failed to save player data for {}", player.getPlainTextName(), var11); // Paper - Print exception
+-        }
+-    }
++            dataToStore = tagValueOutput.buildResult();
++        } catch (Exception exception) {
++            LOGGER.warn("Failed to encode player data for {}", player.getPlainTextName(), exception);
++            return;
++        }
++        save(player.getScoreboardName(), player.getUUID(), player.getStringUUID(), dataToStore);
++        // Canvas end - Async playerdata saving
++    }
++
++    // Canvas start - Async playerdata saving
++    public void save(String playerName, java.util.UUID uniqueId, String stringId, CompoundTag compoundTag) {
++        var nbtBytes = new it.unimi.dsi.fastutil.io.FastByteArrayOutputStream(65536);
++        try {
++            NbtIo.writeCompressed(compoundTag, nbtBytes);
++        } catch (Exception exception) {
++            LOGGER.warn("Failed to encode player data for {}", stringId, exception);
++        }
++        lockFor(uniqueId, playerName);
++        synchronized (PlayerDataStorage.this) {
++            io.canvasmc.canvas.async.AsyncPlayerDataSaving.submit(() -> {
++                try {
++                    Path playerDirPath = this.playerDir.toPath();
++                    Path tmpFile = Files.createTempFile(playerDirPath, stringId + "-", ".dat");
++                    org.apache.commons.io.FileUtils.writeByteArrayToFile(tmpFile.toFile(), nbtBytes.array, 0, nbtBytes.length, false);
++                    Path realFile = playerDirPath.resolve(stringId + ".dat");
++                    Path oldFile = playerDirPath.resolve(stringId + ".dat_old");
++                    Util.safeReplaceFile(realFile, tmpFile, oldFile);
++                } catch (Exception var7) {
++                    LOGGER.warn("Failed to save player data for {}", playerName, var7);
++                } finally {
++                    synchronized (PlayerDataStorage.this) {
++                        savingLocks.remove(uniqueId);
++                    }
++                }
++            }).ifPresent(future -> savingLocks.put(uniqueId, future));
++        }
++    }
++
++    private void lockFor(java.util.UUID uniqueId, String playerName) {
++        java.util.concurrent.Future<?> fut;
++        synchronized (this) {
++            fut = savingLocks.get(uniqueId);
++        }
++        if (fut == null) {
++            return;
++        }
++        while (true) {
++            try {
++                fut.get(10_000L, java.util.concurrent.TimeUnit.MILLISECONDS);
++                break;
++            } catch (InterruptedException ignored) {
++            } catch (java.util.concurrent.ExecutionException
++                     | java.util.concurrent.TimeoutException exception) {
++                LOGGER.warn("Failed to save player data for {}", playerName, exception);
++                fut.cancel(true);
++                break;
++            } finally {
++                savingLocks.remove(uniqueId);
++            }
++        }
++    }
++    // Canvas end - Async playerdata saving
+ 
+     private void backup(NameAndId nameAndId, String suffix) {
+         Path path = this.playerDir.toPath();
+@@ -62,6 +_,7 @@
+     }
+ 
+     private Optional<CompoundTag> load(NameAndId nameAndId, String suffix) {
++        lockFor(nameAndId.id(), nameAndId.name()); // Canvas - Async playerdata saving
+         File file = new File(this.playerDir, nameAndId.id() + suffix);
+         // Spigot start
+         boolean usingWrongFile = false;

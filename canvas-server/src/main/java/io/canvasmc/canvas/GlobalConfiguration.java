@@ -140,6 +140,7 @@ public class GlobalConfiguration extends Part {
         // validate the configuration so users don't end up doing a stupid
         Validator.validateObject(configuration);
         io.canvasmc.canvas.util.DABConfig.initDabEntities();
+        io.canvasmc.canvas.async.AsyncPlayerDataSaving.init(); // Canvas - Async playerdata saving
 
         if (TickRegions.started) {
 
