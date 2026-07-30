@@ -1,0 +1,22 @@
+--- a/net/minecraft/world/level/EntityBasedExplosionDamageCalculator.java
++++ b/net/minecraft/world/level/EntityBasedExplosionDamageCalculator.java
+@@ -15,8 +_,17 @@
+ 
+     @Override
+     public Optional<Float> getBlockExplosionResistance(Explosion explosion, BlockGetter level, BlockPos pos, BlockState state, FluidState fluid) {
+-        return super.getBlockExplosionResistance(explosion, level, pos, state, fluid)
+-            .map(resistance -> this.source.getBlockExplosionResistance(explosion, level, pos, state, fluid, resistance));
++        // Canvas start - Lithium: reduce lambda and Optional allocation
++        Optional<Float> optionalBlastResistance = super.getBlockExplosionResistance(explosion, level, pos, state, fluid);
++        if (optionalBlastResistance.isPresent()) {
++            float resistance = optionalBlastResistance.get();
++            float effectiveExplosionResistance = this.source.getBlockExplosionResistance(explosion, level, pos, state, fluid, resistance);
++            if (effectiveExplosionResistance != resistance) {
++                return Optional.of(effectiveExplosionResistance);
++            }
++        }
++        return optionalBlastResistance;
++        // Canvas end - Lithium: reduce lambda and Optional allocation
+     }
+ 
+     @Override
