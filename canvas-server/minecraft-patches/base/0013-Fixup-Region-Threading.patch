@@ -31,10 +31,10 @@ index d866785adcd159ba5cf381a0fc532b7813246c74..1e28a3920d47a6066fd9fbb314ee64f7
  
          if (last) { // Folia - region threading
 diff --git a/io/papermc/paper/threadedregions/RegionShutdownThread.java b/io/papermc/paper/threadedregions/RegionShutdownThread.java
-index bbd14cf34438a9366f5ff29f1acba4282d77d983..039bf725bba8ea55e9dd40f061381d03a0113b99 100644
+index bbd14cf34438a9366f5ff29f1acba4282d77d983..52533dc7d631b65342f2982ffd7a004e72e84842 100644
 --- a/io/papermc/paper/threadedregions/RegionShutdownThread.java
 +++ b/io/papermc/paper/threadedregions/RegionShutdownThread.java
-@@ -148,9 +148,48 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
+@@ -148,9 +148,49 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
              this.shuttingDown = null;
          }
      }
@@ -74,6 +74,7 @@ index bbd14cf34438a9366f5ff29f1acba4282d77d983..039bf725bba8ea55e9dd40f061381d03
 +        }
 +
 +        MinecraftServer.getServer().getConnection().stop();
++        io.canvasmc.canvas.async.AsyncPlayerDataSaving.shutdown(); // Canvas - Async playerdata saving
 +    }
 +    // Canvas end - region threading
  
@@ -83,7 +84,7 @@ index bbd14cf34438a9366f5ff29f1acba4282d77d983..039bf725bba8ea55e9dd40f061381d03
          // await scheduler termination
          LOGGER.info("Awaiting scheduler termination for 60s...");
          if (TickRegions.getScheduler().halt(true, TimeUnit.SECONDS.toNanos(60L))) {
-@@ -161,6 +200,11 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
+@@ -161,6 +201,11 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
          }
  
          MinecraftServer.getServer().stopServer(); // stop part 1: most logic, kicking players, plugins, etc

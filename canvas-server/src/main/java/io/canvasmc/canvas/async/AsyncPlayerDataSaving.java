@@ -34,6 +34,17 @@ public class AsyncPlayerDataSaving {
         }
     }
 
+    public static void shutdown() {
+        if (IO_POOL != null) {
+            net.minecraft.server.MinecraftServer.LOGGER.info("Waiting for player I/O executor to shutdown...");
+            IO_POOL.shutdown();
+            try {
+                IO_POOL.awaitTermination(60L, TimeUnit.SECONDS);
+            } catch (InterruptedException ignored) {
+            }
+        }
+    }
+
     public static Optional<Future<?>> submit(Runnable runnable) {
         if (GlobalConfiguration.getInstance() == null || GlobalConfiguration.getInstance().asyncPlayerDataSave == null || !GlobalConfiguration.getInstance().asyncPlayerDataSave.enabled) {
             runnable.run();
