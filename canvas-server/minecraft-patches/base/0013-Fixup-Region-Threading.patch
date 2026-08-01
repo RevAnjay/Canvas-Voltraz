@@ -31,10 +31,10 @@ index d866785adcd159ba5cf381a0fc532b7813246c74..1e28a3920d47a6066fd9fbb314ee64f7
  
          if (last) { // Folia - region threading
 diff --git a/io/papermc/paper/threadedregions/RegionShutdownThread.java b/io/papermc/paper/threadedregions/RegionShutdownThread.java
-index bbd14cf34438a9366f5ff29f1acba4282d77d983..52533dc7d631b65342f2982ffd7a004e72e84842 100644
+index bbd14cf34438a9366f5ff29f1acba4282d77d983..5490e15316d5ada1650fe74d2d02a50947312dfb 100644
 --- a/io/papermc/paper/threadedregions/RegionShutdownThread.java
 +++ b/io/papermc/paper/threadedregions/RegionShutdownThread.java
-@@ -148,9 +148,49 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
+@@ -148,9 +148,48 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
              this.shuttingDown = null;
          }
      }
@@ -74,7 +74,6 @@ index bbd14cf34438a9366f5ff29f1acba4282d77d983..52533dc7d631b65342f2982ffd7a004e
 +        }
 +
 +        MinecraftServer.getServer().getConnection().stop();
-+        io.canvasmc.canvas.async.AsyncPlayerDataSaving.shutdown(); // Canvas - Async playerdata saving
 +    }
 +    // Canvas end - region threading
  
@@ -84,7 +83,7 @@ index bbd14cf34438a9366f5ff29f1acba4282d77d983..52533dc7d631b65342f2982ffd7a004e
          // await scheduler termination
          LOGGER.info("Awaiting scheduler termination for 60s...");
          if (TickRegions.getScheduler().halt(true, TimeUnit.SECONDS.toNanos(60L))) {
-@@ -161,6 +201,11 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
+@@ -161,6 +200,11 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
          }
  
          MinecraftServer.getServer().stopServer(); // stop part 1: most logic, kicking players, plugins, etc
@@ -96,6 +95,14 @@ index bbd14cf34438a9366f5ff29f1acba4282d77d983..52533dc7d631b65342f2982ffd7a004e
          // halt all chunk systems first so that any in-progress chunk generation stops
          LOGGER.info("Halting chunk systems...");
          for (final ServerLevel world : MinecraftServer.getServer().getAllLevels()) {
+@@ -218,6 +262,7 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
+         // Note: only save after world data and pending teleportations
+         LOGGER.info("Saving all player data...");
+         MinecraftServer.getServer().getPlayerList().saveAll();
++        io.canvasmc.canvas.async.AsyncPlayerDataSaving.shutdown(); // Canvas - Async playerdata saving
+         LOGGER.info("Saved all player data");
+ 
+         MinecraftServer.getServer().stopPart2(); // stop part 2: close other resources (io thread, etc)
 diff --git a/io/papermc/paper/threadedregions/RegionizedServer.java b/io/papermc/paper/threadedregions/RegionizedServer.java
 index 399477cf0964e7774821792c78ea9bb619fbb617..09566c1a0505d112d7a03200789243d7c82f6466 100644
 --- a/io/papermc/paper/threadedregions/RegionizedServer.java

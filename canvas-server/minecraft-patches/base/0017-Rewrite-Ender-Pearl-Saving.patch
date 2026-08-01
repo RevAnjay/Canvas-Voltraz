@@ -8,7 +8,7 @@ The diff here is to help restore this behavior by rewriting how pearls are
 saved to be safe for region threading
 
 diff --git a/io/papermc/paper/threadedregions/RegionShutdownThread.java b/io/papermc/paper/threadedregions/RegionShutdownThread.java
-index 52533dc7d631b65342f2982ffd7a004e72e84842..5f3e8d297ff73bed58cd3c55df9e23ecbdc9b071 100644
+index 5490e15316d5ada1650fe74d2d02a50947312dfb..b6c7448ec76d380daa9f5a5d3a2a4aec91e5a48d 100644
 --- a/io/papermc/paper/threadedregions/RegionShutdownThread.java
 +++ b/io/papermc/paper/threadedregions/RegionShutdownThread.java
 @@ -170,6 +170,32 @@ public final class RegionShutdownThread extends ca.spottedleaf.moonrise.common.u
@@ -51,8 +51,8 @@ index 52533dc7d631b65342f2982ffd7a004e72e84842..5f3e8d297ff73bed58cd3c55df9e23ec
 +        // wait for pearl save, then wait for connection shutdown
 +        MinecraftServer.getServer().pearls.save(null).join();
          MinecraftServer.getServer().getConnection().stop();
-         io.canvasmc.canvas.async.AsyncPlayerDataSaving.shutdown(); // Canvas - Async playerdata saving
      }
+     // Canvas end - region threading
 diff --git a/io/papermc/paper/threadedregions/RegionizedServer.java b/io/papermc/paper/threadedregions/RegionizedServer.java
 index f2cef3ee3300a58af2d34c65341ab2b6feee641d..22784873f951e228da76d99dab1e65925fd3697a 100644
 --- a/io/papermc/paper/threadedregions/RegionizedServer.java
