@@ -665,6 +665,14 @@ public class GlobalConfiguration extends Part {
                     "This spreads the load by using entity ID-based throttling.",
                     "Ported from Petal/Bloom."
                 );
+            option("useVirtualThread")
+                .docs(
+                    Style.wrap(
+                        "Configures JDK 21+ Virtual Threads (Project Loom) for asynchronous task executors.",
+                        "Virtual threads are lightweight and ideal for I/O-bound tasks like chat, downloads, and async schedulers.",
+                        "Ported from Leaf."
+                    )
+                );
         }
 
         public boolean skipEntityMoveIfMovementIsZero = false;
@@ -678,6 +686,22 @@ public class GlobalConfiguration extends Part {
         public boolean optimizeSunBurnTick = false;
         public boolean onlyTickItemsInHand = false;
         public boolean reduceSensorWork = false;
+
+        public UseVirtualThread useVirtualThread = new UseVirtualThread();
+        public static class UseVirtualThread extends Part {
+
+            {
+                option("asyncChatExecutor").docs("Use Virtual Threads for Async Chat Executor");
+                option("downloadPool").docs("Use Virtual Threads for profile fetching / download pool executor");
+                option("bukkitAsyncScheduler").docs("Use Virtual Threads for CraftAsyncScheduler (Bukkit async tasks)");
+                option("foliaAsyncScheduler").docs("Use Virtual Threads for FoliaAsyncScheduler");
+            }
+
+            public boolean asyncChatExecutor = true;
+            public boolean downloadPool = true;
+            public boolean bukkitAsyncScheduler = false;
+            public boolean foliaAsyncScheduler = false;
+        }
     }
 
     // Canvas start - DAB (Dynamic Activation of Brains)
