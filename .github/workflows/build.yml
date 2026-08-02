@@ -41,9 +41,9 @@ jobs:
       - name: Build server JAR
         run: ./gradlew createMojmapPublisherJar
 
-      - name: Upload build artifact
+      - name: Upload Paperclip jar
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: canvas-server-jar
-          path: canvas-server/build/libs/*.jar
+          name: canvas-server.jar
+          path: canvas-server/build/libs/canvas-paperclip-*-mojmap.jar
