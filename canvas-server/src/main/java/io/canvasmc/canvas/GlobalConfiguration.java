@@ -137,6 +137,13 @@ public class GlobalConfiguration extends Part {
     private static void postLoad(final GlobalConfiguration configuration) {
         INSTANCE = configuration;
 
+        io.canvasmc.canvas.async.ExecutorFactory.syncUseVirtualThreadConfig(
+            configuration.performance.useVirtualThread.asyncChatExecutor,
+            configuration.performance.useVirtualThread.downloadPool,
+            configuration.performance.useVirtualThread.bukkitAsyncScheduler,
+            configuration.performance.useVirtualThread.foliaAsyncScheduler
+        );
+
         // validate the configuration so users don't end up doing a stupid
         Validator.validateObject(configuration);
         io.canvasmc.canvas.util.DABConfig.initDabEntities();
@@ -698,7 +705,7 @@ public class GlobalConfiguration extends Part {
             }
 
             public boolean asyncChatExecutor = true;
-            public boolean downloadPool = true;
+            public boolean downloadPool = false;
             public boolean bukkitAsyncScheduler = false;
             public boolean foliaAsyncScheduler = false;
         }

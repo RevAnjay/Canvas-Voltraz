@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Canvas <canvas@canvasmc.io>
+Date: Sun, 2 Aug 2026 00:00:00 +0000
+Subject: [PATCH] Guard virtual chat executor configuration
+
+
+diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+index 8835cf8d9d1fb3b4930a50d002e0b426b155f4ac..3d5650726f6bebf421e34ae107d3132f6b0ff846 100644
+--- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
++++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
+@@ -324,9 +324,10 @@ public class GlobalConfiguration extends ConfigurationPart {
+                     _chatExecutorMaxSize = _chatExecutorCoreSize;
+                 }
+ 
+-                java.util.concurrent.ThreadPoolExecutor executor = (java.util.concurrent.ThreadPoolExecutor) net.minecraft.server.MinecraftServer.getServer().chatExecutor;
++                if (net.minecraft.server.MinecraftServer.getServer().chatExecutor instanceof java.util.concurrent.ThreadPoolExecutor executor) { // Canvas - Virtual thread support for chat executor
+                 executor.setCorePoolSize(_chatExecutorCoreSize);
+                 executor.setMaximumPoolSize(_chatExecutorMaxSize);
++                } // Canvas - Virtual thread support for chat executor
+             }
+         }
+         public int maxJoinsPerTick = 5;

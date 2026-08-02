@@ -1,8 +1,6 @@
 package io.canvasmc.canvas.async;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.canvasmc.canvas.GlobalConfiguration;
-import io.papermc.paper.threadedregions.scheduler.FoliaAsyncScheduler;
 import net.minecraft.DefaultUncaughtExceptionHandlerWithName;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Util;
@@ -20,10 +18,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ExecutorFactory {
 
     private static final org.slf4j.Logger DOWNLOAD_LOGGER = LoggerFactory.getLogger("DownloadPool");
+    // Mirrors virtual-thread config defaults; update together when defaults change.
+    private static volatile boolean USE_VIRTUAL_THREAD_CHAT = true;
+    private static volatile boolean USE_VIRTUAL_THREAD_DOWNLOAD_POOL = false;
+    private static volatile boolean USE_VIRTUAL_THREAD_BUKKIT = false;
+    private static volatile boolean USE_VIRTUAL_THREAD_FOLIA = false;
+
+    public static void syncUseVirtualThreadConfig(boolean chat, boolean download, boolean bukkit, boolean folia) {
+        USE_VIRTUAL_THREAD_CHAT = chat;
+        USE_VIRTUAL_THREAD_DOWNLOAD_POOL = download;
+        USE_VIRTUAL_THREAD_BUKKIT = bukkit;
+        USE_VIRTUAL_THREAD_FOLIA = folia;
+    }
+
+    public static boolean useVirtualThreadChat() {
+        return USE_VIRTUAL_THREAD_CHAT;
+    }
+
     private static final org.slf4j.Logger FOLIA_ASYNC_LOGGER = LoggerFactory.getLogger("FoliaAsyncScheduler");
 
     public static ExecutorService buildChatExecutor() {
-        if (GlobalConfiguration.getInstance().performance.useVirtualThread.asyncChatExecutor) {
+        if (USE_VIRTUAL_THREAD_CHAT) {
             return Executors.newThreadPerTaskExecutor(
                 Thread.ofVirtual()
                     .name("Async Chat Thread - #", 0)
@@ -42,7 +57,7 @@ public class ExecutorFactory {
     }
 
     public static ExecutorService buildDownloadPoolExecutor() {
-        if (GlobalConfiguration.getInstance().performance.useVirtualThread.downloadPool) {
+        if (USE_VIRTUAL_THREAD_DOWNLOAD_POOL) {
             return Executors.newThreadPerTaskExecutor(
                 Thread.ofVirtual()
                     .name("Download-", 0)
@@ -65,7 +80,7 @@ public class ExecutorFactory {
     }
 
     public static ExecutorService buildBukkitAsyncSchedulerExecutor() {
-        if (GlobalConfiguration.getInstance().performance.useVirtualThread.bukkitAsyncScheduler) {
+        if (USE_VIRTUAL_THREAD_BUKKIT) {
             return Executors.newThreadPerTaskExecutor(
                 Thread.ofVirtual()
                     .name("Craft Scheduler Thread - ", 0)
@@ -83,7 +98,7 @@ public class ExecutorFactory {
     }
 
     public static ExecutorService buildFoliaAsyncSchedulerExecutor() {
-        if (GlobalConfiguration.getInstance().performance.useVirtualThread.foliaAsyncScheduler) {
+        if (USE_VIRTUAL_THREAD_FOLIA) {
             return Executors.newThreadPerTaskExecutor(
                 Thread.ofVirtual()
                     .name("Folia Async Scheduler Thread #", 0)

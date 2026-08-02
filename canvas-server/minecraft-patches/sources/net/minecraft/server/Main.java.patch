@@ -21,7 +21,13 @@
          /* CraftBukkit start - Replace everything
          OptionParser optionParser = new OptionParser();
          OptionSpec<Void> optionSpec = optionParser.accepts("nogui");
-@@ -113,8 +_,7 @@
+@@ -108,13 +_,13 @@
+             io.papermc.paper.plugin.PluginInitializerManager.load(optionSet); // Paper
+             Bootstrap.bootStrap();
+             Bootstrap.validate();
++            io.canvasmc.canvas.GlobalConfiguration.getInstance(); // Canvas - load config before executor construction
+             Util.startTimerHackThread();
+             Path path1 = Paths.get("server.properties");
              DedicatedServerSettings dedicatedServerSettings = new DedicatedServerSettings(optionSet); // CraftBukkit - CLI argument support
              dedicatedServerSettings.forceSave();
              RegionFileVersion.configure(dedicatedServerSettings.getProperties().regionFileComression);
