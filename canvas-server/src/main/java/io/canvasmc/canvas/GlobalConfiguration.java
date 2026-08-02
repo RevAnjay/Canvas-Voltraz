@@ -667,9 +667,9 @@ public class GlobalConfiguration extends Part {
                 );
             option("reduceSensorWork")
                 .docs(
-                    "When enabled, skips mob sensing ticks on certain ticks based on entity ID to reduce sensor work.",
-                    "Sensing determines what entities/mobs are nearby and is expensive for large mob counts.",
-                    "This spreads the load by using entity ID-based throttling.",
+                    "When enabled, caches each mob line-of-sight result for up to 4 ticks instead of clearing the entire cache every tick.",
+                    "This matches Leaf/Gale's safer per-entry expiry model and avoids stale results lasting a full second.",
+                    "Reduces repeated ray casts while preserving responsive mob targeting.",
                     "Ported from Petal/Bloom."
                 );
             option("useVirtualThread")

@@ -82,24 +82,6 @@
          }
  
          return false;
-@@ -805,9 +_,14 @@
-             return;
-         }
-         // Paper end - Allow nerfed mobs to jump and float
--        this.sensing.tick();
--        int i = this.tickCount + this.getId();
--        if (i % 2 != 0 && this.tickCount > 1) {
-+        // Canvas start - Petal: reduce sensor work
-+        int idBasedTickCount = this.tickCount + this.getId();
-+        if (!io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.reduceSensorWork || idBasedTickCount % 20 == 0) {
-+            this.sensing.tick();
-+        }
-+        // Canvas end - Petal: reduce sensor work
-+        // int i = this.tickCount + this.getId(); // Canvas - Petal: moved up
-+        if (idBasedTickCount % 2 != 0 && this.tickCount > 1) {
-             if (this.targetSelector.inactiveTick(this.activatedPriority, false))
-             this.targetSelector.tickRunningGoals(false);
-             if (this.goalSelector.inactiveTick(this.activatedPriority, false))
 @@ -1023,7 +_,7 @@
      protected void dropCustomDeathLoot(ServerLevel level, DamageSource damageSource, boolean recentlyHit) {
          super.dropCustomDeathLoot(level, damageSource, recentlyHit);

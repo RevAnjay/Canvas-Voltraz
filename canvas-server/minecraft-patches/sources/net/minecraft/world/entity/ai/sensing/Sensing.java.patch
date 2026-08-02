@@ -1,0 +1,81 @@
+--- a/net/minecraft/world/entity/ai/sensing/Sensing.java
++++ b/net/minecraft/world/entity/ai/sensing/Sensing.java
+@@ -1,39 +1,61 @@
+ package net.minecraft.world.entity.ai.sensing;
+ 
+-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+-import it.unimi.dsi.fastutil.ints.IntSet;
++import it.unimi.dsi.fastutil.ints.Int2IntMap;
++import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
++import it.unimi.dsi.fastutil.ints.IntArrayList;
++import it.unimi.dsi.fastutil.ints.IntList;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.Mob;
++import org.jspecify.annotations.Nullable;
+ 
+ public class Sensing {
++    private static final int REDUCED_CACHE_TICKS = 4;
+     private final Mob mob;
+-    private final IntSet seen = new IntOpenHashSet();
+-    private final IntSet unseen = new IntOpenHashSet();
++    private final Int2IntMap seen = new Int2IntOpenHashMap(2);
++    private final IntList @Nullable [] expiring;
++    private int currentCacheAddIndex;
++    private int nextToExpireIndex = 1;
+ 
+     public Sensing(Mob mob) {
+         this.mob = mob;
++        if (!io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.reduceSensorWork) {
++            this.expiring = null;
++        } else {
++            this.expiring = new IntList[REDUCED_CACHE_TICKS];
++            for (int i = 0; i < REDUCED_CACHE_TICKS; i++) {
++                this.expiring[i] = new IntArrayList(0);
++            }
++        }
+     }
+ 
+     public void tick() {
+-        this.seen.clear();
+-        this.unseen.clear();
++        if (this.expiring == null) {
++            this.seen.clear();
++            return;
++        }
++
++        IntList expiringNow = this.expiring[this.nextToExpireIndex];
++        expiringNow.forEach(this.seen::remove);
++        expiringNow.clear();
++        this.currentCacheAddIndex = (this.currentCacheAddIndex + 1) % this.expiring.length;
++        this.nextToExpireIndex = (this.nextToExpireIndex + 1) % this.expiring.length;
+     }
+ 
+     public boolean hasLineOfSight(Entity entity) {
+         int id = entity.getId();
+-        if (this.seen.contains(id)) {
++        int cached = this.seen.get(id);
++        if (cached == 1) {
+             return true;
+-        } else if (this.unseen.contains(id)) {
++        }
++        if (cached == 2) {
+             return false;
+-        } else {
+-            boolean hasLineOfSight = this.mob.hasLineOfSight(entity);
+-            if (hasLineOfSight) {
+-                this.seen.add(id);
+-            } else {
+-                this.unseen.add(id);
+-            }
+-
+-            return hasLineOfSight;
+         }
++
++        boolean hasLineOfSight = this.mob.hasLineOfSight(entity);
++        this.seen.put(id, hasLineOfSight ? 1 : 2);
++        if (this.expiring != null) {
++            this.expiring[this.currentCacheAddIndex].add(id);
++        }
++        return hasLineOfSight;
+     }
+ }
