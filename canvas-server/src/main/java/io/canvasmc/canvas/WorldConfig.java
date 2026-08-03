@@ -50,6 +50,7 @@ public class WorldConfig extends Part {
             // During early bootstrap (Blocks.<clinit>), we can't load the full config
             // because MinecraftServer isn't initialized yet. Return a bare default.
             DEFAULT = new WorldConfig();
+            DEFAULT.entities.spawning.throttle.postLoad();
         }
         return DEFAULT;
     }
@@ -198,6 +199,8 @@ public class WorldConfig extends Part {
         if (blocks.spawner.minSpawnDelay > blocks.spawner.maxSpawnDelay) {
             throw new IllegalArgumentException("min-spawn-delay must be less than or equal to max spawn delay");
         }
+
+        entities.spawning.throttle.postLoad();
     }
 
     {
@@ -469,6 +472,70 @@ public class WorldConfig extends Part {
 
         public boolean experienceOrbsAreFireResistant = false; // Canvas - fire res orbs
         public boolean allowUnsafeTeleportation = false; // Luminol - allow unsafe teleportation (sand duping, etc.)
+
+        public Spawning spawning = new Spawning();
+        public static class Spawning extends Part {
+
+            public ThrottleNaturalMobSpawning throttle = new ThrottleNaturalMobSpawning();
+            public static class ThrottleNaturalMobSpawning extends Part {
+
+                {
+                    option("enabled").docs("Skip mob spawning for chunks with repeated failures.");
+                }
+
+                public boolean enabled = false;
+
+                public CategoryThrottle monster = new CategoryThrottle();
+                public CategoryThrottle creature = new CategoryThrottle();
+                public CategoryThrottle ambient = new CategoryThrottle();
+                public CategoryThrottle axolotls = new CategoryThrottle();
+                public CategoryThrottle undergroundWaterCreature = new CategoryThrottle();
+                public CategoryThrottle waterCreature = new CategoryThrottle();
+                public CategoryThrottle waterAmbient = new CategoryThrottle();
+
+                public static class CategoryThrottle extends Part {
+                    {
+                        option("minFailed").docs("Minimum consecutive failed spawn attempts before throttling kicks in.");
+                        option("spawnChance").docs("Percentage chance (0.0 - 100.0) to attempt spawning when throttled.");
+                    }
+
+                    public long minFailed = 8L;
+                    public double spawnChance = 25.0D;
+                }
+
+                public long[] failedAttempts;
+                public int[] parsedSpawnChance;
+
+                public CategoryThrottle getCategorySettings(net.minecraft.world.entity.MobCategory category) {
+                    return switch (category) {
+                        case MONSTER -> monster;
+                        case CREATURE -> creature;
+                        case AMBIENT -> ambient;
+                        case AXOLOTLS -> axolotls;
+                        case UNDERGROUND_WATER_CREATURE -> undergroundWaterCreature;
+                        case WATER_CREATURE -> waterCreature;
+                        case WATER_AMBIENT -> waterAmbient;
+                        default -> new CategoryThrottle();
+                    };
+                }
+
+                public void postLoad() {
+                    net.minecraft.world.entity.MobCategory[] categories = net.minecraft.world.level.NaturalSpawner.SPAWNING_CATEGORIES;
+                    failedAttempts = new long[categories.length];
+                    parsedSpawnChance = new int[categories.length];
+
+                    for (int i = 0; i < categories.length; i++) {
+                        CategoryThrottle cat = getCategorySettings(categories[i]);
+                        long attempts = Math.max(-1L, cat.minFailed);
+                        double chance = Math.clamp(cat.spawnChance, 0.0D, 100.0D) / 100.0D;
+                        int chanceInt = Math.toIntExact(Math.round((chance * Integer.MAX_VALUE)));
+
+                        failedAttempts[i] = attempts;
+                        parsedSpawnChance[i] = chanceInt;
+                    }
+                }
+            }
+        }
     }
 
     public Combat combat = new Combat();

@@ -9,10 +9,11 @@
      public boolean loaded;
      public final ServerLevel level; // CraftBukkit - type
      private @Nullable Supplier<FullChunkStatus> fullStatus;
-@@ -134,6 +_,18 @@
+@@ -134,6 +_,19 @@
      private final int maxSection;
      private final boolean debug;
      private final BlockState defaultBlockState;
++    public final int[] failedSpawnAttempts = new int[net.minecraft.world.entity.MobCategory.values().length]; // Leaf - throttle mob spawning
 +    // Pufferfish start - instead of using a random every time the chunk is ticked, define when lightning strikes preemptively
 +    private int lightningTick;
 +
