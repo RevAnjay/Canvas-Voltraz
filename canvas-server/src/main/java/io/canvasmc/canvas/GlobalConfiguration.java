@@ -519,6 +519,45 @@ public class GlobalConfiguration extends Part {
                 .docs(
                     "The maximum number of particle packets allowed per player per tick when particle throttling is enabled"
                 ).greaterThan(0.0F);
+            option("nettyTransportType")
+                .docs(
+                    Style.wrap(
+                        "Allows changing the transport type used by Netty.",
+                        "Options:",
+                        "  - AUTO: Automatically selects best available transport (io_uring -> kqueue -> epoll -> nio).",
+                        "  - IO_URING: High-performance Linux transport using io_uring for minimal syscalls and low latency (Linux kernel >= 5.4).",
+                        "  - KQUEUE: Event notification mechanism optimized for BSD/macOS systems.",
+                        "  - EPOLL: Scalable Linux transport using epoll for efficient I/O multiplexing.",
+                        "  - NIO: Java's built-in non-blocking I/O, works on all platforms but generally slower."
+                    ).defineEnum(NettyTransportType.class, (type) -> {
+                        return switch (type) {
+                            case AUTO -> "Auto-detect best native transport";
+                            case IO_URING -> "Linux io_uring (high performance, kernel >= 5.4)";
+                            case KQUEUE -> "BSD / macOS kqueue";
+                            case EPOLL -> "Linux epoll";
+                            case NIO -> "Java standard NIO";
+                        };
+                    })
+                );
+        }
+
+        public enum NettyTransportType implements net.minecraft.util.StringRepresentable {
+            AUTO("auto"),
+            IO_URING("io_uring"),
+            KQUEUE("kqueue"),
+            EPOLL("epoll"),
+            NIO("nio");
+
+            private final String name;
+
+            NettyTransportType(String name) {
+                this.name = name;
+            }
+
+            @Override
+            public String getSerializedName() {
+                return name;
+            }
         }
 
         public boolean filterVelocityPacket = false;
@@ -532,6 +571,7 @@ public class GlobalConfiguration extends Part {
         public boolean purpurAlternativeKeepalive = false;
         public boolean particleThrottling = false;
         public int particleThrottleLimit = 20;
+        public NettyTransportType nettyTransportType = NettyTransportType.AUTO;
     }
 
     {

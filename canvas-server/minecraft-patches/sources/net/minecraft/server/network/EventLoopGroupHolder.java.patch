@@ -1,0 +1,106 @@
+--- a/net/minecraft/server/network/EventLoopGroupHolder.java
++++ b/net/minecraft/server/network/EventLoopGroupHolder.java
+@@ -56,6 +_,56 @@
+         }
+     };
+     // Paper end - Unix domain socket support
++    // Leaf start - Add io_uring support
++    private static final boolean HAS_IO_URING;
++    private static final EventLoopGroupHolder IO_URING;
++    private static final EventLoopGroupHolder IO_URING_UNIX_DOMAIN;
++
++    static {
++        boolean available = false;
++        EventLoopGroupHolder ioUring = null;
++        EventLoopGroupHolder ioUringUnix = null;
++        try {
++            Class<?> ioUringCls = Class.forName("io.netty.channel.uring.IoUring");
++            java.lang.reflect.Method isAvailable = ioUringCls.getMethod("isAvailable");
++            available = (boolean) isAvailable.invoke(null);
++            if (available) {
++                Class<? extends Channel> socketChannel = (Class<? extends Channel>) Class.forName("io.netty.channel.uring.IoUringSocketChannel");
++                Class<? extends ServerChannel> serverSocketChannel = (Class<? extends ServerChannel>) Class.forName("io.netty.channel.uring.IoUringServerSocketChannel");
++                Class<? extends Channel> domainSocket = (Class<? extends Channel>) Class.forName("io.netty.channel.uring.IoUringDomainSocketChannel");
++                Class<? extends ServerChannel> serverDomainSocket = (Class<? extends ServerChannel>) Class.forName("io.netty.channel.uring.IoUringServerDomainSocketChannel");
++                Class<?> ioHandlerCls = Class.forName("io.netty.channel.uring.IoUringIoHandler");
++                java.lang.reflect.Method newFactory = ioHandlerCls.getMethod("newFactory");
++
++                ioUring = new EventLoopGroupHolder("IO_Uring", socketChannel, serverSocketChannel) {
++                    @Override
++                    protected IoHandlerFactory ioHandlerFactory() {
++                        try {
++                            return (IoHandlerFactory) newFactory.invoke(null);
++                        } catch (Exception e) {
++                            throw new RuntimeException(e);
++                        }
++                    }
++                };
++                ioUringUnix = new EventLoopGroupHolder("IO_Uring Unix Domain Socket", domainSocket, serverDomainSocket) {
++                    @Override
++                    protected IoHandlerFactory ioHandlerFactory() {
++                        try {
++                            return (IoHandlerFactory) newFactory.invoke(null);
++                        } catch (Exception e) {
++                            throw new RuntimeException(e);
++                        }
++                    }
++                };
++            }
++        } catch (Throwable ignored) {
++            available = false;
++        }
++        HAS_IO_URING = available;
++        IO_URING = ioUring;
++        IO_URING_UNIX_DOMAIN = ioUringUnix;
++    }
++    // Leaf end - Add io_uring support
+     private final String type;
+     private final Class<? extends Channel> channelCls;
+     private final Class<? extends ServerChannel> serverChannelCls;
+@@ -79,15 +_,38 @@
+     // Paper start - Unix domain socket support
+     public static EventLoopGroupHolder remote(java.net.SocketAddress address, boolean tryNativeTransport) {
+         if (tryNativeTransport) {
+-            if (KQueue.isAvailable()) {
+-                return KQUEUE;
+-            }
++            io.canvasmc.canvas.GlobalConfiguration.Networking.NettyTransportType transportType =
++                io.canvasmc.canvas.GlobalConfiguration.getInstance().networking.nettyTransportType;
+ 
+-            if (Epoll.isAvailable()) {
+-                if (address instanceof io.netty.channel.unix.DomainSocketAddress) {
+-                    return EPOLL_UNIX_DOMAIN;
+-                } else {
+-                    return EPOLL;
++            switch (transportType) {
++                case IO_URING -> {
++                    if (HAS_IO_URING) {
++                        return address instanceof io.netty.channel.unix.DomainSocketAddress ? IO_URING_UNIX_DOMAIN : IO_URING;
++                    }
++                }
++                case KQUEUE -> {
++                    if (KQueue.isAvailable()) {
++                        return KQUEUE;
++                    }
++                }
++                case EPOLL -> {
++                    if (Epoll.isAvailable()) {
++                        return address instanceof io.netty.channel.unix.DomainSocketAddress ? EPOLL_UNIX_DOMAIN : EPOLL;
++                    }
++                }
++                case NIO -> {
++                    return NIO;
++                }
++                case AUTO -> {
++                    if (HAS_IO_URING) {
++                        return address instanceof io.netty.channel.unix.DomainSocketAddress ? IO_URING_UNIX_DOMAIN : IO_URING;
++                    }
++                    if (KQueue.isAvailable()) {
++                        return KQUEUE;
++                    }
++                    if (Epoll.isAvailable()) {
++                        return address instanceof io.netty.channel.unix.DomainSocketAddress ? EPOLL_UNIX_DOMAIN : EPOLL;
++                    }
+                 }
+             }
+         }
