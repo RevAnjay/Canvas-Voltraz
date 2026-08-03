@@ -128,6 +128,8 @@ Built JAR output location: `canvas-server/build/libs/canvas-paperclip-*.jar`.
 - `networking.particleThrottling` — Particle packet throttling
 - `networking.nettyTransportType` — Configurable Netty transport (DEFAULT / EPOLL / KQUEUE / IO_URING)
 - `performance.asyncPlayerDataSaving.*` — Shutdown-safe async player data saving
+- `performance.dab.*` — Dynamic Activation of Brains settings
+- `performance.optimizedPoweredRails` — Fast powered rail propagation toggle
 
 ### World Configuration (`config/canvas-worlds.yml`)
 - `regionBars.*` — Regionized TPS / RAM bossbar
@@ -137,8 +139,6 @@ Built JAR output location: `canvas-server/build/libs/canvas-paperclip-*.jar`.
 - `entities.spawning.throttle.*` — Throttle natural mob spawning per category
 - `blocks.spawner.*` — Mob spawner parameter tuning
 - `farming.*` — Farmland / crop / leaf decay settings
-- `performance.dab.*` — Dynamic Activation of Brains settings
-- `performance.optimizedPoweredRails` — Fast powered rail propagation toggle
 
 ## Credits & Upstream Projects
 
