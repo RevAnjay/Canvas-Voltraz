@@ -503,8 +503,8 @@ public class WorldConfig extends Part {
                     public double spawnChance = 25.0D;
                 }
 
-                public long[] failedAttempts;
-                public int[] parsedSpawnChance;
+                public transient long[] failedAttempts;
+                public transient int[] parsedSpawnChance;
 
                 public CategoryThrottle getCategorySettings(net.minecraft.world.entity.MobCategory category) {
                     return switch (category) {
