@@ -40,15 +40,27 @@ Building upon vanilla Canvas, this fork ports extensive optimizations and bugfix
 - Chunk reload detector fix
 - `preventMovingIntoUnloadedChunks` config fix
 
-### Optimizations from Kitin (6 Patches)
-| Patch | Description |
-|-------|-------------|
-| **Gale AI Collections** | AttributeMap uses Reference-based HashMap, reducing memory overhead |
-| **Reduce Entity Packets** | Skip position sync packets for TNT/high-speed entities, significantly reducing network traffic in world-eater scenarios |
-| **Villager Smart Hibernation** | Enclosed villagers freeze AI, reducing unnecessary computation |
-| **Particle Throttling** | Particle packet throttling with configurable per-tick limits |
-| **Dropper Transfer** | Dropper zero-copy item transfer, skipping event system overhead |
-| **ItemEntity Water Fix** | Fixes abnormal item entity movement in water |
+### Optimizations & Features Ported from Leaf / Petal / Gale / Lithium
+| Feature / Optimization | Description | Source / Ref |
+|-----------------------|-------------|--------------|
+| **Virtual Thread Support** | Support for Bukkit, Folia Async Schedulers, Chat Executor, and Download Pool | Leaf / Loom |
+| **Async Player Data Saving** | Shutdown-safe asynchronous player data saving pipeline | Leaf |
+| **DAB (Dynamic Activation of Brains)** | Configurable entity brain activation throttling | Leaf / Pufferfish |
+| **Optimized Powered Rails** | Fast redstone propagation and wiring optimization for powered rails (Leaf 0224) | Leaf |
+| **Throttle Natural Mob Spawning** | Throttles failed natural mob spawn attempts per category to boost tick rates | Leaf 0229 / Paper PR |
+| **BinaryGoalSet AI Navigation** | Replaces GoalSelector set with high-performance `BinaryGoalSet` | Leaf |
+| **Line-of-Sight Cache Expiry** | Optimized entity line-of-sight check caching with tick expiration | Leaf |
+| **Fast Bit Radix Sort** | Fast bit radix sorting for distance-based entity sorting | Leaf |
+| **Netty Transport & `io_uring`** | Configurable Netty transport layer with native `io_uring` support | Leaf / Netty |
+| **Biome Zoom Seed Caching** | Caches biome zoom seed obfuscation on world options and player spawn info | Leaf 0174 |
+| **Only Tick Items in Hand** | Skips item ticking when not held in main or off hand | Leaf |
+| **Remove Streams in Hotpaths** | Replaced Stream API with indexed loops in `BlockBehaviour` blockstate cache & Trial Spawner | Leaf 0129 / 0174 |
+| **Lithium Explosion & Fast Allocations** | Fast explosion damage calculator, cached empty arrays & `VALUES_ARRAY` | Lithium / Petal |
+| **Reduce Sensor & Block Packet Work** | Reduces entity sensor work frequency and block destruction packet allocations | Petal / Leaf |
+| **VarLong & Entity Distance Optimizations** | Fast VarLong size calculations & optimized `distanceToSqr` checks (Leaf 0163) | Leaf |
+| **BlockEntityType#isValid Optimization** | Fast lookup for valid block entities without array iterations (Leaf 0208) | Leaf 0208 |
+| **Short-Circuit `isOnFire()` Checks** | Early exit on fire tick checks for non-flammable entities | Leaf |
+| **Lobotomize Stuck Villagers** | Replaced smart hibernation with lobotomization for stuck villagers | Leaf / Purpur |
 
 ### Features from Luminol
 | Feature | Description |
@@ -111,14 +123,19 @@ Built JAR output location: `canvas-server/build/libs/canvas-paperclip-*.jar`.
 - `regionCompressionLevel` — Linear compression level (1-22)
 - `networking.filterVelocityPacket` — Entity velocity packet filtering
 - `networking.particleThrottling` — Particle packet throttling
+- `networking.nettyTransportType` — Configurable Netty transport (DEFAULT / EPOLL / KQUEUE / IO_URING)
+- `performance.asyncPlayerDataSaving.*` — Shutdown-safe async player data saving
 
 ### World Configuration (`config/canvas-worlds.yml`)
 - `regionBars.*` — Regionized TPS / RAM bossbar
 - `visuals.particles.*` — Particle packet toggles
 - `entities.entityCollisionMode` — Entity collision mode (VANILLA / ONLY_PUSHABLE_PLAYERS_SMALL / ONLY_PUSHABLE_PLAYERS_LARGE / NO_COLLISIONS)
 - `entities.fastOrbs` — Fast XP orb merging & pickup
+- `entities.spawning.throttle.*` — Throttle natural mob spawning per category
 - `blocks.spawner.*` — Mob spawner parameter tuning
 - `farming.*` — Farmland / crop / leaf decay settings
+- `performance.dab.*` — Dynamic Activation of Brains settings
+- `performance.optimizedPoweredRails` — Fast powered rail propagation toggle
 
 ## Credits & Upstream Projects
 
