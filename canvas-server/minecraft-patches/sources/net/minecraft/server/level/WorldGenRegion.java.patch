@@ -1,5 +1,14 @@
 --- a/net/minecraft/server/level/WorldGenRegion.java
 +++ b/net/minecraft/server/level/WorldGenRegion.java
+@@ -124,7 +_,7 @@
+         this.levelData = level.getLevelData();
+         this.random = level.getChunkSource().randomState().getOrCreateRandomFactory(WORLDGEN_REGION_RANDOM).at(this.center.getPos().getWorldPosition());
+         this.dimensionType = level.dimensionType();
+-        this.biomeManager = new BiomeManager(this, BiomeManager.obfuscateSeed(this.seed));
++        this.biomeManager = new BiomeManager(this, level.getLevel().getBiomeManager().biomeZoomSeed); // Leaf - cache biome zoom seed
+         this.structureManager = level.structureManager().forWorldGenRegion(this); // Folia - region threading
+     }
+ 
 @@ -319,7 +_,7 @@
              return true;
          } else {

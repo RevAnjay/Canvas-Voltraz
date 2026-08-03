@@ -26,6 +26,16 @@
          this.server.getPluginManager().callEvent(new org.bukkit.event.server.ServerLoadEvent(org.bukkit.event.server.ServerLoadEvent.LoadType.STARTUP));
          this.connection.acceptConnections();
      }
+@@ -667,8 +_,7 @@
+         net.minecraft.world.level.storage.PrimaryLevelData serverLevelData
+     ) {
+         WorldOptions worldOptions = serverLevelData.worldGenOptions();
+-        long seed = worldOptions.seed();
+-        long l = BiomeManager.obfuscateSeed(seed);
++        long l = worldOptions.biomeZoomSeed(); // Leaf - cache biome zoom seed
+         List<CustomSpawner> list = ImmutableList.of(
+             new PhantomSpawner(), new PatrolSpawner(), new CatSpawner(), new VillageSiege(), new WanderingTraderSpawner(serverLevelData)
+         );
 @@ -736,6 +_,7 @@
              );
          }
