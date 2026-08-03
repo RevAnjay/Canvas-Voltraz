@@ -672,6 +672,23 @@ public class GlobalConfiguration extends Part {
                     "Reduces repeated ray casts while preserving responsive mob targeting.",
                     "Ported from Petal/Bloom."
                 );
+            option("dab")
+                .docs(
+                    Style.wrap(
+                        "Dynamic Activation of Brains (DAB) reduces AI processing for distant entities.",
+                        "Entities beyond the start distance have their AI tick rate reduced based on distance,",
+                        "significantly improving performance with large entity counts.",
+                        "Ported from Pufferfish/Folia."
+                    )
+                );
+            option("optimizedPoweredRails")
+                .docs(
+                    Style.wrap(
+                        "Optimizes powered rail computation by caching and limiting rail activation range.",
+                        "Reduces redundant block updates and recalculation for powered rails,",
+                        "especially beneficial for servers with extensive rail networks."
+                    )
+                );
             option("useVirtualThread")
                 .docs(
                     Style.wrap(
@@ -694,6 +711,44 @@ public class GlobalConfiguration extends Part {
         public boolean onlyTickItemsInHand = false;
         public boolean reduceSensorWork = false;
 
+        public DAB dab = new DAB();
+        public static class DAB extends Part {
+
+            {
+                option("enabled").docs("Whether DAB is enabled");
+                option("startDistance").docs("Distance in blocks from player at which DAB begins to reduce entity AI tick rate").greaterThan(0.0F);
+                option("maxTickFreq").docs("Maximum AI tick interval (in ticks) for the most distant entities").greaterThan(0.0F);
+                option("activationDistMod").docs("Distance modifier controlling how aggressively AI tick rate scales with distance").greaterThan(0.0F);
+                option("dontEnableIfInWater").docs("Whether to keep entities in water fully active regardless of distance");
+                option("blacklistedEntities").docs("List of entity type names that should never be deactivated by DAB");
+            }
+
+            public boolean enabled = true;
+            public int startDistance = 12;
+            public int maxTickFreq = 20;
+            public int activationDistMod = 8;
+            public boolean dontEnableIfInWater = false;
+            public java.util.List<String> blacklistedEntities = new java.util.ArrayList<>(java.util.Arrays.asList(
+                "villager",
+                "axolotl",
+                "hoglin",
+                "zombified_piglin",
+                "goat"
+            ));
+        }
+
+        public OptimizedPoweredRails optimizedPoweredRails = new OptimizedPoweredRails();
+        public static class OptimizedPoweredRails extends Part {
+
+            {
+                option("enabled").docs("Whether optimized powered rails is enabled");
+                option("railActivationRange").docs("Maximum distance (in blocks) that a powered rail can activate other rails").greaterThan(0.0F);
+            }
+
+            public boolean enabled = true;
+            public int railActivationRange = 8; // Vanilla signal distance (PoweredRailBlock recursionCount >= 8)
+        }
+
         public UseVirtualThread useVirtualThread = new UseVirtualThread();
         public static class UseVirtualThread extends Part {
 
@@ -709,69 +764,6 @@ public class GlobalConfiguration extends Part {
             public boolean bukkitAsyncScheduler = false;
             public boolean foliaAsyncScheduler = false;
         }
-    }
-
-    // Canvas start - DAB (Dynamic Activation of Brains)
-    {
-        option("dab")
-            .docs(
-                Style.wrap(
-                    "Dynamic Activation of Brains (DAB) reduces AI processing for distant entities.",
-                    "Entities beyond the start distance have their AI tick rate reduced based on distance,",
-                    "significantly improving performance with large entity counts.",
-                    "Ported from Pufferfish/Folia."
-                )
-            );
-    }
-
-    public DAB dab = new DAB();
-    public static class DAB extends Part {
-
-        {
-            option("enabled").docs("Whether DAB is enabled");
-            option("startDistance").docs("Distance in blocks from player at which DAB begins to reduce entity AI tick rate").greaterThan(0.0F);
-            option("maxTickFreq").docs("Maximum AI tick interval (in ticks) for the most distant entities").greaterThan(0.0F);
-            option("activationDistMod").docs("Distance modifier controlling how aggressively AI tick rate scales with distance").greaterThan(0.0F);
-            option("dontEnableIfInWater").docs("Whether to keep entities in water fully active regardless of distance");
-            option("blacklistedEntities").docs("List of entity type names that should never be deactivated by DAB");
-        }
-
-        public boolean enabled = true;
-        public int startDistance = 12;
-        public int maxTickFreq = 20;
-        public int activationDistMod = 8;
-        public boolean dontEnableIfInWater = false;
-        public java.util.List<String> blacklistedEntities = new java.util.ArrayList<>(java.util.Arrays.asList(
-            "villager",
-            "axolotl",
-            "hoglin",
-            "zombified_piglin",
-            "goat"
-        ));
-    }
-
-    // Canvas start - Optimized Powered Rails
-    {
-        option("optimizedPoweredRails")
-            .docs(
-                Style.wrap(
-                    "Optimizes powered rail computation by caching and limiting rail activation range.",
-                    "Reduces redundant block updates and recalculation for powered rails,",
-                    "especially beneficial for servers with extensive rail networks."
-                )
-            );
-    }
-
-    public OptimizedPoweredRails optimizedPoweredRails = new OptimizedPoweredRails();
-    public static class OptimizedPoweredRails extends Part {
-
-        {
-            option("enabled").docs("Whether optimized powered rails is enabled");
-            option("railActivationRange").docs("Maximum distance (in blocks) that a powered rail can activate other rails").greaterThan(0.0F);
-        }
-
-        public boolean enabled = true;
-        public int railActivationRange = 8; // Vanilla signal distance (PoweredRailBlock recursionCount >= 8)
     }
 
     // Canvas start - Async Player Data Save

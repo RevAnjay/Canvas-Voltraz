@@ -85,7 +85,7 @@ public class OptimizedPoweredRails {
     private static boolean findPoweredRailSignalFaster(PoweredRailBlock self, Level level,
                                                        BlockPos pos, BlockState state, boolean searchForward, int distance,
                                                        Object2BooleanOpenHashMap<BlockPos> checkedPos) {
-        if (distance >= io.canvasmc.canvas.GlobalConfiguration.getInstance().optimizedPoweredRails.railActivationRange)
+        if (distance >= io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.optimizedPoweredRails.railActivationRange)
             return false; // Purpur - Config for powered rail activation distance
         int x = pos.getX();
         int y = pos.getY();
@@ -190,7 +190,7 @@ public class OptimizedPoweredRails {
 
     private static void setRailPositionsPower(PoweredRailBlock self, Level level, BlockPos pos,
                                               Object2BooleanOpenHashMap<BlockPos> checkedPos, int[] count, int i, Direction dir) {
-        final int railPowerLimit = io.canvasmc.canvas.GlobalConfiguration.getInstance().optimizedPoweredRails.railActivationRange;
+        final int railPowerLimit = io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.optimizedPoweredRails.railActivationRange;
         for (int z = 1; z < railPowerLimit; z++) {
             BlockPos newPos = pos.relative(dir, z);
             BlockState state = level.getBlockState(newPos);
@@ -215,7 +215,7 @@ public class OptimizedPoweredRails {
 
     private static void setRailPositionsDePower(PoweredRailBlock self, Level level, BlockPos pos,
                                                 int[] count, int i, Direction dir) {
-        final int railPowerLimit = io.canvasmc.canvas.GlobalConfiguration.getInstance().optimizedPoweredRails.railActivationRange;
+        final int railPowerLimit = io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.optimizedPoweredRails.railActivationRange;
         for (int z = 1; z < railPowerLimit; z++) {
             BlockPos newPos = pos.relative(dir, z);
             BlockState state = level.getBlockState(newPos);

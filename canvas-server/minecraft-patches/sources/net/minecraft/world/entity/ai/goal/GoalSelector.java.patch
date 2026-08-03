@@ -7,7 +7,7 @@
  import java.util.EnumMap;
  import java.util.EnumSet;
  import java.util.Map;
-@@ -20,17 +_,29 @@
+@@ -20,22 +_,34 @@
          }
      };
      private final Map<Goal.Flag, WrappedGoal> lockedFlags = new EnumMap<>(Goal.Flag.class);
@@ -39,6 +39,12 @@
      }
  
      // Paper start - EAR 2
+     public boolean inactiveTick(int tickRate, boolean inactive) { // Pufferfish start - DAB
+-        if (inactive && !io.canvasmc.canvas.GlobalConfiguration.getInstance().dab.enabled) tickRate = 4;
++        if (inactive && !io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.dab.enabled) tickRate = 4;
+         tickRate = Math.min(tickRate, 3);
+         this.curRate++;
+         return this.curRate % tickRate == 0;
 @@ -47,7 +_,12 @@
      }
  

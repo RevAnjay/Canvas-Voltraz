@@ -43,15 +43,26 @@
  
      //static AABB maxBB = new AABB(0, 0, 0, 0, 0, 0); // Folia - threaded regions - replaced by local variable
  
-@@ -193,7 +_,7 @@
+@@ -192,15 +_,15 @@
+             if (bbByType[entity.activationType.ordinal()].intersects(entity.getBoundingBox())) { // Folia - threaded regions
                  entity.activatedTick = io.papermc.paper.threadedregions.RegionizedServer.getCurrentTick(); // Folia - threaded regions
                  // Pufferfish start - DAB
-                 if (io.canvasmc.canvas.GlobalConfiguration.getInstance().dab.enabled && entity.getType().dabEnabled &&
+-                if (io.canvasmc.canvas.GlobalConfiguration.getInstance().dab.enabled && entity.getType().dabEnabled &&
 -                    (!entity.isInWater() || entity.getType().is(net.minecraft.tags.EntityTypeTags.CAN_BREATHE_UNDER_WATER))) {
-+                    (!io.canvasmc.canvas.GlobalConfiguration.getInstance().dab.dontEnableIfInWater || entity.getType().is(net.minecraft.tags.EntityTypeTags.CAN_BREATHE_UNDER_WATER) || !entity.isInWater())) { // Leaf - Option for dontEnableIfInWater
++                if (io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.dab.enabled && entity.getType().dabEnabled &&
++                    (!io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.dab.dontEnableIfInWater || entity.getType().is(net.minecraft.tags.EntityTypeTags.CAN_BREATHE_UNDER_WATER) || !entity.isInWater())) { // Leaf - Option for dontEnableIfInWater
                      if (!entity.activatedPriorityReset) {
                          entity.activatedPriorityReset = true;
-                         entity.activatedPriority = io.canvasmc.canvas.GlobalConfiguration.getInstance().dab.maxTickFreq;
+-                        entity.activatedPriority = io.canvasmc.canvas.GlobalConfiguration.getInstance().dab.maxTickFreq;
++                        entity.activatedPriority = io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.dab.maxTickFreq;
+                     }
+                     int squaredDistance = (int) player.distanceToSqr(entity);
+                     entity.activatedPriority = squaredDistance > io.canvasmc.canvas.util.DABConfig.startDistanceSquared ?
+-                      Math.max(1, Math.min(squaredDistance >> io.canvasmc.canvas.GlobalConfiguration.getInstance().dab.activationDistMod, entity.activatedPriority)) :
++                      Math.max(1, Math.min(squaredDistance >> io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.dab.activationDistMod, entity.activatedPriority)) :
+                       1;
+                 } else {
+                     entity.activatedPriority = 1;
 @@ -246,7 +_,7 @@
          }
          // special cases.

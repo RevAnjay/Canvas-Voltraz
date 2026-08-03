@@ -12,7 +12,7 @@ public final class DABConfig {
     private DABConfig() {}
 
     public static void initDabEntities() {
-        GlobalConfiguration.DAB dab = GlobalConfiguration.getInstance().dab;
+        GlobalConfiguration.Performance.DAB dab = GlobalConfiguration.getInstance().performance.dab;
         if (dab == null) return;
         startDistanceSquared = dab.startDistance * dab.startDistance; // Canvas - set before guard
         if (BuiltInRegistries.ENTITY_TYPE.keySet().isEmpty()) return; // Canvas - avoid circular class-init during Blocks.<clinit>

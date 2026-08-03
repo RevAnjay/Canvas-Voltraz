@@ -5,7 +5,7 @@
      @Override
      protected void updateState(BlockState state, Level level, BlockPos pos, Block block) {
 +        // Canvas start - Rail Optimization (ported from Leaf 0224)
-+        if (io.canvasmc.canvas.GlobalConfiguration.getInstance().optimizedPoweredRails.enabled) {
++        if (io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.optimizedPoweredRails.enabled) {
 +            io.canvasmc.canvas.world.block.OptimizedPoweredRails.updateState(this, state, level, pos);
 +            return;
 +        }

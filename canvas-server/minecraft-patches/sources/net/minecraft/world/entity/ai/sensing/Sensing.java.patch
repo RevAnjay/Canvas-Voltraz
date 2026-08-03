@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/ai/sensing/Sensing.java
 +++ b/net/minecraft/world/entity/ai/sensing/Sensing.java
-@@ -1,39 +1,61 @@
+@@ -1,39 +_,61 @@
  package net.minecraft.world.entity.ai.sensing;
  
 -import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -67,15 +67,14 @@
 -            } else {
 -                this.unseen.add(id);
 -            }
--
++        }
+ 
 -            return hasLineOfSight;
-         }
-+
 +        boolean hasLineOfSight = this.mob.hasLineOfSight(entity);
 +        this.seen.put(id, hasLineOfSight ? 1 : 2);
 +        if (this.expiring != null) {
 +            this.expiring[this.currentCacheAddIndex].add(id);
-+        }
+         }
 +        return hasLineOfSight;
      }
  }
