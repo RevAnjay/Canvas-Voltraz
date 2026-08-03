@@ -1,6 +1,9 @@
-# Canvas 1.21.11 (PixelHaven Fork)
+# Canvas 1.21.11 (Voltraz Fork)
 
-A community-maintained fork based on [CanvasMC](https://github.com/CraftCanvasMC/Canvas), running on Minecraft 1.21.11.
+A community-maintained server fork running on Minecraft 1.21.11.
+
+### Lineage Flow
+`Canvas` ➔ [`Canvas-PixelHavenFork`](https://github.com/Holywuya/Canvas-PixelHavenFork) ➔ `Canvas-Voltraz`
 
 Canvas is a high-performance Folia fork designed to provide a stable and efficient regionized multithreading environment for large-scale servers.
 
@@ -139,6 +142,7 @@ Built JAR output location: `canvas-server/build/libs/canvas-paperclip-*.jar`.
 
 ## Credits & Upstream Projects
 
+- [Canvas-PixelHavenFork](https://github.com/Holywuya/Canvas-PixelHavenFork) - Direct upstream fork (PixelHaven)
 - [CanvasMC](https://github.com/CraftCanvasMC/Canvas) - Base project
 - [Folia](https://github.com/PaperMC/Folia) - Regionized multithreading Minecraft server
 - [Paper](https://github.com/PaperMC/Paper) - High performance Minecraft server
