@@ -65,6 +65,7 @@ public final class CanvasFakeChunkManager {
 
     public static final class PlayerFakeChunkSession {
         private final LongSet sentChunks = new LongOpenHashSet();
+        private final LongSet pendingBuilds = new LongOpenHashSet();
 
         public void tick(ServerPlayer player, ServerLevel level, int maxRadius, int maxRate) {
             int playerChunkX = player.chunkPosition().x;
@@ -83,13 +84,27 @@ public final class CanvasFakeChunkManager {
                         int targetZ = playerChunkZ + z;
                         long key = ChunkKeyCodec.pack(targetX, targetZ);
 
-                        if (!sentChunks.contains(key)) {
-                            ClientboundLevelChunkWithLightPacket packet = FakeChunkCache.get().getOrBuild(level, targetX, targetZ);
-                            if (packet != null) {
-                                player.connection.send(packet);
-                                sentChunks.add(key);
-                                sentCount++;
-                            }
+                        if (sentChunks.contains(key) || pendingBuilds.contains(key)) {
+                            continue;
+                        }
+
+                        ClientboundLevelChunkWithLightPacket cached = FakeChunkCache.get().getIfCached(level, targetX, targetZ);
+                        if (cached != null) {
+                            player.connection.send(cached);
+                            sentChunks.add(key);
+                            sentCount++;
+                        } else {
+                            pendingBuilds.add(key);
+                            FakeChunkCache.get().getOrBuildAsync(level, targetX, targetZ).thenAccept(packet -> {
+                                level.getServer().execute(() -> {
+                                    pendingBuilds.remove(key);
+                                    if (packet != null && !player.hasDisconnected() && player.level() == level) {
+                                        player.connection.send(packet);
+                                        sentChunks.add(key);
+                                    }
+                                });
+                            });
+                            sentCount++;
                         }
                     }
                 }
@@ -106,6 +121,7 @@ public final class CanvasFakeChunkManager {
 
         public void clear() {
             sentChunks.clear();
+            pendingBuilds.clear();
         }
     }
 }

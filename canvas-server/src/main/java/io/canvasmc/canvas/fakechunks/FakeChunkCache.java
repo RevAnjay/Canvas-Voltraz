@@ -1,7 +1,9 @@
 package io.canvasmc.canvas.fakechunks;
 
 import io.canvasmc.canvas.GlobalConfiguration;
+import io.canvasmc.canvas.fakechunks.async.ChunkAsyncExecutor;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
@@ -31,7 +33,7 @@ public final class FakeChunkCache {
         return worldCaches.computeIfAbsent(worldId, id -> new ConcurrentHashMap<>());
     }
 
-    public ClientboundLevelChunkWithLightPacket getOrBuild(ServerLevel level, int chunkX, int chunkZ) {
+    public ClientboundLevelChunkWithLightPacket getIfCached(ServerLevel level, int chunkX, int chunkZ) {
         long key = ChunkKeyCodec.pack(chunkX, chunkZ);
         ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
         long now = System.currentTimeMillis();
@@ -40,16 +42,28 @@ public final class FakeChunkCache {
         if (existing != null && existing.expireAtMs > now) {
             return existing.packet;
         }
+        return null;
+    }
+
+    public CompletableFuture<ClientboundLevelChunkWithLightPacket> getOrBuildAsync(ServerLevel level, int chunkX, int chunkZ) {
+        ClientboundLevelChunkWithLightPacket cached = getIfCached(level, chunkX, chunkZ);
+        if (cached != null) {
+            return CompletableFuture.completedFuture(cached);
+        }
 
         LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
         if (chunk == null) {
-            return null;
+            return CompletableFuture.completedFuture(null);
         }
 
-        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
-        long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
-        cache.put(key, new CacheEntry(packet, now + ttlMs));
-        return packet;
+        return CompletableFuture.supplyAsync(() -> {
+            ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
+            long key = ChunkKeyCodec.pack(chunkX, chunkZ);
+            long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
+            ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
+            cache.put(key, new CacheEntry(packet, System.currentTimeMillis() + ttlMs));
+            return packet;
+        }, ChunkAsyncExecutor.get());
     }
 
     public void invalidate(UUID worldId, long chunkKey) {
