@@ -94,6 +94,14 @@ public final class CanvasFakeChunkManager {
                     }
                 }
             }
+
+            if (sentChunks.size() > 4096) {
+                sentChunks.removeIf((long k) -> {
+                    int cx = ChunkKeyCodec.unpackX(k);
+                    int cz = ChunkKeyCodec.unpackZ(k);
+                    return Math.max(Math.abs(cx - playerChunkX), Math.abs(cz - playerChunkZ)) > maxRadius + 4;
+                });
+            }
         }
 
         public void clear() {

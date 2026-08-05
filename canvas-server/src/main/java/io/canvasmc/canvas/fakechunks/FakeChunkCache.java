@@ -42,7 +42,7 @@ public final class FakeChunkCache {
         }
 
         LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
-        if (chunk == null) {
+        if (chunk == null || !chunk.isLoaded()) {
             return null;
         }
 
