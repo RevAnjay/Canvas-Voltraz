@@ -828,6 +828,34 @@ public class GlobalConfiguration extends Part {
         public boolean enabled = true;
     }
 
+    // Canvas start - Fake Chunks Global Settings
+    {
+        option("fakeChunks")
+            .docs(
+                Style.wrap(
+                    "Global settings for client-side extended view distance (fake chunks).",
+                    "Sends cached terrain data to clients beyond vanilla view distance without server-side tick overhead."
+                )
+            );
+    }
+
+    public FakeChunks fakeChunks = new FakeChunks();
+    public static class FakeChunks extends Part {
+
+        {
+            option("enabled").docs("Whether native fake chunks system is globally enabled");
+            option("maxViewDistance").docs("Maximum allowed view distance for fake chunks (e.g. 32)").between(2, 64);
+            option("cacheTtlSeconds").docs("Cache duration in seconds for serialized fake chunk payloads").between(1, 300);
+            option("maxSendingRatePerTick").docs("Maximum fake chunks sent per player tick to smooth network spikes").between(1, 64);
+        }
+
+        public boolean enabled = true;
+        public int maxViewDistance = 32;
+        public int cacheTtlSeconds = 30;
+        public int maxSendingRatePerTick = 8;
+    }
+    // Canvas end - Fake Chunks Global Settings
+
     // Canvas end - Performance-related config sections
 
     {
