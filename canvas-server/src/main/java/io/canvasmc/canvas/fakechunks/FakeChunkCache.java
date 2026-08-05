@@ -60,6 +60,10 @@ public final class FakeChunkCache {
             } else {
                 byte[] nbtBytes = io.canvasmc.canvas.fakechunks.disk.DiskChunkReader.readNbtFromDisk(level, chunkX, chunkZ);
                 if (nbtBytes != null) {
+                    LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
+                    if (deserializedChunk != null) {
+                        packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), null, null);
+                    }
                 }
             }
 
