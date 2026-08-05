@@ -51,17 +51,24 @@ public final class FakeChunkCache {
             return CompletableFuture.completedFuture(cached);
         }
 
-        LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
-        if (chunk == null) {
-            return CompletableFuture.completedFuture(null);
-        }
-
         return CompletableFuture.supplyAsync(() -> {
-            ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
-            long key = ChunkKeyCodec.pack(chunkX, chunkZ);
-            long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
-            ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
-            cache.put(key, new CacheEntry(packet, System.currentTimeMillis() + ttlMs));
+            LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
+            ClientboundLevelChunkWithLightPacket packet = null;
+
+            if (chunk != null) {
+                packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
+            } else {
+                byte[] nbtBytes = io.canvasmc.canvas.fakechunks.disk.DiskChunkReader.readNbtFromDisk(level, chunkX, chunkZ);
+                if (nbtBytes != null) {
+                }
+            }
+
+            if (packet != null) {
+                long key = ChunkKeyCodec.pack(chunkX, chunkZ);
+                long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
+                ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
+                cache.put(key, new CacheEntry(packet, System.currentTimeMillis() + ttlMs));
+            }
             return packet;
         }, ChunkAsyncExecutor.get());
     }
