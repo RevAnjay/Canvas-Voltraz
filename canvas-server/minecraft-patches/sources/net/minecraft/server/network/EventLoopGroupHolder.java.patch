@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/network/EventLoopGroupHolder.java
 +++ b/net/minecraft/server/network/EventLoopGroupHolder.java
-@@ -56,6 +_,56 @@
+@@ -56,7 +_,58 @@
          }
      };
      // Paper end - Unix domain socket support
@@ -55,8 +55,10 @@
 +    }
 +    // Leaf end - Add io_uring support
      private final String type;
++    public String type() { return this.type; }
      private final Class<? extends Channel> channelCls;
      private final Class<? extends ServerChannel> serverChannelCls;
+     private volatile @Nullable EventLoopGroup group;
 @@ -79,15 +_,38 @@
      // Paper start - Unix domain socket support
      public static EventLoopGroupHolder remote(java.net.SocketAddress address, boolean tryNativeTransport) {

@@ -51,6 +51,14 @@
      }
  
      public net.kyori.adventure.text.@Nullable Component remove(ServerPlayer player) { // CraftBukkit - return string // Paper - return Component
+@@ -510,6 +_,7 @@
+ 
+         org.bukkit.event.player.PlayerQuitEvent playerQuitEvent = new org.bukkit.event.player.PlayerQuitEvent(player.getBukkitEntity(), leaveMessage, player.quitReason); // Paper - Adventure & Add API for quit reason
+         this.cserver.getPluginManager().callEvent(playerQuitEvent);
++        io.canvasmc.canvas.fakechunks.CanvasFakeChunkManager.get().removePlayer(player); // Canvas - fake chunks
+         player.getBukkitEntity().disconnect();
+ 
+         if (this.server.isSameThread()) player.doTick(); // SPIGOT-924 // Paper - Improved watchdog support; don't tick during emergency shutdowns
 @@ -561,6 +_,7 @@
          player.getBukkitEntity().packetProcessor.close(); // Folia - region threading
          player.getAdvancements().stopListening();

@@ -95,6 +95,15 @@
  
              if (this.getHealth() != this.lastSentHealth
                  || this.lastSentFood != this.foodData.getFoodLevel()
+@@ -1078,6 +_,8 @@
+                 CriteriaTriggers.LOCATION.trigger(this);
+             }
+ 
++            io.canvasmc.canvas.fakechunks.CanvasFakeChunkManager.get().tickPlayer(this); // Canvas - fake chunks
++
+             // CraftBukkit start - initialize oldLevel, fire PlayerLevelChangeEvent, and tick client-sided world border
+             if (this.oldLevel == -1) {
+                 this.oldLevel = this.experienceLevel;
 @@ -1090,6 +_,16 @@
  
              // Folia - region threading - move to main tick loop where we can detect duplicates

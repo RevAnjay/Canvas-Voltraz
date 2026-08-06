@@ -26,19 +26,28 @@ public final class CanvasFakeChunkManager {
         }
 
         GlobalConfiguration globalConfig = GlobalConfiguration.get();
-        if (!globalConfig.fakeChunks.enabled) {
-            removePlayer(player);
-            return;
-        }
+        boolean globalEnabled = globalConfig != null && globalConfig.fakeChunks != null && globalConfig.fakeChunks.enabled;
 
         if (!(player.level() instanceof ServerLevel level)) {
             return;
         }
 
-        System.out.println("[FakeChunks Debug] Ticking player: " + player.getScoreboardName() + " in level: " + level.getWorld().getName() + " serverViewDist: " + level.serverLevelData.canvas$distanceConfig.viewDistanceOrDefault());
-
         WorldConfig worldConfig = WorldConfig.forWorld(level);
-        if (!worldConfig.fakeChunks.enabled) {
+        boolean worldEnabled = worldConfig != null && worldConfig.fakeChunks != null && worldConfig.fakeChunks.enabled;
+
+        if (player.tickCount % 20 == 0) {
+            System.out.println("[FakeChunks Debug] tickPlayer called for " + player.getScoreboardName() 
+                + " | globalEnabled=" + globalEnabled 
+                + " | worldEnabled=" + worldEnabled 
+                + " | level=" + (level.getWorld() != null ? level.getWorld().getName() : "null"));
+        }
+
+        if (!globalEnabled) {
+            removePlayer(player);
+            return;
+        }
+
+        if (!worldEnabled) {
             removePlayer(player);
             return;
         }

@@ -1,0 +1,10 @@
+--- a/net/minecraft/server/network/ServerConnectionListener.java
++++ b/net/minecraft/server/network/ServerConnectionListener.java
+@@ -78,6 +_,7 @@
+             // Paper start - Use Velocity cipher
+             ServerConnectionListener.LOGGER.info("Paper: Using " + com.velocitypowered.natives.util.Natives.compress.getLoadedVariant() + " compression from Velocity.");
+             ServerConnectionListener.LOGGER.info("Paper: Using " + com.velocitypowered.natives.util.Natives.cipher.getLoadedVariant() + " cipher from Velocity.");
++            ServerConnectionListener.LOGGER.info("Canvas: Using Netty transport type: " + eventLoopGroupHolder.type());
+             // Paper end - Use Velocity cipher
+ 
+             this.channels
