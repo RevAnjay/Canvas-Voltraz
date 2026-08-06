@@ -70,16 +70,26 @@ public final class CanvasFakeChunkManager {
         private final LongSet sentChunks = new LongOpenHashSet();
         private final LongSet pendingBuilds = new LongOpenHashSet();
         private int lastSentRadius = -1;
+        private long lastSentCenterKey = ChunkKeyCodec.pack(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
         public void tick(ServerPlayer player, ServerLevel level, int maxRadius, int maxRate) {
             int playerChunkX = player.chunkPosition().x;
             int playerChunkZ = player.chunkPosition().z;
             int serverViewDist = level.serverLevelData.canvas$distanceConfig.viewDistanceOrDefault();
 
+            long currentCenterKey = ChunkKeyCodec.pack(playerChunkX, playerChunkZ);
+
             if (lastSentRadius != maxRadius) {
                 lastSentRadius = maxRadius;
                 player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
                     new net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket(maxRadius)
+                ));
+            }
+
+            if (lastSentCenterKey != currentCenterKey) {
+                lastSentCenterKey = currentCenterKey;
+                player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
+                    new net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket(playerChunkX, playerChunkZ)
                 ));
             }
 
