@@ -35,6 +35,8 @@ public final class CanvasFakeChunkManager {
             return;
         }
 
+        System.out.println("[FakeChunks Debug] Ticking player: " + player.getScoreboardName() + " in level: " + level.getWorld().getName() + " serverViewDist: " + level.serverLevelData.canvas$distanceConfig.viewDistanceOrDefault());
+
         WorldConfig worldConfig = WorldConfig.forWorld(level);
         if (!worldConfig.fakeChunks.enabled) {
             removePlayer(player);
@@ -81,6 +83,7 @@ public final class CanvasFakeChunkManager {
 
             if (lastSentRadius != maxRadius) {
                 lastSentRadius = maxRadius;
+                System.out.println("[FakeChunks Debug] Sending radius packet: " + maxRadius + " to " + player.getScoreboardName());
                 player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
                     new net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket(maxRadius)
                 ));
@@ -111,6 +114,7 @@ public final class CanvasFakeChunkManager {
 
                         ClientboundLevelChunkWithLightPacket cached = FakeChunkCache.get().getIfCached(level, targetX, targetZ);
                         if (cached != null) {
+                            System.out.println("[FakeChunks Debug] Sending cached fake chunk (" + targetX + ", " + targetZ + ") to " + player.getScoreboardName());
                             player.connection.send(cached);
                             sentChunks.add(key);
                             sentCount++;
@@ -120,8 +124,11 @@ public final class CanvasFakeChunkManager {
                                 level.getServer().execute(() -> {
                                     pendingBuilds.remove(key);
                                     if (packet != null && !player.hasDisconnected() && player.level() == level) {
+                                        System.out.println("[FakeChunks Debug] Sending built fake chunk (" + targetX + ", " + targetZ + ") to " + player.getScoreboardName());
                                         player.connection.send(packet);
                                         sentChunks.add(key);
+                                    } else if (packet == null) {
+                                        System.out.println("[FakeChunks Debug] Failed to read/build fake chunk (" + targetX + ", " + targetZ + ")");
                                     }
                                 });
                             });
