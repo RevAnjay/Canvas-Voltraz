@@ -41,6 +41,8 @@ public final class CanvasFakeChunkManager {
             return;
         }
 
+        io.canvasmc.canvas.fakechunks.netty.CanvasChannelInjector.inject(player);
+
         int maxDist = worldConfig.fakeChunks.maxViewDistance > 0 
             ? worldConfig.fakeChunks.maxViewDistance 
             : globalConfig.fakeChunks.maxViewDistance;
@@ -51,6 +53,7 @@ public final class CanvasFakeChunkManager {
 
     public void removePlayer(ServerPlayer player) {
         if (player != null) {
+            io.canvasmc.canvas.fakechunks.netty.CanvasChannelInjector.uninject(player);
             PlayerFakeChunkSession session = sessions.remove(player.getUUID());
             if (session != null) {
                 session.clear();
