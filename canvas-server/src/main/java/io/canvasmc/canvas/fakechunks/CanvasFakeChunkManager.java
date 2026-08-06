@@ -69,11 +69,19 @@ public final class CanvasFakeChunkManager {
     public static final class PlayerFakeChunkSession {
         private final LongSet sentChunks = new LongOpenHashSet();
         private final LongSet pendingBuilds = new LongOpenHashSet();
+        private int lastSentRadius = -1;
 
         public void tick(ServerPlayer player, ServerLevel level, int maxRadius, int maxRate) {
             int playerChunkX = player.chunkPosition().x;
             int playerChunkZ = player.chunkPosition().z;
             int serverViewDist = level.serverLevelData.canvas$distanceConfig.viewDistanceOrDefault();
+
+            if (lastSentRadius != maxRadius) {
+                lastSentRadius = maxRadius;
+                player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
+                    new net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket(maxRadius)
+                ));
+            }
 
             int sentCount = 0;
 

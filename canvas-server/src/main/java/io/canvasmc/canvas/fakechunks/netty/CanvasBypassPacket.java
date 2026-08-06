@@ -2,8 +2,19 @@ package io.canvasmc.canvas.fakechunks.netty;
 
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.ReferenceCounted;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
 
-public record CanvasBypassPacket(Object payload) implements ReferenceCounted {
+public record CanvasBypassPacket(Object payload) implements ReferenceCounted, Packet<PacketListener> {
+
+    @Override
+    public PacketType<? extends Packet<PacketListener>> type() {
+        return null;
+    }
+
+    @Override
+    public void handle(PacketListener listener) {}
 
     @Override
     public int refCnt() {
