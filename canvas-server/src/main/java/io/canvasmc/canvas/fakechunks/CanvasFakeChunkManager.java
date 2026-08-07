@@ -51,16 +51,10 @@ public final class CanvasFakeChunkManager {
         io.canvasmc.canvas.fakechunks.netty.CanvasChannelInjector.inject(player);
 
         int maxDist = globalConfig.fakeChunks.maxViewDistance;
-
-        try {
-            org.bukkit.entity.Player bukkitPlayer = player.getBukkitEntity();
-            if (bukkitPlayer != null) {
-                int clientDist = bukkitPlayer.getClientViewDistance();
-                if (clientDist > 0) {
-                    maxDist = Math.min(maxDist, clientDist);
-                }
-            }
-        } catch (Throwable ignored) {}
+        int clientDist = player.requestedViewDistance();
+        if (clientDist > 0) {
+            maxDist = Math.min(maxDist, clientDist);
+        }
 
         if (player.connection != null && player.connection.connection != null && player.connection.connection.channel != null) {
             io.netty.channel.Channel channel = player.connection.connection.channel;
@@ -134,7 +128,12 @@ public final class CanvasFakeChunkManager {
             int playerChunkZ = player.chunkPosition().z;
             this.lastPlayerX = playerChunkX;
             this.lastPlayerZ = playerChunkZ;
-            int serverViewDist = level.serverLevelData.canvas$distanceConfig.viewDistanceOrDefault();
+            int serverViewDist = 10;
+            try {
+                if (level.serverLevelData != null && level.serverLevelData.canvas$distanceConfig != null) {
+                    serverViewDist = level.serverLevelData.canvas$distanceConfig.viewDistanceOrDefault();
+                }
+            } catch (Throwable ignored) {}
 
             long currentCenterKey = ChunkKeyCodec.pack(playerChunkX, playerChunkZ);
 
