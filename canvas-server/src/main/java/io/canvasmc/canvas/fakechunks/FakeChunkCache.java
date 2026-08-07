@@ -45,6 +45,13 @@ public final class FakeChunkCache {
         return null;
     }
 
+    private static java.util.BitSet createFullSkyLightMask(ServerLevel level) {
+        int sectionCount = level.getLightEngine().getLightSectionCount();
+        java.util.BitSet mask = new java.util.BitSet(sectionCount);
+        mask.set(0, sectionCount);
+        return mask;
+    }
+
     public CompletableFuture<ClientboundLevelChunkWithLightPacket> getOrBuildAsync(ServerLevel level, int chunkX, int chunkZ) {
         ClientboundLevelChunkWithLightPacket cached = getIfCached(level, chunkX, chunkZ);
         if (cached != null) {
@@ -55,9 +62,11 @@ public final class FakeChunkCache {
 
         ChunkAsyncExecutor.get().execute(() -> {
             try {
+                java.util.BitSet skyLightMask = createFullSkyLightMask(level);
+
                 LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
                 if (chunk != null) {
-                    ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
+                    ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), skyLightMask, null);
                     packet.setReady(true);
                     cacheAndComplete(level, chunkX, chunkZ, packet, future);
                     return;
@@ -67,7 +76,7 @@ public final class FakeChunkCache {
                 if (nbtBytes != null) {
                     LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
                     if (deserializedChunk != null) {
-                        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), null, null);
+                        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), skyLightMask, null);
                         packet.setReady(true);
                         cacheAndComplete(level, chunkX, chunkZ, packet, future);
                         return;
@@ -78,7 +87,7 @@ public final class FakeChunkCache {
                     if (bChunk instanceof org.bukkit.craftbukkit.CraftChunk craftChunk) {
                         net.minecraft.world.level.chunk.ChunkAccess access = craftChunk.getHandle(net.minecraft.world.level.chunk.status.ChunkStatus.FULL);
                         if (access instanceof LevelChunk loadedChunk) {
-                            ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(loadedChunk, level.getLightEngine(), null, null);
+                            ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(loadedChunk, level.getLightEngine(), skyLightMask, null);
                             packet.setReady(true);
                             cacheAndComplete(level, chunkX, chunkZ, packet, future);
                             return;
