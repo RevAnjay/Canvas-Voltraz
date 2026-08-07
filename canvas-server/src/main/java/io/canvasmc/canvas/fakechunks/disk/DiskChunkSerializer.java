@@ -41,11 +41,15 @@ public final class DiskChunkSerializer {
                     return levelChunk;
                 } else if (chunkAccess instanceof ImposterProtoChunk imposter) {
                     return imposter.getWrapped();
+                } else if (chunkAccess != null) {
+                    LOGGER.warn("ChunkAccess for [{}, {}] is type {}, not LevelChunk", chunkX, chunkZ, chunkAccess.getClass().getName());
                 }
+            } else {
+                LOGGER.warn("SerializableChunkData.parse returned null for [{}, {}]", chunkX, chunkZ);
             }
             return null;
         } catch (Exception e) {
-            LOGGER.warn("Failed to deserialize SerializableChunkData for chunk [{}, {}]: {}", chunkX, chunkZ, e.getMessage());
+            LOGGER.warn("Failed to deserialize SerializableChunkData for chunk [{}, {}]: {}", chunkX, chunkZ, e.getMessage(), e);
             return null;
         }
     }
