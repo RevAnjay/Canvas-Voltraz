@@ -128,6 +128,7 @@ public final class CanvasFakeChunkManager {
                             sentChunks.add(key);
                             sentCount++;
                         } else {
+                            System.out.println("[FakeChunks Debug] Requesting async chunk build for (" + targetX + ", " + targetZ + ")");
                             pendingBuilds.add(key);
                             FakeChunkCache.get().getOrBuildAsync(level, targetX, targetZ).thenAccept(packet -> {
                                 level.getServer().execute(() -> {
