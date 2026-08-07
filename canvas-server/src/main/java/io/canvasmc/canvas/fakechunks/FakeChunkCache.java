@@ -52,28 +52,36 @@ public final class FakeChunkCache {
         }
 
         return CompletableFuture.supplyAsync(() -> {
-            LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
-            ClientboundLevelChunkWithLightPacket packet = null;
+            try {
+                LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
+                ClientboundLevelChunkWithLightPacket packet = null;
 
-            if (chunk != null) {
-                packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
-            } else {
-                byte[] nbtBytes = io.canvasmc.canvas.fakechunks.disk.DiskChunkReader.readNbtFromDisk(level, chunkX, chunkZ);
-                if (nbtBytes != null) {
-                    LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
-                    if (deserializedChunk != null) {
-                        packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), null, null);
+                if (chunk != null) {
+                    packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
+                    packet.setReady(true);
+                } else {
+                    byte[] nbtBytes = io.canvasmc.canvas.fakechunks.disk.DiskChunkReader.readNbtFromDisk(level, chunkX, chunkZ);
+                    if (nbtBytes != null) {
+                        LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
+                        if (deserializedChunk != null) {
+                            packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), null, null);
+                            packet.setReady(true);
+                        }
                     }
                 }
-            }
 
-            if (packet != null) {
-                long key = ChunkKeyCodec.pack(chunkX, chunkZ);
-                long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
-                ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
-                cache.put(key, new CacheEntry(packet, System.currentTimeMillis() + ttlMs));
+                if (packet != null) {
+                    long key = ChunkKeyCodec.pack(chunkX, chunkZ);
+                    long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
+                    ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
+                    cache.put(key, new CacheEntry(packet, System.currentTimeMillis() + ttlMs));
+                }
+                return packet;
+            } catch (Throwable t) {
+                System.err.println("[FakeChunks Error] Failed to getOrBuildAsync for chunk [" + chunkX + ", " + chunkZ + "]: " + t.getMessage());
+                t.printStackTrace();
+                return null;
             }
-            return packet;
         }, ChunkAsyncExecutor.get());
     }
 
