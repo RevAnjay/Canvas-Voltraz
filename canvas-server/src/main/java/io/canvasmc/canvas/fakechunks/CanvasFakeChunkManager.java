@@ -75,6 +75,13 @@ public final class CanvasFakeChunkManager {
         return sessions.get(uuid);
     }
 
+    public void resetSession(UUID uuid) {
+        PlayerFakeChunkSession session = sessions.get(uuid);
+        if (session != null) {
+            session.clear();
+        }
+    }
+
     public void removePlayer(ServerPlayer player) {
         if (player != null) {
             io.canvasmc.canvas.fakechunks.netty.CanvasChannelInjector.uninject(player);
@@ -115,6 +122,10 @@ public final class CanvasFakeChunkManager {
                 return true;
             }
             return false;
+        }
+
+        public boolean isSent(long key) {
+            return sentChunks.contains(key);
         }
 
         public void tick(ServerPlayer player, ServerLevel level, int maxRadius, int maxRate) {

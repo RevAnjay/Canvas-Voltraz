@@ -9,6 +9,8 @@ import io.netty.util.ReferenceCountUtil;
 import java.util.UUID;
 import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.network.protocol.game.ClientboundLoginPacket;
+import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
 import net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket;
 
 public final class CanvasPacketHandler extends ChannelOutboundHandlerAdapter {
@@ -53,6 +55,8 @@ public final class CanvasPacketHandler extends ChannelOutboundHandlerAdapter {
                         promise.setSuccess();
                         return;
                     }
+                } else if (msg instanceof ClientboundRespawnPacket || msg instanceof ClientboundLoginPacket) {
+                    session.clear();
                 }
             }
         }
