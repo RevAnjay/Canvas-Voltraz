@@ -51,47 +51,61 @@ public final class FakeChunkCache {
             return CompletableFuture.completedFuture(cached);
         }
 
-        return CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<ClientboundLevelChunkWithLightPacket> future = new CompletableFuture<>();
+
+        ChunkAsyncExecutor.get().execute(() -> {
             try {
                 LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
-                ClientboundLevelChunkWithLightPacket packet = null;
-
                 if (chunk != null) {
-                    packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
+                    ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
                     packet.setReady(true);
-                } else {
-                    byte[] nbtBytes = io.canvasmc.canvas.fakechunks.disk.DiskChunkReader.readNbtFromDisk(level, chunkX, chunkZ);
-                    if (nbtBytes != null) {
-                        LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
-                        if (deserializedChunk != null) {
-                            packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), null, null);
-                            packet.setReady(true);
-                        }
-                    } else {
-                        try {
-                            org.bukkit.Chunk bChunk = level.getWorld().getChunkAtAsync(chunkX, chunkZ, false).get();
-                            if (bChunk instanceof org.bukkit.craftbukkit.CraftChunk craftChunk) {
-                                net.minecraft.world.level.chunk.ChunkAccess access = craftChunk.getHandle(net.minecraft.world.level.chunk.status.ChunkStatus.FULL);
-                                if (access instanceof LevelChunk loadedChunk) {
-                                    packet = new ClientboundLevelChunkWithLightPacket(loadedChunk, level.getLightEngine(), null, null);
-                                    packet.setReady(true);
-                                }
-                            }
-                        } catch (Throwable ignored) {}
+                    cacheAndComplete(level, chunkX, chunkZ, packet, future);
+                    return;
+                }
+
+                byte[] nbtBytes = io.canvasmc.canvas.fakechunks.disk.DiskChunkReader.readNbtFromDisk(level, chunkX, chunkZ);
+                if (nbtBytes != null) {
+                    LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
+                    if (deserializedChunk != null) {
+                        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), null, null);
+                        packet.setReady(true);
+                        cacheAndComplete(level, chunkX, chunkZ, packet, future);
+                        return;
                     }
                 }
 
-                if (packet != null) {
-                    long key = ChunkKeyCodec.pack(chunkX, chunkZ);
-                    long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
-                    ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
-                    cache.put(key, new CacheEntry(packet, System.currentTimeMillis() + ttlMs));
-                }
-                return packet;
+                level.getWorld().getChunkAtAsync(chunkX, chunkZ, false).thenAcceptAsync(bChunk -> {
+                    if (bChunk instanceof org.bukkit.craftbukkit.CraftChunk craftChunk) {
+                        net.minecraft.world.level.chunk.ChunkAccess access = craftChunk.getHandle(net.minecraft.world.level.chunk.status.ChunkStatus.FULL);
+                        if (access instanceof LevelChunk loadedChunk) {
+                            ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(loadedChunk, level.getLightEngine(), null, null);
+                            packet.setReady(true);
+                            cacheAndComplete(level, chunkX, chunkZ, packet, future);
+                            return;
+                        }
+                    }
+                    future.complete(null);
+                }, ChunkAsyncExecutor.get()).exceptionally(err -> {
+                    future.complete(null);
+                    return null;
+                });
+
             } catch (Throwable t) {
-                return null;
+                future.complete(null);
             }
-        }, ChunkAsyncExecutor.get());
+        });
+
+        return future;
+    }
+
+    private void cacheAndComplete(ServerLevel level, int chunkX, int chunkZ, ClientboundLevelChunkWithLightPacket packet, CompletableFuture<ClientboundLevelChunkWithLightPacket> future) {
+        if (packet != null) {
+            long key = ChunkKeyCodec.pack(chunkX, chunkZ);
+            long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
+            ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
+            cache.put(key, new CacheEntry(packet, System.currentTimeMillis() + ttlMs));
+        }
+        future.complete(packet);
     }
 
     public void invalidate(UUID worldId, long chunkKey) {

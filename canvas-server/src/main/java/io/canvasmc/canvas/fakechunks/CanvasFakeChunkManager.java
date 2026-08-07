@@ -141,40 +141,45 @@ public final class CanvasFakeChunkManager {
             }
 
             int sentCount = 0;
+            long[] offsets = io.canvasmc.canvas.fakechunks.planner.ChunkPlannerService.radiusIterationList(maxRadius);
 
-            for (int r = serverViewDist + 1; r <= maxRadius && sentCount < maxRate; r++) {
-                for (int x = -r; x <= r && sentCount < maxRate; x++) {
-                    for (int z = -r; z <= r && sentCount < maxRate; z++) {
-                        if (Math.max(Math.abs(x), Math.abs(z)) != r) {
-                            continue;
-                        }
-                        int targetX = playerChunkX + x;
-                        int targetZ = playerChunkZ + z;
-                        long key = ChunkKeyCodec.pack(targetX, targetZ);
+            for (long offset : offsets) {
+                if (sentCount >= maxRate) {
+                    break;
+                }
+                int relX = ChunkKeyCodec.unpackX(offset);
+                int relZ = ChunkKeyCodec.unpackZ(offset);
+                int dist = Math.max(Math.abs(relX), Math.abs(relZ));
 
-                        if (sentChunks.contains(key) || pendingBuilds.contains(key) || serverChunks.contains(key)) {
-                            continue;
-                        }
+                if (dist <= serverViewDist || dist > maxRadius) {
+                    continue;
+                }
 
-                        ClientboundLevelChunkWithLightPacket cached = FakeChunkCache.get().getIfCached(level, targetX, targetZ);
-                        if (cached != null) {
-                            player.connection.send(cached);
-                            sentChunks.add(key);
-                            sentCount++;
-                        } else {
-                            pendingBuilds.add(key);
-                            FakeChunkCache.get().getOrBuildAsync(level, targetX, targetZ).thenAccept(packet -> {
-                                level.getServer().execute(() -> {
-                                    pendingBuilds.remove(key);
-                                    if (packet != null && !player.hasDisconnected() && player.level() == level) {
-                                        player.connection.send(packet);
-                                        sentChunks.add(key);
-                                    }
-                                });
-                            });
-                            sentCount++;
-                        }
-                    }
+                int targetX = playerChunkX + relX;
+                int targetZ = playerChunkZ + relZ;
+                long key = ChunkKeyCodec.pack(targetX, targetZ);
+
+                if (sentChunks.contains(key) || pendingBuilds.contains(key) || serverChunks.contains(key)) {
+                    continue;
+                }
+
+                ClientboundLevelChunkWithLightPacket cached = FakeChunkCache.get().getIfCached(level, targetX, targetZ);
+                if (cached != null) {
+                    player.connection.send(cached);
+                    sentChunks.add(key);
+                    sentCount++;
+                } else {
+                    pendingBuilds.add(key);
+                    FakeChunkCache.get().getOrBuildAsync(level, targetX, targetZ).thenAccept(packet -> {
+                        level.getServer().execute(() -> {
+                            pendingBuilds.remove(key);
+                            if (packet != null && !player.hasDisconnected() && player.level() == level) {
+                                player.connection.send(packet);
+                                sentChunks.add(key);
+                            }
+                        });
+                    });
+                    sentCount++;
                 }
             }
 
