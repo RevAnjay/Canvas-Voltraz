@@ -60,13 +60,20 @@ public final class FakeChunkCache {
                     packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
                     packet.setReady(true);
                 } else {
+                    System.out.println("[FakeChunks Debug] Reading NBT from disk for chunk (" + chunkX + ", " + chunkZ + ")...");
                     byte[] nbtBytes = io.canvasmc.canvas.fakechunks.disk.DiskChunkReader.readNbtFromDisk(level, chunkX, chunkZ);
                     if (nbtBytes != null) {
+                        System.out.println("[FakeChunks Debug] NBT read successful (" + nbtBytes.length + " bytes) for chunk (" + chunkX + ", " + chunkZ + "). Parsing chunk...");
                         LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
                         if (deserializedChunk != null) {
                             packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), null, null);
                             packet.setReady(true);
+                            System.out.println("[FakeChunks Debug] Chunk parse successful for (" + chunkX + ", " + chunkZ + ")");
+                        } else {
+                            System.out.println("[FakeChunks Debug] Chunk parse returned null for (" + chunkX + ", " + chunkZ + ")");
                         }
+                    } else {
+                        System.out.println("[FakeChunks Debug] NBT read returned null (file/sector empty) for chunk (" + chunkX + ", " + chunkZ + ")");
                     }
                 }
 
