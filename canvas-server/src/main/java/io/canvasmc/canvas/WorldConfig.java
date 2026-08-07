@@ -770,7 +770,7 @@ public class WorldConfig extends Part {
             option("maxViewDistance").docs("Per-world max fake chunk view distance limit (0 = fallback to global limit)").between(0, 64);
         }
 
-        public boolean enabled = true;
+        public boolean enabled = false;
         public int maxViewDistance = 0;
     }
     // Canvas end - Fake Chunks Per-World Settings

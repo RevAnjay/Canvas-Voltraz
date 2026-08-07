@@ -844,12 +844,14 @@ public class GlobalConfiguration extends Part {
 
         {
             option("enabled").docs("Whether native fake chunks system is globally enabled");
+            option("requirePermission").docs("Whether players need permission (canvas.fakechunks.use) to receive fake chunks");
             option("maxViewDistance").docs("Maximum allowed view distance for fake chunks (e.g. 32)").between(2, 64);
             option("cacheTtlSeconds").docs("Cache duration in seconds for serialized fake chunk payloads").between(1, 300);
             option("maxSendingRatePerTick").docs("Maximum fake chunks sent per player tick to smooth network spikes").between(1, 64);
         }
 
-        public boolean enabled = true;
+        public boolean enabled = false;
+        public boolean requirePermission = false;
         public int maxViewDistance = 32;
         public int cacheTtlSeconds = 30;
         public int maxSendingRatePerTick = 8;

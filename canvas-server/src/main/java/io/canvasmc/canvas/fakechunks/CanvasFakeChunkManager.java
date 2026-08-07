@@ -45,6 +45,14 @@ public final class CanvasFakeChunkManager {
             return;
         }
 
+        org.bukkit.entity.Player bukkitPlayer = player.getBukkitEntity();
+        if (globalConfig.fakeChunks.requirePermission) {
+            if (bukkitPlayer != null && !bukkitPlayer.hasPermission("canvas.fakechunks.use")) {
+                removePlayer(player);
+                return;
+            }
+        }
+
         io.canvasmc.canvas.fakechunks.netty.CanvasChannelInjector.inject(player);
 
         int maxDist = worldConfig.fakeChunks.maxViewDistance > 0 
@@ -52,7 +60,6 @@ public final class CanvasFakeChunkManager {
             : globalConfig.fakeChunks.maxViewDistance;
 
         try {
-            org.bukkit.entity.Player bukkitPlayer = player.getBukkitEntity();
             if (bukkitPlayer != null) {
                 int clientDist = bukkitPlayer.getClientViewDistance();
                 if (clientDist > 0) {
