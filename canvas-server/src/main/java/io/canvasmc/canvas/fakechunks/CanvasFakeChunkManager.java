@@ -147,6 +147,7 @@ public final class CanvasFakeChunkManager {
 
             if (lastSentCenterKey != currentCenterKey) {
                 lastSentCenterKey = currentCenterKey;
+                pendingBuilds.clear(); // Clear pending builds on center shift so old distance builds don't block fresh center builds
                 player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
                     new net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket(playerChunkX, playerChunkZ)
                 ));
@@ -186,8 +187,12 @@ public final class CanvasFakeChunkManager {
                         level.getServer().execute(() -> {
                             pendingBuilds.remove(key);
                             if (packet != null && !player.hasDisconnected() && player.level() == level) {
-                                player.connection.send(packet);
-                                sentChunks.add(key);
+                                int curX = player.chunkPosition().x;
+                                int curZ = player.chunkPosition().z;
+                                if (Math.max(Math.abs(targetX - curX), Math.abs(targetZ - curZ)) <= maxRadius) {
+                                    player.connection.send(packet);
+                                    sentChunks.add(key);
+                                }
                             }
                         });
                     });

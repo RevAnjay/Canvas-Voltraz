@@ -35,7 +35,8 @@ public final class CanvasPacketHandler extends ChannelOutboundHandlerAdapter {
             return;
         }
 
-        if (msg instanceof ClientboundSetChunkCacheRadiusPacket) {
+        if (msg instanceof ClientboundSetChunkCacheRadiusPacket radiusPacket) {
+            ctx.channel().attr(MAX_RADIUS_KEY).set(radiusPacket.getRadius());
             ReferenceCountUtil.release(msg);
             promise.setSuccess();
             return;
