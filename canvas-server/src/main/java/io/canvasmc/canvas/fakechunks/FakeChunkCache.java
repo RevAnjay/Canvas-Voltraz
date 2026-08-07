@@ -73,7 +73,17 @@ public final class FakeChunkCache {
                             System.out.println("[FakeChunks Debug] Chunk parse returned null for (" + chunkX + ", " + chunkZ + ")");
                         }
                     } else {
-                        System.out.println("[FakeChunks Debug] NBT read returned null (file/sector empty) for chunk (" + chunkX + ", " + chunkZ + ")");
+                        System.out.println("[FakeChunks Debug] NBT read returned null for (" + chunkX + ", " + chunkZ + "), attempting async fallback load...");
+                        try {
+                            org.bukkit.Chunk bChunk = level.getWorld().getChunkAtAsync(chunkX, chunkZ, false).get();
+                            if (bChunk instanceof org.bukkit.craftbukkit.CraftChunk craftChunk) {
+                                net.minecraft.world.level.chunk.ChunkAccess access = craftChunk.getHandle(net.minecraft.world.level.chunk.status.ChunkStatus.FULL);
+                                if (access instanceof LevelChunk loadedChunk) {
+                                    packet = new ClientboundLevelChunkWithLightPacket(loadedChunk, level.getLightEngine(), null, null);
+                                    packet.setReady(true);
+                                }
+                            }
+                        } catch (Throwable ignored) {}
                     }
                 }
 

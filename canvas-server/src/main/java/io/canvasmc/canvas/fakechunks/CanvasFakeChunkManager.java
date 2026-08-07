@@ -162,7 +162,13 @@ public final class CanvasFakeChunkManager {
                 sentChunks.removeIf((long k) -> {
                     int cx = ChunkKeyCodec.unpackX(k);
                     int cz = ChunkKeyCodec.unpackZ(k);
-                    return Math.max(Math.abs(cx - playerChunkX), Math.abs(cz - playerChunkZ)) > maxRadius + 4;
+                    boolean out = Math.max(Math.abs(cx - playerChunkX), Math.abs(cz - playerChunkZ)) > maxRadius + 4;
+                    if (out) {
+                        player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
+                            new net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket(new net.minecraft.world.level.ChunkPos(cx, cz))
+                        ));
+                    }
+                    return out;
                 });
             }
         }
