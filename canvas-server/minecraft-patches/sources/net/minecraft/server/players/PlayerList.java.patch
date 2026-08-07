@@ -158,12 +158,13 @@
  
      // CraftBukkit start - add a world/entity limited version
      public void broadcastAll(Packet packet, net.minecraft.world.entity.player.Player entityhuman) {
-@@ -944,7 +_,7 @@
+@@ -944,7 +_,8 @@
          } // Paper - Add sendOpLevel API
          // Purpur start - Barrels and enderchests 6 rows
  
 -        if (io.canvasmc.canvas.Config.INSTANCE.containers.enderChestSixRows && io.canvasmc.canvas.Config.INSTANCE.containers.enderChestPermissionRows) {
 +        if (io.canvasmc.canvas.GlobalConfiguration.getInstance().purpurContainers.enderChestSixRows && io.canvasmc.canvas.GlobalConfiguration.getInstance().purpurContainers.enderChestPermissionRows) {
++        player.canvas$hasFakeChunksPermission = player.getBukkitEntity().hasPermission("canvas.fakechunks.use"); // Canvas - fake chunks
              org.bukkit.craftbukkit.entity.CraftHumanEntity bukkit = player.getBukkitEntity();
              if (bukkit.hasPermission("purpur.enderchest.rows.six")) {
                  player.sixRowEnderchestSlotCount = 54;
