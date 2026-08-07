@@ -43,7 +43,7 @@ public final class CanvasFakeChunkManager {
             return;
         }
 
-        if (!player.canvas$hasFakeChunksPermission) {
+        if (globalConfig.fakeChunks.requirePermission && !player.canvas$hasFakeChunksPermission) {
             removePlayer(player);
             return;
         }
