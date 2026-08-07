@@ -49,7 +49,7 @@ public final class DiskChunkSerializer {
             }
             return null;
         } catch (Exception e) {
-            LOGGER.warn("Failed to deserialize SerializableChunkData for chunk [{}, {}]: {}", chunkX, chunkZ, e.getMessage(), e);
+            LOGGER.warn("Failed to deserialize SerializableChunkData for chunk [{}, {}]: {}", chunkX, chunkZ, e.getMessage());
             return null;
         }
     }

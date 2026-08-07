@@ -35,13 +35,6 @@ public final class CanvasFakeChunkManager {
         WorldConfig worldConfig = WorldConfig.forWorld(level);
         boolean worldEnabled = worldConfig != null && worldConfig.fakeChunks != null && worldConfig.fakeChunks.enabled;
 
-        if (player.tickCount % 20 == 0) {
-            System.out.println("[FakeChunks Debug] tickPlayer called for " + player.getScoreboardName() 
-                + " | globalEnabled=" + globalEnabled 
-                + " | worldEnabled=" + worldEnabled 
-                + " | level=" + (level.getWorld() != null ? level.getWorld().getName() : "null"));
-        }
-
         if (!globalEnabled) {
             removePlayer(player);
             return;
@@ -135,7 +128,6 @@ public final class CanvasFakeChunkManager {
 
             if (lastSentRadius != maxRadius) {
                 lastSentRadius = maxRadius;
-                System.out.println("[FakeChunks Debug] Sending radius packet: " + maxRadius + " to " + player.getScoreboardName());
                 player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
                     new net.minecraft.network.protocol.game.ClientboundSetChunkCacheRadiusPacket(maxRadius)
                 ));
@@ -166,22 +158,17 @@ public final class CanvasFakeChunkManager {
 
                         ClientboundLevelChunkWithLightPacket cached = FakeChunkCache.get().getIfCached(level, targetX, targetZ);
                         if (cached != null) {
-                            System.out.println("[FakeChunks Debug] Sending cached fake chunk (" + targetX + ", " + targetZ + ") to " + player.getScoreboardName());
                             player.connection.send(cached);
                             sentChunks.add(key);
                             sentCount++;
                         } else {
-                            System.out.println("[FakeChunks Debug] Requesting async chunk build for (" + targetX + ", " + targetZ + ")");
                             pendingBuilds.add(key);
                             FakeChunkCache.get().getOrBuildAsync(level, targetX, targetZ).thenAccept(packet -> {
                                 level.getServer().execute(() -> {
                                     pendingBuilds.remove(key);
                                     if (packet != null && !player.hasDisconnected() && player.level() == level) {
-                                        System.out.println("[FakeChunks Debug] Sending built fake chunk (" + targetX + ", " + targetZ + ") to " + player.getScoreboardName());
                                         player.connection.send(packet);
                                         sentChunks.add(key);
-                                    } else if (packet == null) {
-                                        System.out.println("[FakeChunks Debug] Failed to read/build fake chunk (" + targetX + ", " + targetZ + ")");
                                     }
                                 });
                             });

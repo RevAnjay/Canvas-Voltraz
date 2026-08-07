@@ -60,20 +60,14 @@ public final class FakeChunkCache {
                     packet = new ClientboundLevelChunkWithLightPacket(chunk, level.getLightEngine(), null, null);
                     packet.setReady(true);
                 } else {
-                    System.out.println("[FakeChunks Debug] Reading NBT from disk for chunk (" + chunkX + ", " + chunkZ + ")...");
                     byte[] nbtBytes = io.canvasmc.canvas.fakechunks.disk.DiskChunkReader.readNbtFromDisk(level, chunkX, chunkZ);
                     if (nbtBytes != null) {
-                        System.out.println("[FakeChunks Debug] NBT read successful (" + nbtBytes.length + " bytes) for chunk (" + chunkX + ", " + chunkZ + "). Parsing chunk...");
                         LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
                         if (deserializedChunk != null) {
                             packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), null, null);
                             packet.setReady(true);
-                            System.out.println("[FakeChunks Debug] Chunk parse successful for (" + chunkX + ", " + chunkZ + ")");
-                        } else {
-                            System.out.println("[FakeChunks Debug] Chunk parse returned null for (" + chunkX + ", " + chunkZ + ")");
                         }
                     } else {
-                        System.out.println("[FakeChunks Debug] NBT read returned null for (" + chunkX + ", " + chunkZ + "), attempting async fallback load...");
                         try {
                             org.bukkit.Chunk bChunk = level.getWorld().getChunkAtAsync(chunkX, chunkZ, false).get();
                             if (bChunk instanceof org.bukkit.craftbukkit.CraftChunk craftChunk) {
@@ -95,8 +89,6 @@ public final class FakeChunkCache {
                 }
                 return packet;
             } catch (Throwable t) {
-                System.err.println("[FakeChunks Error] Failed to getOrBuildAsync for chunk [" + chunkX + ", " + chunkZ + "]: " + t.getMessage());
-                t.printStackTrace();
                 return null;
             }
         }, ChunkAsyncExecutor.get());
