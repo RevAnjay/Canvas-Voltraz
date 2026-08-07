@@ -848,6 +848,7 @@ public class GlobalConfiguration extends Part {
             option("maxViewDistance").docs("Maximum allowed view distance for fake chunks (e.g. 32)").between(2, 64);
             option("cacheTtlSeconds").docs("Cache duration in seconds for serialized fake chunk payloads").between(1, 300);
             option("maxSendingRatePerTick").docs("Maximum fake chunks sent per player tick to smooth network spikes").between(1, 64);
+            option("disabledWorlds").docs("List of world names where fake chunks are disabled");
         }
 
         public boolean enabled = false;
@@ -855,6 +856,7 @@ public class GlobalConfiguration extends Part {
         public int maxViewDistance = 32;
         public int cacheTtlSeconds = 30;
         public int maxSendingRatePerTick = 8;
+        public java.util.List<String> disabledWorlds = java.util.List.of("world_nether", "world_the_end");
     }
     // Canvas end - Fake Chunks Global Settings
 

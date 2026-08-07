@@ -752,27 +752,4 @@ public class WorldConfig extends Part {
         public boolean thunderStopsAfterSleep = true;
     }
 
-    // Canvas start - Fake Chunks Per-World Settings
-    {
-        option("fakeChunks")
-            .docs(
-                Style.wrap(
-                    "Per-world settings for client-side extended view distance (fake chunks)."
-                )
-            );
-    }
-
-    public FakeChunks fakeChunks = new FakeChunks();
-    public static class FakeChunks extends Part {
-
-        {
-            option("enabled").docs("Whether fake chunks system is enabled for this world");
-            option("maxViewDistance").docs("Per-world max fake chunk view distance limit (0 = fallback to global limit)").between(0, 64);
-        }
-
-        public boolean enabled = false;
-        public int maxViewDistance = 0;
-    }
-    // Canvas end - Fake Chunks Per-World Settings
-
 }

@@ -32,15 +32,13 @@ public final class CanvasFakeChunkManager {
             return;
         }
 
-        WorldConfig worldConfig = WorldConfig.forWorld(level);
-        boolean worldEnabled = worldConfig != null && worldConfig.fakeChunks != null && worldConfig.fakeChunks.enabled;
-
         if (!globalEnabled) {
             removePlayer(player);
             return;
         }
 
-        if (!worldEnabled) {
+        String worldName = level.getWorld().getName();
+        if (globalConfig.fakeChunks.disabledWorlds != null && globalConfig.fakeChunks.disabledWorlds.contains(worldName)) {
             removePlayer(player);
             return;
         }
@@ -52,9 +50,7 @@ public final class CanvasFakeChunkManager {
 
         io.canvasmc.canvas.fakechunks.netty.CanvasChannelInjector.inject(player);
 
-        int maxDist = worldConfig.fakeChunks.maxViewDistance > 0 
-            ? worldConfig.fakeChunks.maxViewDistance 
-            : globalConfig.fakeChunks.maxViewDistance;
+        int maxDist = globalConfig.fakeChunks.maxViewDistance;
 
         try {
             org.bukkit.entity.Player bukkitPlayer = player.getBukkitEntity();
