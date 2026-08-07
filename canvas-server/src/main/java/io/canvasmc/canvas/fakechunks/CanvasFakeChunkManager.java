@@ -58,6 +58,16 @@ public final class CanvasFakeChunkManager {
             ? worldConfig.fakeChunks.maxViewDistance 
             : globalConfig.fakeChunks.maxViewDistance;
 
+        try {
+            org.bukkit.entity.Player bukkitPlayer = player.getBukkitEntity();
+            if (bukkitPlayer != null) {
+                int clientDist = bukkitPlayer.getClientViewDistance();
+                if (clientDist > 0) {
+                    maxDist = Math.min(maxDist, clientDist);
+                }
+            }
+        } catch (Throwable ignored) {}
+
         PlayerFakeChunkSession session = sessions.computeIfAbsent(player.getUUID(), uuid -> new PlayerFakeChunkSession());
         session.tick(player, level, maxDist, globalConfig.fakeChunks.maxSendingRatePerTick);
     }

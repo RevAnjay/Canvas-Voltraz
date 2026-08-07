@@ -42,7 +42,7 @@ public final class DiskChunkSerializer {
                 } else if (chunkAccess instanceof ImposterProtoChunk imposter) {
                     return imposter.getWrapped();
                 } else if (chunkAccess != null) {
-                    LOGGER.warn("ChunkAccess for [{}, {}] is type {}, not LevelChunk", chunkX, chunkZ, chunkAccess.getClass().getName());
+                    LOGGER.debug("ChunkAccess for [{}, {}] is type {} (status={}), not LevelChunk", chunkX, chunkZ, chunkAccess.getClass().getName(), chunkAccess.getPersistedStatus());
                 }
             } else {
                 LOGGER.warn("SerializableChunkData.parse returned null for [{}, {}]", chunkX, chunkZ);
