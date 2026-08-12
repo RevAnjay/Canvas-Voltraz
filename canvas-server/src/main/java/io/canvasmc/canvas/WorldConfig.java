@@ -326,6 +326,11 @@ public class WorldConfig extends Part {
 
         public boolean fastOrbs = false;
 
+        {
+            option("allowTeleportationWithPassengers").docs("Allows the Bukkit API to teleport entities with passengers");
+        }
+        public boolean allowTeleportationWithPassengers = false;
+
         public ItemEntities itemEntities = new ItemEntities();
         public static class ItemEntities extends Part {
 

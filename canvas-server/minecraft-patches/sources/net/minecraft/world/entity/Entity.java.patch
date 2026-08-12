@@ -429,6 +429,22 @@
          if (!ServerLevel.isInSpawnableBounds(new BlockPos(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockX(pos), ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockY(pos), ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockZ(pos)))) {
              throw new TeleportValidationException("Destination pos not in spawnable bounds");
          }
+@@ -4398,4 +_,14 @@
+         if ((teleportFlags & TELEPORT_FLAG_TELEPORT_PASSENGERS) != 0L) {
+             if (isPassenger()) throw new TeleportValidationException("Entity is passenger");
++            // Canvas start - allow teleportation with passengers
++            if (isVehicle() && !io.canvasmc.canvas.WorldConfig.getDefaults().entities.allowTeleportationWithPassengers) {
++                for (Entity passenger : new java.util.ArrayList<>(this.getPassengers())) {
++                    passenger.stopRiding(true);
++                    if (passenger instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
++                        serverPlayer.connection.send(new net.minecraft.network.protocol.game.ClientboundSetPassengersPacket(this));
++                    }
++                }
++            }
++            // Canvas end - allow teleportation with passengers
+         } else {
+             if (isVehicle() || isPassenger()) throw new TeleportValidationException("Entity is passenger or vehicle");
+
 @@ -4571,7 +_,7 @@
      public boolean endPortalLogicAsync(BlockPos portalPos) {
          ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this, "Cannot portal entity async");
