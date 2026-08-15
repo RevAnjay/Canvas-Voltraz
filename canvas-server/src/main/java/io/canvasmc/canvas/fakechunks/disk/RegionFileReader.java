@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
@@ -46,7 +46,19 @@ public final class RegionFileReader {
     private static final ThreadLocal<byte[]> DECOMPRESSION_BUF =
         ThreadLocal.withInitial(() -> new byte[DECOMPRESSION_BUFFER_SIZE]);
 
-    private static final Map<String, FileChannel> CHANNEL_CACHE = new ConcurrentHashMap<>();
+    // ponytail: LRU channel cache, unbounded worlds would leak handles; bounded + eviction-close. Swap for a per-world map if handle counts ever matter.
+    private static final Map<String, FileChannel> CHANNEL_CACHE = java.util.Collections.synchronizedMap(new LinkedHashMap<String, FileChannel>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(java.util.Map.Entry<String, FileChannel> eldest) {
+            if (size() > 256) {
+                try {
+                    eldest.getValue().close();
+                } catch (IOException | NullPointerException ignored) {}
+                return true;
+            }
+            return false;
+        }
+    });
 
     private RegionFileReader() {}
 
@@ -65,6 +77,8 @@ public final class RegionFileReader {
         int localZ = chunkZ & REGION_LOCAL_MASK;
         int locationIndex = (localX + localZ * REGION_DIMENSION) * LOCATION_ENTRY_SIZE;
 
+        // Canvas - LRU cap: evicted channels are closed; an in-flight read then hits ClosedChannelException below
+        // and self-heals by reopening on next request. Bounds open file handles without a world-unload hook.
         FileChannel channel = CHANNEL_CACHE.computeIfAbsent(regionFile.getAbsolutePath(), path -> {
             try {
                 return FileChannel.open(regionFile.toPath(), StandardOpenOption.READ);
@@ -145,14 +159,16 @@ public final class RegionFileReader {
     }
 
     public static void clearCache() {
-        for (FileChannel ch : CHANNEL_CACHE.values()) {
-            if (ch != null) {
-                try {
-                    ch.close();
-                } catch (IOException ignored) {}
+        synchronized (CHANNEL_CACHE) {
+            for (FileChannel ch : CHANNEL_CACHE.values()) {
+                if (ch != null) {
+                    try {
+                        ch.close();
+                    } catch (IOException ignored) {}
+                }
             }
+            CHANNEL_CACHE.clear();
         }
-        CHANNEL_CACHE.clear();
         LOCATION_BUF.remove();
         CHUNK_HEADER_BUF.remove();
         DECOMPRESSION_BUF.remove();

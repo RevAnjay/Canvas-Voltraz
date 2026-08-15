@@ -16,6 +16,9 @@ public final class FakeChunkCache {
     public static FakeChunkCache get() { return INSTANCE; }
 
     private final ConcurrentMap<UUID, ConcurrentMap<Long, CacheEntry>> worldCaches = new ConcurrentHashMap<>();
+    private static final long CLEANUP_INTERVAL_MS = 60_000L;
+    private volatile long nextCleanupMs = System.currentTimeMillis() + CLEANUP_INTERVAL_MS;
+    private static final int MAX_ENTRIES_PER_WORLD = 4096;
 
     private FakeChunkCache() {}
 
@@ -38,6 +41,8 @@ public final class FakeChunkCache {
         ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
         long now = System.currentTimeMillis();
 
+        maybeCleanup(now);
+
         CacheEntry existing = cache.get(key);
         if (existing != null && existing.expireAtMs > now) {
             return existing.packet;
@@ -45,6 +50,14 @@ public final class FakeChunkCache {
         return null;
     }
 
+    private void maybeCleanup(long now) {
+        if (now < nextCleanupMs) return;
+        nextCleanupMs = now + CLEANUP_INTERVAL_MS; // unchecked volatile write, at most one extra sweep per interval
+        worldCaches.forEach((worldId, cache) -> {
+            cache.values().removeIf(e -> e.expireAtMs <= now);
+            if (cache.isEmpty()) worldCaches.remove(worldId, cache); // drops dead worlds
+        });
+    }
     private static java.util.BitSet createFullSkyLightMask(ServerLevel level) {
         int sectionCount = level.getLightEngine().getLightSectionCount();
         java.util.BitSet mask = new java.util.BitSet(sectionCount);
@@ -113,6 +126,12 @@ public final class FakeChunkCache {
             long ttlMs = GlobalConfiguration.get().fakeChunks.cacheTtlSeconds * 1000L;
             ConcurrentMap<Long, CacheEntry> cache = getOrCreateCache(level.getWorld().getUID());
             cache.put(key, new CacheEntry(packet, System.currentTimeMillis() + ttlMs));
+            // ponytail: arbitrary eviction keeps the hot path lock-free; use bounded LRU only if hit-rate metrics justify its lock.
+            while (cache.size() > MAX_ENTRIES_PER_WORLD) {
+                var iterator = cache.keySet().iterator();
+                if (!iterator.hasNext()) break;
+                cache.remove(iterator.next());
+            }
         }
         future.complete(packet);
     }
