@@ -1,15 +1,22 @@
 package io.canvasmc.canvas.fakechunks.async;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ChunkAsyncExecutor {
 
     private static final AtomicInteger THREAD_COUNTER = new AtomicInteger(1);
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(
-        Math.max(2, Runtime.getRuntime().availableProcessors() / 2),
+    private static final int WORKERS = Math.max(2, Runtime.getRuntime().availableProcessors() / 2);
+    private static final ExecutorService EXECUTOR = new ThreadPoolExecutor(
+        WORKERS,
+        WORKERS,
+        0L,
+        TimeUnit.MILLISECONDS,
+        new LinkedBlockingQueue<>(WORKERS * 4),
         new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -18,12 +25,18 @@ public final class ChunkAsyncExecutor {
                 t.setPriority(Thread.NORM_PRIORITY - 1);
                 return t;
             }
-        }
+        },
+        // ponytail: caller-runs gives backpressure; split disk/build pools only if profiling shows region-thread stalls.
+        new ThreadPoolExecutor.CallerRunsPolicy()
     );
 
     private ChunkAsyncExecutor() {}
 
     public static ExecutorService get() {
         return EXECUTOR;
+    }
+
+    public static void shutdown() {
+        EXECUTOR.shutdownNow();
     }
 }

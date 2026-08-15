@@ -16,12 +16,14 @@ public final class FakeChunkCache {
     public static FakeChunkCache get() { return INSTANCE; }
 
     private final ConcurrentMap<UUID, ConcurrentMap<Long, CacheEntry>> worldCaches = new ConcurrentHashMap<>();
+    private final ConcurrentMap<CacheKey, CompletableFuture<ClientboundLevelChunkWithLightPacket>> builds = new ConcurrentHashMap<>();
     private static final long CLEANUP_INTERVAL_MS = 60_000L;
     private volatile long nextCleanupMs = System.currentTimeMillis() + CLEANUP_INTERVAL_MS;
     private static final int MAX_ENTRIES_PER_WORLD = 4096;
 
     private FakeChunkCache() {}
 
+    private record CacheKey(UUID worldId, long chunkKey) {}
     private static final class CacheEntry {
         final ClientboundLevelChunkWithLightPacket packet;
         final long expireAtMs;
@@ -71,8 +73,14 @@ public final class FakeChunkCache {
             return CompletableFuture.completedFuture(cached);
         }
 
-        CompletableFuture<ClientboundLevelChunkWithLightPacket> future = new CompletableFuture<>();
+        CacheKey key = new CacheKey(level.getWorld().getUID(), ChunkKeyCodec.pack(chunkX, chunkZ));
+        CompletableFuture<ClientboundLevelChunkWithLightPacket> existing = builds.get(key);
+        if (existing != null) return existing;
 
+        CompletableFuture<ClientboundLevelChunkWithLightPacket> future = new CompletableFuture<>();
+        existing = builds.putIfAbsent(key, future);
+        if (existing != null) return existing;
+        future.whenComplete((packet, error) -> builds.remove(key, future));
         ChunkAsyncExecutor.get().execute(() -> {
             try {
                 java.util.BitSet skyLightMask = createFullSkyLightMask(level);
@@ -148,5 +156,12 @@ public final class FakeChunkCache {
         if (cache != null) {
             cache.clear();
         }
+        builds.keySet().removeIf(key -> key.worldId().equals(worldId));
+    }
+
+    public void clear() {
+        worldCaches.clear();
+        builds.forEach((key, future) -> future.cancel(false));
+        builds.clear();
     }
 }
