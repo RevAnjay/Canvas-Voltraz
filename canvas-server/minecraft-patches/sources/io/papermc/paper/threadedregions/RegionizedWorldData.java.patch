@@ -68,13 +68,16 @@
  
      // misc. fields
      private boolean isHandlingTick;
-@@ -350,6 +_,9 @@
+@@ -350,6 +_,12 @@
      // entities
      // this is copy on write to allow packet processing to iterate safely
      private final CopyOnWriteArrayList<ServerPlayer> localPlayers = new CopyOnWriteArrayList<>();
 +    // Canvas start - Portal rate limiter
 +    public final io.canvasmc.canvas.util.RateThrottler portalRateThrottler = new io.canvasmc.canvas.util.RateThrottler();
 +    // Canvas end - Portal rate limiter
++    // Canvas start - Entity tick limiter
++    public final io.canvasmc.canvas.world.entity.EntityTickLimiter entityTickLimiter = new io.canvasmc.canvas.world.entity.EntityTickLimiter(io.canvasmc.canvas.GlobalConfiguration.getInstance().entityTickLimit.defaultLimit);
++    // Canvas end - Entity tick limiter
      private final NearbyPlayers nearbyPlayers;
      public final io.papermc.paper.threadedregions.EntityScheduler.EntitySchedulerTickList entitySchedulerTickList = new io.papermc.paper.threadedregions.EntityScheduler.EntitySchedulerTickList();
      private final ReferenceList<Entity> allEntities = new ReferenceList<>(EMPTY_ENTITY_ARRAY);

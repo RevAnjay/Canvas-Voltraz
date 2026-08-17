@@ -14,7 +14,11 @@
      }
  
      // Folia start - region threading
-@@ -918,6 +_,7 @@
+@@ -915,9 +_,11 @@
+             }
+ 
+             io.papermc.paper.entity.activation.ActivationRange.activateEntities(this); // Paper - EAR
++            if (io.canvasmc.canvas.GlobalConfiguration.getInstance().entityTickLimit.enabled) regionizedWorldData.entityTickLimiter.tickLimiterStart(); // Canvas - entity tick limiter
              regionizedWorldData // Folia - regionised ticking
                  .forEachTickingEntity( // Folia - regionised ticking
                      entity -> {
@@ -22,11 +26,16 @@
                          if (!entity.isRemoved()) {
                              if (!handleTickState.isEntityFrozen(entity)) { // Canvas - region threading
                                  entity.checkDespawn();
-@@ -932,7 +_,43 @@
+@@ -932,12 +_,54 @@
                                          entity.stopRiding();
                                      }
  
 -                                    this.guardEntityTick(this::tickNonPassenger, entity);
++                                    // Canvas start - entity tick limiter
++                                    if (io.canvasmc.canvas.GlobalConfiguration.getInstance().entityTickLimit.enabled && regionizedWorldData.entityTickLimiter.tickLimiterShouldSkip(entity)) {
++                                        return;
++                                    }
++                                    // Canvas end - entity tick limiter
 +                                    // Canvas start - inline guardEntityTick to avoid lambda allocation
 +                                    if (io.canvasmc.canvas.GlobalConfiguration.getInstance().performance.removeTickGuardLambda) {
 +                                        try {
@@ -67,6 +76,12 @@
                                  }
                              }
                          }
+                     }
+                 );
++            if (io.canvasmc.canvas.GlobalConfiguration.getInstance().entityTickLimit.enabled) regionizedWorldData.entityTickLimiter.tickLimiterFinish(); // Canvas - entity tick limiter
+             this.tickBlockEntities();
+         }
+         // Paper - rewrite chunk system
 @@ -1035,71 +_,73 @@
      // Paper start - optimise random ticking
      private final io.papermc.paper.threadedregions.util.SimpleThreadLocalRandomSource simpleRandom = io.papermc.paper.threadedregions.util.SimpleThreadLocalRandomSource.INSTANCE; // Folia - region threading

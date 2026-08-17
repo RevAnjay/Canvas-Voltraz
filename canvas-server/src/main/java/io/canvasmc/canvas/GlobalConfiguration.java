@@ -889,6 +889,38 @@ public class GlobalConfiguration extends Part {
     }
     // Canvas end - Fake Chunks Global Settings
 
+    // Canvas start - Entity tick limiter
+    {
+        option("entityTickLimit")
+            .docs(
+                Style.wrap(
+                    "Per-region entity tick limiter (ported from Kaiiju/Luminol).",
+                    "When the number of a particular entity type in a region exceeds its limit, entity ticking",
+                    "is throttled (staggered) instead of ticking every entity every tick. This prevents entity farms",
+                    "and large mob populations from overloading a single region's tick loop.",
+                    "",
+                    "Unlike Kaiiju's original, this implements ONLY the tick throttle and deliberately does NOT remove",
+                    "entities. Excess entities are only ticked less frequently, never deleted."
+                )
+            );
+    }
+    public EntityTickLimit entityTickLimit = new EntityTickLimit();
+    public static class EntityTickLimit extends Part {
+
+        {
+            option("enabled")
+                .docs("Whether the entity tick limiter is enabled");
+            option("defaultLimit")
+                .docs(
+                    "Default per-type entity tick limit within a single region. When exceeded, entities of that",
+                    "type are ticked on a staggered rotation. 0 disables (unlimited)."
+                ).greaterThanOrEqualTo(0.0F);
+        }
+
+        public boolean enabled = false;
+        public int defaultLimit = 300;
+    }
+    // Canvas end - Entity tick limiter
     // Canvas end - Performance-related config sections
 
     {
