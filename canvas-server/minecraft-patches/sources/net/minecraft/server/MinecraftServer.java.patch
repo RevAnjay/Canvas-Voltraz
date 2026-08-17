@@ -87,14 +87,17 @@
          try {
              List<ServerPlayer> flushing = new java.util.ArrayList<>(region.world.getCurrentWorldData().getLocalPlayers());
              for (final net.minecraft.server.level.ServerPlayer localPlayer : flushing) {
-@@ -1749,6 +_,7 @@
+@@ -1747,6 +_,10 @@
+             CrashReport crashReport = CrashReport.forThrowable(thrown, "Exception ticking region");
+             region.world.fillReportDetails(crashReport);
              throw new ReportedException(crashReport);
++        } finally {
++            // Canvas - portal rate limiter: always complete the tick window, even on exception, so the throttler
++            // does not get stuck in RECORDING state and crash every subsequent tick with IllegalStateException.
++            region.world.getCurrentWorldData().portalRateThrottler.done();
          }
          // Canvas end - optimize flush calls with region threading
-+        region.world.getCurrentWorldData().portalRateThrottler.done(); // Canvas - portal rate limiter
          if (false && nanos - this.lastServerStatus >= STATUS_EXPIRE_TIME_NANOS) { // Folia - region threading
-             this.lastServerStatus = nanos;
-             this.status = this.buildServerStatus();
 @@ -1873,12 +_,28 @@
          //io.papermc.paper.adventure.providers.ClickCallbackProviderImpl.DIALOG_CLICK_MANAGER.handleQueue(this.tickCount); // Paper // Folia - region threading - moved to global tick
          //this.getFunctions().tick(); // Folia - region threading - TODO Purge functions
