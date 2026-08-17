@@ -606,6 +606,11 @@ public class GlobalConfiguration extends Part {
     {
         option("serverModName").docs("The server mod name displayed in the server list and client info").word();
         option("restoreVanillaEnderPearlBehavior").docs("Restore and fix vanilla ender pearl behavior broken by Folia");
+        option("dontLoadChunksToSpawnPhantoms")
+            .docs(
+                "When enabled, phantom spawns only occur in already-loaded chunks instead of loading",
+                "the chunk at the spawn position. Avoids chunk-loading I/O spikes when spawning phantoms."
+            );
 
         option("displayWorldLoadScreenForPortaling")
             .docs(
@@ -632,6 +637,7 @@ public class GlobalConfiguration extends Part {
 
     public String serverModName = ServerBuildInfo.buildInfo().brandName();
     public boolean restoreVanillaEnderPearlBehavior = false;
+    public boolean dontLoadChunksToSpawnPhantoms = false;
     public boolean displayWorldLoadScreenForPortaling = true;
     public boolean displayWorldLoadScreenForTeleporting = true;
     public boolean cacheMinecraft2BukkitEntityTypeConversion = false;

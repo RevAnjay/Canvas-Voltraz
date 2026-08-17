@@ -1,0 +1,21 @@
+--- a/net/minecraft/world/level/levelgen/PhantomSpawner.java
++++ b/net/minecraft/world/level/levelgen/PhantomSpawner.java
+@@ -53,8 +_,16 @@
+                                             BlockPos blockPos1 = blockPos.above(20 + randomSource.nextInt(15))
+                                                 .east(-10 + randomSource.nextInt(21))
+                                                 .south(-10 + randomSource.nextInt(21));
+-                                            BlockState blockState = level.getBlockState(blockPos1);
+-                                            FluidState fluidState = level.getFluidState(blockPos1);
++                                            // Canvas start - don't load chunks to spawn phantoms
++                                            BlockState blockState;
++                                            if (io.canvasmc.canvas.GlobalConfiguration.getInstance().dontLoadChunksToSpawnPhantoms) {
++                                                blockState = level.getBlockStateIfLoaded(blockPos1);
++                                                if (blockState == null) continue;
++                                            } else {
++                                                blockState = level.getBlockState(blockPos1);
++                                            }
++                                            FluidState fluidState = blockState.getFluidState();
++                                            // Canvas end - don't load chunks to spawn phantoms
+                                             if (NaturalSpawner.isValidEmptySpawnBlock(level, blockPos1, blockState, fluidState, EntityType.PHANTOM)) {
+                                                 SpawnGroupData spawnGroupData = null;
+                                                 int i2 = 1 + randomSource.nextInt(currentDifficultyAt.getDifficulty().getId() + 1);
