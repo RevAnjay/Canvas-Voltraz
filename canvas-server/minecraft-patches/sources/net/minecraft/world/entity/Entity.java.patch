@@ -429,7 +429,8 @@
          if (!ServerLevel.isInSpawnableBounds(new BlockPos(ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockX(pos), ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockY(pos), ca.spottedleaf.moonrise.common.util.CoordinateUtils.getBlockZ(pos)))) {
              throw new TeleportValidationException("Destination pos not in spawnable bounds");
          }
-@@ -4398,4 +_,14 @@
+@@ -4397,6 +_,16 @@
+ 
          if ((teleportFlags & TELEPORT_FLAG_TELEPORT_PASSENGERS) != 0L) {
              if (isPassenger()) throw new TeleportValidationException("Entity is passenger");
 +            // Canvas start - allow teleportation with passengers
@@ -444,7 +445,7 @@
 +            // Canvas end - allow teleportation with passengers
          } else {
              if (isVehicle() || isPassenger()) throw new TeleportValidationException("Entity is passenger or vehicle");
-
+         }
 @@ -4571,7 +_,7 @@
      public boolean endPortalLogicAsync(BlockPos portalPos) {
          ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this, "Cannot portal entity async");

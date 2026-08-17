@@ -79,6 +79,22 @@
                  // Paper end - improve tick loop
  
                  boolean flag = l == 0L;
+@@ -1725,6 +_,7 @@
+         //this.tickCount++; // Folia - region threading
+         //this.tickRateManager.tick(); // Folia - region threading
+         // Canvas start - optimize flush calls with region threading
++        region.world.getCurrentWorldData().portalRateThrottler.begin(); // Canvas - portal rate limiter
+         try {
+             List<ServerPlayer> flushing = new java.util.ArrayList<>(region.world.getCurrentWorldData().getLocalPlayers());
+             for (final net.minecraft.server.level.ServerPlayer localPlayer : flushing) {
+@@ -1749,6 +_,7 @@
+             throw new ReportedException(crashReport);
+         }
+         // Canvas end - optimize flush calls with region threading
++        region.world.getCurrentWorldData().portalRateThrottler.done(); // Canvas - portal rate limiter
+         if (false && nanos - this.lastServerStatus >= STATUS_EXPIRE_TIME_NANOS) { // Folia - region threading
+             this.lastServerStatus = nanos;
+             this.status = this.buildServerStatus();
 @@ -1873,12 +_,28 @@
          //io.papermc.paper.adventure.providers.ClickCallbackProviderImpl.DIALOG_CLICK_MANAGER.handleQueue(this.tickCount); // Paper // Folia - region threading - moved to global tick
          //this.getFunctions().tick(); // Folia - region threading - TODO Purge functions
@@ -180,3 +196,13 @@
      public boolean enforceSecureProfile() {
          return false;
      }
+@@ -2863,8 +_,7 @@
+         }
+     }
+ 
+-    public final java.util.concurrent.ExecutorService chatExecutor = java.util.concurrent.Executors.newCachedThreadPool(
+-        new com.google.common.util.concurrent.ThreadFactoryBuilder().setDaemon(true).setNameFormat("Async Chat Thread - #%d").setUncaughtExceptionHandler(new net.minecraft.DefaultUncaughtExceptionHandlerWithName(net.minecraft.server.MinecraftServer.LOGGER)).build()); // Paper
++    public final java.util.concurrent.ExecutorService chatExecutor = io.canvasmc.canvas.async.ExecutorFactory.buildChatExecutor(); // Canvas - Virtual thread support for chat executor
+     public final ChatDecorator improvedChatDecorator = new io.papermc.paper.adventure.ImprovedChatDecorator(this); // Paper - adventure
+ 
+     public ChatDecorator getChatDecorator() {

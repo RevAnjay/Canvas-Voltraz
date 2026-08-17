@@ -15,6 +15,17 @@
                  if (tileEntity != null) {
                      tileEntity.updateTicks(fromTickOffset, fromRedstoneTimeOffset);
                  }
+@@ -158,6 +_,10 @@
+             for (final ChunkHolder chunkHolder : from.chunkHoldersToBroadcast) {
+                 into.chunkHoldersToBroadcast.add(chunkHolder);
+             }
++            // Canvas start - Portal rate limiter
++            into.portalRateThrottler.mergeWith(from.portalRateThrottler);
++            from.portalRateThrottler.destroy();
++            // Canvas end - Portal rate limiter
+         }
+ 
+         @Override
 @@ -252,7 +_,18 @@
                    //       marked as removed. So if there is no section, it's probably removed!
              }
@@ -35,6 +46,19 @@
                  final int chunkX = pos.getX() >> 4;
                  final int chunkZ = pos.getZ() >> 4;
  
+@@ -326,6 +_,12 @@
+                     into.chunkHoldersToBroadcast.add(chunkHolder);
+                 }
+             }
++            // Canvas start - Portal rate limiter
++            for (final RegionizedWorldData worldData : dataSet) {
++                from.portalRateThrottler.splitInto(worldData.portalRateThrottler);
++            }
++            from.portalRateThrottler.destroy();
++            // Canvas end - Portal rate limiter
+         }
+     };
+ 
 @@ -334,7 +_,7 @@
      private RegionizedServer.WorldLevelData tickData;
  
@@ -44,6 +68,16 @@
  
      // misc. fields
      private boolean isHandlingTick;
+@@ -350,6 +_,9 @@
+     // entities
+     // this is copy on write to allow packet processing to iterate safely
+     private final CopyOnWriteArrayList<ServerPlayer> localPlayers = new CopyOnWriteArrayList<>();
++    // Canvas start - Portal rate limiter
++    public final io.canvasmc.canvas.util.RateThrottler portalRateThrottler = new io.canvasmc.canvas.util.RateThrottler();
++    // Canvas end - Portal rate limiter
+     private final NearbyPlayers nearbyPlayers;
+     public final io.papermc.paper.threadedregions.EntityScheduler.EntitySchedulerTickList entitySchedulerTickList = new io.papermc.paper.threadedregions.EntityScheduler.EntitySchedulerTickList();
+     private final ReferenceList<Entity> allEntities = new ReferenceList<>(EMPTY_ENTITY_ARRAY);
 @@ -365,8 +_,8 @@
      private final LevelTicks<Fluid> fluidLevelTicks;
  
@@ -121,3 +155,22 @@
      }
  
      public NearbyPlayers getNearbyPlayers() {
+@@ -549,6 +_,18 @@
+     public int getPlayerCount() {
+         return this.localPlayers.size();
+     }
++
++    // Canvas start - Portal rate limiter
++    public boolean isPortalTeleportationOutOfRate() {
++        if (!io.canvasmc.canvas.GlobalConfiguration.getInstance().portalRateLimiter.enabled) {
++            return false;
++        }
++        return this.portalRateThrottler.isOutOfRate(io.canvasmc.canvas.GlobalConfiguration.getInstance().portalRateLimiter.maxTeleportsPerTick);
++    }
++    public void increasePortalRate() {
++        this.portalRateThrottler.increase();
++    }
++    // Canvas end - Portal rate limiter
+ 
+     public Iterable<Entity> getLocalEntities() {
+         return this.allEntities;

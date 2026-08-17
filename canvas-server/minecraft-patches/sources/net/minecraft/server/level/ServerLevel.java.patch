@@ -212,6 +212,38 @@
              }
          }
      }
+@@ -1462,8 +_,15 @@
+             // removed from region while ticking
+             return;
+         }
++        // Canvas start - portal rate limiter
++        final io.papermc.paper.threadedregions.RegionizedWorldData portalWorldData = entity.level().getCurrentWorldData();
++        if (entity.portalProcess != null && portalWorldData.isPortalTeleportationOutOfRate()) {
++            return;
++        }
++        // Canvas end - portal rate limiter
+         if (entity.handlePortal()) {
+             // portalled
++            portalWorldData.increasePortalRate(); // Canvas - portal rate limiter
+             return;
+         }
+         // Folia end - region threading
+@@ -1494,8 +_,15 @@
+                 // removed from region while ticking
+                 return;
+             }
++            // Canvas start - portal rate limiter
++            final io.papermc.paper.threadedregions.RegionizedWorldData portalWorldData = passengerEntity.level().getCurrentWorldData();
++            if (passengerEntity.portalProcess != null && portalWorldData.isPortalTeleportationOutOfRate()) {
++                return;
++            }
++            // Canvas end - portal rate limiter
+             if (passengerEntity.handlePortal()) {
+                 // portalled
++                portalWorldData.increasePortalRate(); // Canvas - portal rate limiter
+                 return;
+             }
+             // Folia end - region threading
 @@ -1729,7 +_,7 @@
  
      // CraftBukkit start

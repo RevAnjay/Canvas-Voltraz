@@ -574,6 +574,35 @@ public class GlobalConfiguration extends Part {
         public NettyTransportType nettyTransportType = NettyTransportType.AUTO;
     }
 
+    // Canvas start - Portal rate limiter
+    {
+        option("portalRateLimiter")
+            .docs(
+                Style.wrap(
+                    "Limits how many portal teleportations are handled per tick within a single tick region.",
+                    "When exceeded, the portal teleportation is pushed into the next tick. Prevents portal spam",
+                    "from overloading a region's tick loop (e.g. players mass-teleporting through a nether hub)."
+                )
+            );
+    }
+    public PortalRateLimiter portalRateLimiter = new PortalRateLimiter();
+    public static class PortalRateLimiter extends Part {
+
+        {
+            option("enabled")
+                .docs("Whether or not to limit the portal rate when entities go into portals");
+            option("maxTeleportsPerTick")
+                .docs(
+                    "Decides how much portal teleportation should be handled within a tick in a single tick region.",
+                    "When exceeded, the portal teleportation will be pushed into the next tick"
+                ).greaterThan(0.0F);
+        }
+
+        public boolean enabled = false;
+        public int maxTeleportsPerTick = 200;
+    }
+    // Canvas end - Portal rate limiter
+
     {
         option("serverModName").docs("The server mod name displayed in the server list and client info").word();
         option("restoreVanillaEnderPearlBehavior").docs("Restore and fix vanilla ender pearl behavior broken by Folia");
