@@ -12,6 +12,38 @@
                  this.setUnderLavaMovement();
              } else {
                  this.applyGravity();
+@@ -244,6 +_,12 @@
+ 
+     private void mergeWithNeighbours() {
+         if (this.isMergable()) {
++            final ItemStack item = this.getItem(); // Canvas - cache item for merge checks
++            // Canvas start - skip merge checks for full stacks
++            if (this.isRemoved() || item.getCount() >= item.getMaxStackSize()) {
++                return;
++            }
++            // Canvas end - skip merge checks for full stacks
+             double radius = this.level().spigotConfig.itemMerge; // Spigot
+             for (ItemEntity itemEntity : this.level()
+                 .getEntitiesOfClass(ItemEntity.class, this.getBoundingBox().inflate(radius, this.level().paperConfig().entities.behavior.onlyMergeItemsHorizontally ? 0 : radius - 0.5D, radius), neighbour -> neighbour != this && neighbour.isMergable())) { // Spigot // Paper - configuration to only merge items horizontally
+@@ -256,7 +_,7 @@
+                         }
+                     }
+                     // Paper end - Fix items merging through walls
+-                    this.tryToMerge(itemEntity);
++                    this.tryToMerge(itemEntity, item);
+                     if (this.isRemoved()) {
+                         break;
+                     }
+@@ -270,8 +_,7 @@
+         return this.isAlive() && this.pickupDelay != 32767 && this.age != -32768 && this.age < this.despawnRate && item.getCount() < item.getMaxStackSize(); // Paper - Alternative item-despawn-rate
+     }
+ 
+-    private void tryToMerge(ItemEntity itemEntity) {
+-        ItemStack item = this.getItem();
++    private void tryToMerge(ItemEntity itemEntity, ItemStack item) { // Canvas - reuse cached item
+         ItemStack item1 = itemEntity.getItem();
+         if (Objects.equals(this.target, itemEntity.target) && areMergable(item, item1)) {
+             if (item1.getCount() < item.getCount()) {
 @@ -328,6 +_,15 @@
          return !this.isInvulnerableToBase(damageSource) && this.getItem().canBeHurtBy(damageSource);
      }
