@@ -16,7 +16,7 @@ public final class ChunkAsyncExecutor {
         WORKERS,
         0L,
         TimeUnit.MILLISECONDS,
-        new LinkedBlockingQueue<>(WORKERS * 4),
+        new LinkedBlockingQueue<>(WORKERS * 32),
         new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -26,8 +26,8 @@ public final class ChunkAsyncExecutor {
                 return t;
             }
         },
-        // ponytail: caller-runs gives backpressure; split disk/build pools only if profiling shows region-thread stalls.
-        new ThreadPoolExecutor.CallerRunsPolicy()
+        // DiscardOldest drops stale distant chunk build requests when flooded instead of stalling the calling thread
+        new ThreadPoolExecutor.DiscardOldestPolicy()
     );
 
     private ChunkAsyncExecutor() {}

@@ -150,6 +150,19 @@ public final class CanvasFakeChunkManager {
                 player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
                     new net.minecraft.network.protocol.game.ClientboundSetChunkCacheCenterPacket(playerChunkX, playerChunkZ)
                 ));
+
+                // Eagerly prune and tell client to forget chunks that are now out of view distance
+                sentChunks.removeIf((long k) -> {
+                    int cx = ChunkKeyCodec.unpackX(k);
+                    int cz = ChunkKeyCodec.unpackZ(k);
+                    boolean out = Math.max(Math.abs(cx - playerChunkX), Math.abs(cz - playerChunkZ)) > maxRadius + 2;
+                    if (out) {
+                        player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
+                            new net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket(new net.minecraft.world.level.ChunkPos(cx, cz))
+                        ));
+                    }
+                    return out;
+                });
             }
 
             int sentCount = 0;
@@ -199,11 +212,11 @@ public final class CanvasFakeChunkManager {
                 }
             }
 
-            if (sentChunks.size() > 4096) {
+            if (sentChunks.size() > 2048) {
                 sentChunks.removeIf((long k) -> {
                     int cx = ChunkKeyCodec.unpackX(k);
                     int cz = ChunkKeyCodec.unpackZ(k);
-                    boolean out = Math.max(Math.abs(cx - playerChunkX), Math.abs(cz - playerChunkZ)) > maxRadius + 4;
+                    boolean out = Math.max(Math.abs(cx - playerChunkX), Math.abs(cz - playerChunkZ)) > maxRadius + 2;
                     if (out) {
                         player.connection.send(new io.canvasmc.canvas.fakechunks.netty.CanvasBypassPacket(
                             new net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket(new net.minecraft.world.level.ChunkPos(cx, cz))
