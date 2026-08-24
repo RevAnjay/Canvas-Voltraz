@@ -104,21 +104,9 @@ public final class FakeChunkCache {
                     }
                 }
 
-                level.getWorld().getChunkAtAsync(chunkX, chunkZ, false).thenAcceptAsync(bChunk -> {
-                    if (bChunk instanceof org.bukkit.craftbukkit.CraftChunk craftChunk) {
-                        net.minecraft.world.level.chunk.ChunkAccess access = craftChunk.getHandle(net.minecraft.world.level.chunk.status.ChunkStatus.FULL);
-                        if (access instanceof LevelChunk loadedChunk) {
-                            ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(loadedChunk, level.getLightEngine(), skyLightMask, null);
-                            packet.setReady(true);
-                            cacheAndComplete(level, chunkX, chunkZ, packet, future);
-                            return;
-                        }
-                    }
-                    future.complete(null);
-                }, ChunkAsyncExecutor.get()).exceptionally(err -> {
-                    future.complete(null);
-                    return null;
-                });
+                // If not in memory and not on disk, don't trigger asynchronous generation/loading
+                // via Bukkit API which can violate Folia's tick thread constraints.
+                future.complete(null);
 
             } catch (Throwable t) {
                 future.complete(null);

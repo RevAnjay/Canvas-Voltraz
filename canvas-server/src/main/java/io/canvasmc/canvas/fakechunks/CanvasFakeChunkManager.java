@@ -101,13 +101,13 @@ public final class CanvasFakeChunkManager {
         private int lastPlayerX;
         private int lastPlayerZ;
 
-        public void onServerChunkAdd(int chunkX, int chunkZ) {
+        public synchronized void onServerChunkAdd(int chunkX, int chunkZ) {
             long key = ChunkKeyCodec.pack(chunkX, chunkZ);
             serverChunks.add(key);
             sentChunks.remove(key);
         }
 
-        public boolean onServerChunkRemove(int chunkX, int chunkZ, int maxRadius) {
+        public synchronized boolean onServerChunkRemove(int chunkX, int chunkZ, int maxRadius) {
             long key = ChunkKeyCodec.pack(chunkX, chunkZ);
             serverChunks.remove(key);
             if (sentChunks.contains(key)) {
@@ -119,11 +119,11 @@ public final class CanvasFakeChunkManager {
             return false;
         }
 
-        public boolean isSent(long key) {
+        public synchronized boolean isSent(long key) {
             return sentChunks.contains(key);
         }
 
-        public void tick(ServerPlayer player, ServerLevel level, int maxRadius, int maxRate) {
+        public synchronized void tick(ServerPlayer player, ServerLevel level, int maxRadius, int maxRate) {
             int playerChunkX = player.chunkPosition().x;
             int playerChunkZ = player.chunkPosition().z;
             this.lastPlayerX = playerChunkX;
@@ -197,13 +197,15 @@ public final class CanvasFakeChunkManager {
                     pendingBuilds.add(key);
                     FakeChunkCache.get().getOrBuildAsync(level, targetX, targetZ).thenAccept(packet -> {
                         level.getServer().execute(() -> {
-                            pendingBuilds.remove(key);
-                            if (packet != null && !player.hasDisconnected() && player.level() == level) {
-                                int curX = player.chunkPosition().x;
-                                int curZ = player.chunkPosition().z;
-                                if (Math.max(Math.abs(targetX - curX), Math.abs(targetZ - curZ)) <= maxRadius) {
-                                    player.connection.send(packet);
-                                    sentChunks.add(key);
+                            synchronized (this) {
+                                pendingBuilds.remove(key);
+                                if (packet != null && !player.hasDisconnected() && player.level() == level) {
+                                    int curX = player.chunkPosition().x;
+                                    int curZ = player.chunkPosition().z;
+                                    if (Math.max(Math.abs(targetX - curX), Math.abs(targetZ - curZ)) <= maxRadius) {
+                                        player.connection.send(packet);
+                                        sentChunks.add(key);
+                                    }
                                 }
                             }
                         });
@@ -227,7 +229,7 @@ public final class CanvasFakeChunkManager {
             }
         }
 
-        public void clear() {
+        public synchronized void clear() {
             sentChunks.clear();
             pendingBuilds.clear();
             serverChunks.clear();
