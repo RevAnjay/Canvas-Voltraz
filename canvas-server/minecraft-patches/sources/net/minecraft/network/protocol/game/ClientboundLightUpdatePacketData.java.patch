@@ -1,6 +1,6 @@
 --- a/net/minecraft/network/protocol/game/ClientboundLightUpdatePacketData.java
 +++ b/net/minecraft/network/protocol/game/ClientboundLightUpdatePacketData.java
-@@ -16,30 +_,113 @@
+@@ -16,30 +_,146 @@
  
  public class ClientboundLightUpdatePacketData {
      private static final StreamCodec<ByteBuf, byte[]> DATA_LAYER_STREAM_CODEC = ByteBufCodecs.byteArray(2048);
@@ -161,7 +161,7 @@
      }
  
      public void write(FriendlyByteBuf buffer) {
-@@ -56,23 +_,29 @@
+@@ -56,23 +_,62 @@
          buffer.writeBitSet(this.blockYMask);
          buffer.writeBitSet(this.emptySkyYMask);
          buffer.writeBitSet(this.emptyBlockYMask);
@@ -205,51 +205,52 @@
 +            buffer.writeVarInt(0);
 +        }
 +        // Leaf end - rewrite ClientboundLightUpdatePacketData
++    }
++
++    private static final byte[] FULL_BRIGHT_ARRAY = new byte[2048];
++    static {
++        java.util.Arrays.fill(FULL_BRIGHT_ARRAY, (byte) 0xFF);
++    }
++    private static final java.util.concurrent.ConcurrentHashMap<Integer, byte[][]> FULL_BRIGHT_SECTION_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
++
++    private static byte[][] getFullBrightArrays(int sectionCount) {
++        return FULL_BRIGHT_SECTION_CACHE.computeIfAbsent(sectionCount, count -> {
++            byte[][] arrays = new byte[count][];
++            for (int i = 0; i < count; i++) {
++                arrays[i] = FULL_BRIGHT_ARRAY;
++            }
++            return arrays;
++        });
++    }
++
++    public static ClientboundLightUpdatePacketData createFullBright(ChunkPos chunkPos, int sectionCount, boolean hasSky) {
++        BitSet notSkyEmpty = new BitSet(sectionCount);
++        BitSet notBlockEmpty = new BitSet(sectionCount);
++        BitSet skyEmpty = new BitSet(sectionCount);
++        BitSet blockEmpty = new BitSet(sectionCount);
++        byte[][] fullBrightUpdates = getFullBrightArrays(sectionCount);
++        if (hasSky) {
++            notSkyEmpty.set(0, sectionCount);
++            blockEmpty.set(0, sectionCount);
++            return new ClientboundLightUpdatePacketData(notSkyEmpty, notBlockEmpty, skyEmpty, blockEmpty, fullBrightUpdates, EMPTY_ARRAY);
++        } else {
++            notBlockEmpty.set(0, sectionCount);
++            skyEmpty.set(0, sectionCount);
++            return new ClientboundLightUpdatePacketData(notSkyEmpty, notBlockEmpty, skyEmpty, blockEmpty, EMPTY_ARRAY, fullBrightUpdates);
++        }
++    }
++
++    private ClientboundLightUpdatePacketData(BitSet skyYMask, BitSet blockYMask, BitSet emptySkyYMask, BitSet emptyBlockYMask, byte[][] skyUpdates, byte[][] blockUpdates) {
++        this.skyYMask = skyYMask;
++        this.blockYMask = blockYMask;
++        this.emptySkyYMask = emptySkyYMask;
++        this.emptyBlockYMask = emptyBlockYMask;
++        this.skyUpdates = skyUpdates;
++        this.blockUpdates = blockUpdates;
++        this.skyUpdateCount = skyUpdates.length;
++        this.blockUpdateCount = blockUpdates.length;
      }
  
-    private static final byte[] FULL_BRIGHT_ARRAY = new byte[2048];
-    static {
-        java.util.Arrays.fill(FULL_BRIGHT_ARRAY, (byte) 0xFF);
-    }
-    private static final java.util.concurrent.ConcurrentHashMap<Integer, byte[][]> FULL_BRIGHT_SECTION_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
-
-    private static byte[][] getFullBrightArrays(int sectionCount) {
-        return FULL_BRIGHT_SECTION_CACHE.computeIfAbsent(sectionCount, count -> {
-            byte[][] arrays = new byte[count][];
-            for (int i = 0; i < count; i++) {
-                arrays[i] = FULL_BRIGHT_ARRAY;
-            }
-            return arrays;
-        });
-    }
-
-    public static ClientboundLightUpdatePacketData createFullBright(ChunkPos chunkPos, int sectionCount, boolean hasSky) {
-        BitSet notSkyEmpty = new BitSet(sectionCount);
-        BitSet notBlockEmpty = new BitSet(sectionCount);
-        BitSet skyEmpty = new BitSet(sectionCount);
-        BitSet blockEmpty = new BitSet(sectionCount);
-        byte[][] fullBrightUpdates = getFullBrightArrays(sectionCount);
-        if (hasSky) {
-            notSkyEmpty.set(0, sectionCount);
-            blockEmpty.set(0, sectionCount);
-            return new ClientboundLightUpdatePacketData(notSkyEmpty, notBlockEmpty, skyEmpty, blockEmpty, fullBrightUpdates, EMPTY_ARRAY);
-        } else {
-            notBlockEmpty.set(0, sectionCount);
-            skyEmpty.set(0, sectionCount);
-            return new ClientboundLightUpdatePacketData(notSkyEmpty, notBlockEmpty, skyEmpty, blockEmpty, EMPTY_ARRAY, fullBrightUpdates);
-        }
-    }
-    private ClientboundLightUpdatePacketData(BitSet skyYMask, BitSet blockYMask, BitSet emptySkyYMask, BitSet emptyBlockYMask, byte[][] skyUpdates, byte[][] blockUpdates) {
-        this.skyYMask = skyYMask;
-        this.blockYMask = blockYMask;
-        this.emptySkyYMask = emptySkyYMask;
-        this.emptyBlockYMask = emptyBlockYMask;
-        this.skyUpdates = skyUpdates;
-        this.blockUpdates = blockUpdates;
-        this.skyUpdateCount = skyUpdates.length;
-        this.blockUpdateCount = blockUpdates.length;
-    }
-
      public BitSet getSkyYMask() {
 @@ -84,7 +_,7 @@
      }
