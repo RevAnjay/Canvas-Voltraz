@@ -97,7 +97,11 @@ public final class FakeChunkCache {
                 if (nbtBytes != null) {
                     LevelChunk deserializedChunk = io.canvasmc.canvas.fakechunks.disk.DiskChunkSerializer.parseChunkFromNbt(nbtBytes, level, chunkX, chunkZ);
                     if (deserializedChunk != null) {
-                        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, level.getLightEngine(), skyLightMask, null);
+                        int sectionCount = level.getLightEngine().getLightSectionCount();
+                        boolean hasSky = level.dimensionType().hasSkyLight();
+                        net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData fullBrightLight =
+                            net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData.createFullBright(deserializedChunk.getPos(), sectionCount, hasSky);
+                        ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, fullBrightLight);
                         packet.setReady(true);
                         cacheAndComplete(level, chunkX, chunkZ, packet, future);
                         return;
