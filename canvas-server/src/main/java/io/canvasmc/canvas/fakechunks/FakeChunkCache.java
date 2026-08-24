@@ -60,6 +60,56 @@ public final class FakeChunkCache {
             if (cache.isEmpty()) worldCaches.remove(worldId, cache); // drops dead worlds
         });
     }
+    private static final byte[] FULL_BRIGHT_SECTION = new byte[2048];
+    static {
+        java.util.Arrays.fill(FULL_BRIGHT_SECTION, (byte) 0xFF);
+    }
+    private static final java.util.concurrent.ConcurrentHashMap<Long, net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData> FULL_BRIGHT_PACKET_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData getFullBrightLightData(int sectionCount, boolean hasSky) {
+        long key = (((long) sectionCount) << 1) | (hasSky ? 1L : 0L);
+        return FULL_BRIGHT_PACKET_CACHE.computeIfAbsent(key, k -> {
+            net.minecraft.network.FriendlyByteBuf buf = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
+            try {
+                java.util.BitSet notSkyEmpty = new java.util.BitSet(sectionCount);
+                java.util.BitSet notBlockEmpty = new java.util.BitSet(sectionCount);
+                java.util.BitSet skyEmpty = new java.util.BitSet(sectionCount);
+                java.util.BitSet blockEmpty = new java.util.BitSet(sectionCount);
+
+                if (hasSky) {
+                    notSkyEmpty.set(0, sectionCount);
+                    blockEmpty.set(0, sectionCount);
+                } else {
+                    notBlockEmpty.set(0, sectionCount);
+                    skyEmpty.set(0, sectionCount);
+                }
+
+                buf.writeBitSet(notSkyEmpty);
+                buf.writeBitSet(notBlockEmpty);
+                buf.writeBitSet(skyEmpty);
+                buf.writeBitSet(blockEmpty);
+
+                if (hasSky) {
+                    buf.writeVarInt(sectionCount);
+                    for (int i = 0; i < sectionCount; i++) {
+                        buf.writeByteArray(FULL_BRIGHT_SECTION);
+                    }
+                    buf.writeVarInt(0);
+                } else {
+                    buf.writeVarInt(0);
+                    buf.writeVarInt(sectionCount);
+                    for (int i = 0; i < sectionCount; i++) {
+                        buf.writeByteArray(FULL_BRIGHT_SECTION);
+                    }
+                }
+
+                return new net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData(buf, 0, 0);
+            } finally {
+                buf.release();
+            }
+        });
+    }
+
     private static java.util.BitSet createFullSkyLightMask(ServerLevel level) {
         int sectionCount = level.getLightEngine().getLightSectionCount();
         java.util.BitSet mask = new java.util.BitSet(sectionCount);
@@ -100,7 +150,7 @@ public final class FakeChunkCache {
                         int sectionCount = level.getLightEngine().getLightSectionCount();
                         boolean hasSky = level.dimensionType().hasSkyLight();
                         net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData fullBrightLight =
-                            net.minecraft.network.protocol.game.ClientboundLightUpdatePacketData.createFullBright(deserializedChunk.getPos(), sectionCount, hasSky);
+                            getFullBrightLightData(sectionCount, hasSky);
                         ClientboundLevelChunkWithLightPacket packet = new ClientboundLevelChunkWithLightPacket(deserializedChunk, fullBrightLight);
                         packet.setReady(true);
                         cacheAndComplete(level, chunkX, chunkZ, packet, future);
